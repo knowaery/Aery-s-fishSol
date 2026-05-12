@@ -77,6 +77,7 @@ totalCraftedjp := 0
 potionCraftCount := 1
 fishingFailsafeRan := false
 limboFish := false
+restartingMacro := false
 
 if (FileExist(iniFilePath)) {
     IniRead, tempRes, %iniFilePath%, Macro, resolution
@@ -245,6 +246,7 @@ if (FileExist(iniFilePath)) {
     }
 }
 
+checkGhostServer := false
 
 
 
@@ -565,7 +567,7 @@ Gui, Add, Text, x153 y308 w70 h25 vManualCraftStatus BackgroundTrans, OFF
 Gui, Tab, Private Server
 Gui, Add, Text, x35 y90 w150 h25 BackgroundTrans, Private Server Link:
 Gui, Add, Edit, x35 y115 w515 h25 vPrivateServerInput gUpdatePrivateServer Background0xD3D3D3 cBlack, %privateServerLink%
-
+/*
 Gui, Font, s11 cWhite Bold
 Gui, Add, GroupBox, x33 y185 w534 h100 cWhite, Check For Ghost Server
 Gui, Font, s10 c0xCCCCCC Normal
@@ -574,6 +576,7 @@ Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Button, x45 y245 w80 h25 gToggleCheckGhostServer vCheckGhostServerBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, Text, x143 y248 w70 h25 vCheckGhostServerStatus BackgroundTrans, OFF
+*/
 
 Gui, Font, s11 cWhite Bold
 Gui, Add, GroupBox, x33 y290 w534 h100 cWhite, Biome Detection
@@ -2948,7 +2951,7 @@ RunRejoin() {
     Process, Close, RobloxPlayerBeta.exe
     sleep 2000
     Run, % "powershell -NoProfile -Command ""Start-Process '" . privateServerLink . "'"""
-    sleep 15000s
+    sleep 15000
     WinActivate, ahk_exe RobloxPlayerBeta.exe
     sleep 5000
     EnsureFullScreen()
@@ -2985,7 +2988,9 @@ RunRejoin2() {
     Run, % "powershell -NoProfile -Command ""Start-Process '" . privateServerLink . "'"""
 }
 FishingSpot() {
-    global keyW, keyA
+    global keyW, keyA, azertyPathing, res, toggle, maxLoopCount, fishingLoopCount
+    global strangeControllerLastRun, biomeRandomizerLastRun, checkGhostServerLastRun
+    global startTick, cycleCount, restartingMacro, MaxLoopInput, FishingLoopInput
     keyW := azertyPathing ? "z" : "w"
     keyA := azertyPathing ? "q" : "a"
     Send, {%keyW% Down}
@@ -3025,12 +3030,41 @@ FishingSpot() {
     Sleep, 300
     sleep 200
     Send, {%keyA% Down}
-    sleep 1400
+    sleep 1300
     Send, {%keyA% Up}
     sleep 75
     Send, {%keyW% Down}
     sleep 2670
     Send, {%keyW% Up}
+    if (restartingMacro) {
+        if (MaxLoopInput > 0) {
+            maxLoopCount := MaxLoopInput
+        }
+        if (FishingLoopInput > 0) {
+            fishingLoopCount := FishingLoopInput
+        }
+        toggle := true
+        strangeControllerLastRun := 0
+        biomeRandomizerLastRun := 0
+        checkGhostServerLastRun := 0
+
+        if (startTick = "") {
+            startTick := A_TickCount
+        }
+        if (cycleCount = "") {
+            cycleCount := 0
+        }
+        strangeControllerLastRun := 0
+        biomeRandomizerLastRun := 0
+        checkGhostServerLastRun := 0
+        WinActivate, ahk_exe RobloxPlayerBeta.exe
+        ManualGUIUpdate()
+        EnsureFullscreen()
+        SetTimer, UpdateGUI, 1000
+        SetTimer, DoMouseMove, 100
+        try SendWebhook(":green_circle: Macro Started!", "7909721")
+        restartingMacro := false
+    }
 }
 
 CraftSelected2:
@@ -3151,7 +3185,6 @@ F1::
         ManualGUIUpdate()
         EnsureFullscreen()
         SetTimer, UpdateGUI, 1000
-        WinClose, %ahkPath% ahk_class AutoHotkey
         if (res = "1080p") {
             SetTimer, DoMouseMove, 100
         }
@@ -3441,7 +3474,7 @@ if (toggle) {
         sleep 500
         Click, WheelDown 45
 
-        if (manualCraft && selectedItem2 != "") {
+        if (manualCraft = true && selectedItem2 != "") {
             sleep, 1000
             ManualCraftMovement()
             Sleep, 500
@@ -3589,11 +3622,11 @@ if (toggle) {
             MouseClick, Left
             sleep 200
             Send, {%keyA% Down}
-            sleep 1400
+            sleep 1300
             Send, {%keyA% Up}
             sleep 75
             Send, {%keyW% Down}
-            sleep 2692
+            sleep 2682
             Send, {%keyW% Up}
             loopCount := 0
         }
@@ -3645,6 +3678,40 @@ if (toggle) {
             fishingFailsafeRan := true
             try SendWebhook3(":grey_question: Fishing failsafe was triggered.", "13424349")
         }
+
+        /*
+        if (A_TickCount - startWhitePixelSearch > (180000) && fishingFailsafeRan) {
+            if (privateServerLink != "") {
+                try SendWebhook3("No Activity Detected in 3 Minutes \nRestarting Macro...", "14495300")
+                restartingMacro := true
+                toggle := false
+                SetTimer, DoMouseMove, Off
+                SetTimer, UpdateGUI, Off
+                Send, {w up}
+                Send, {a up}
+                Send, {s up}
+                Send, {d up}
+                Send, {space up}
+                Send, {e up}
+                Send, {esc up}
+                Send, {r up}
+                RunRejoin()
+            } else {
+                try SendWebhook3("No Activity Detected in 3 Minutes \nRestarting Macro without Rejoining...", "14495300")
+                restartingMacro := true
+                toggle := false
+                SetTimer, DoMouseMove, Off
+                SetTimer, UpdateGUI, Off
+                Send, {Esc}
+                Sleep, 650
+                Send, R
+                Sleep, 650
+                Send, {Enter}
+                sleep 10000
+                FishingSpot()
+            }
+        }
+        */
 
         ; PixelSearch loop with 9-second timeout
         startTime := A_TickCount
