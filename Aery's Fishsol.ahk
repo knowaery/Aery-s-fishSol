@@ -14,7 +14,7 @@ if (FileExist(iconFilePath)) {
 res := "1080p"
 maxLoopCount := 30
 fishingLoopCount := 10
-sellAllToggle := false
+sellAllToggle := true
 advancedFishingToggle := false
 pathingMode := "Vip Pathing"
 azertyPathing := false
@@ -74,6 +74,9 @@ totalCrafteddp := 0
 totalCrafteddip := 0
 totalCraftedzp := 0
 totalCraftedjp := 0
+potionCraftCount := 1
+fishingFailsafeRan := false
+limboFish := false
 
 if (FileExist(iniFilePath)) {
     IniRead, tempRes, %iniFilePath%, Macro, resolution
@@ -226,6 +229,10 @@ if (FileExist(iniFilePath)) {
     potionCraftCount := tempPotionCraftCount
     potionCraftCount2 := potionCraftCount
 
+    IniRead, tempLimboFish, %iniFilePath%, Macro, limboFish
+    if (tempLimboFish != "ERROR")
+    limboFish := (tempLimboFish = "true" || tempLimboFish = "1")
+
     IniRead, tempAdvancedThreshold, %iniFilePath%, Macro, advancedFishingThreshold
     if (tempAdvancedThreshold != "ERROR" && tempAdvancedThreshold >= 0 && tempAdvancedThreshold <= 40)
     {
@@ -289,18 +296,12 @@ Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Button, x45 y140 w70 h35 gStartScript vStartBtn c0x00AA00 +0x8000, Start
 Gui, Add, Button, x125 y140 w70 h35 gPauseScript vPauseBtn c0xFFAA00 +0x8000, Pause
 Gui, Add, Button, x205 y140 w70 h35 gCloseScript vStopBtn c0xFF4444 +0x8000, Stop
+Gui, Add, Text, x45 y180 w80 h25 BackgroundTrans, Resolution:
+Gui, Font, s11 cWhite Bold
+Gui, Add, Text, x120 y178 w80 h25 BackgroundTrans, 1080p
 
 
-Gui, Add, GroupBox, x305 y85 w260 h120 cWhite, Configuration
-Gui, Font, s10 cWhite Bold
-Gui, Add, Text, x320 y110 w80 h25 BackgroundTrans, Resolution:
-Gui, Font, s13 cWhite Bold
-Gui, Add, Text, x320 y135 w80 h25 BackgroundTrans, 1080p
-
-Gui, Font, s10 cWhite Bold
-Gui, Add, Button, x320 y170 w100 h25 gToggleSellAll vSellAllBtn, Toggle Sell All
-Gui, Font, s10 c0xCCCCCC
-Gui, Add, Text, x435 y174 w100 h25 vSellAllStatus BackgroundTrans, OFF
+Gui, Add, GroupBox, x305 y85 w260 h120 cWhite, Limbo Fish
 
 Gui, Add, GroupBox, x30 y215 w535 h120 cWhite, Loop Count Settings
 Gui, Font, s10 cWhite Bold
@@ -893,6 +894,13 @@ if (biomeDetect) {
     GuiControl,, BiomeDetectStatus, OFF
     GuiControl, +c0xFF4444, BiomeDetectStatus
 }
+if (limboFish) {
+    GuiControl,, LimboFishStatus, ON
+    GuiControl, +c0x00DD00, LimboFishStatus
+} else {
+    GuiControl,, LimboFishStatus, OFF
+    GuiControl, +c0xFF4444, LimboFishStatus
+}
 
 SetTimer, AuraBiomeDetect, 1000
 
@@ -1292,6 +1300,18 @@ ToggleBiomeDetect:
     IniWrite, % (biomeDetect ? "true" : "false"), %iniFilePath%, Macro, biomeDetect
 return
 
+ToggleLimboFish:
+    limboFish := !limboFish
+    if (limboFish) {
+        GuiControl,, LimboFishStatus, ON
+        GuiControl, +c0x00DD00, LimboFishStatus
+    } else {
+        GuiControl,, LimboFishStatus, OFF
+        GuiControl, +c0xFF4444, LimboFishStatus
+    }
+    IniWrite, % (limboFish ? "true" : "false"), %iniFilePath%, Macro, limboFish
+return
+
 
 UpdatePrivateServer:
     Gui, Submit, NoHide
@@ -1622,7 +1642,7 @@ global auracolor := 0
                 pendingSkips := true
             }
 
-            if ((detectGlobal || detectTrans) && (prevBiome = "GLITCHED" || prevBiome = "DREAMSPACE" || prevBiome = "CYBERSPACE" || prevBiome = "SINGULARITY") && (biome != prevBiome)) {
+            if ((toggle) && (detectGlobal || detectTrans) && (prevBiome = "GLITCHED" || prevBiome = "DREAMSPACE" || prevBiome = "CYBERSPACE" || prevBiome = "SINGULARITY") && (biome != prevBiome)) {
                 ClipBiome()
             }
 
@@ -3174,6 +3194,14 @@ F2::
 return
 
 F3::
+    Send, {w up}
+    Send, {a up}
+    Send, {s up}
+    Send, {d up}
+    Send, {space up}
+    Send, {e up}
+    Send, {esc up}
+    Send, {r up}
     if (toggle) {
         try SendWebhook(":red_circle: Macro Stopped.", "0")
     } else if (autocrafting) {
@@ -3598,7 +3626,7 @@ if (toggle) {
         }
         }
 
-        if (A_TickCount - startWhitePixelSearch > (31 * 1000) && !fishingFailsafeRan) {
+        if (A_TickCount - startWhitePixelSearch > (31000) && !fishingFailsafeRan) {
             MouseMove, 1368, 950, 3
             sleep 300
             MouseClick, Left
@@ -3615,6 +3643,7 @@ if (toggle) {
             sleep 300
             MouseClick, Left
             fishingFailsafeRan := true
+            try SendWebhook3(":grey_question: Fishing failsafe was triggered.", "13424349")
         }
 
         ; PixelSearch loop with 9-second timeout
