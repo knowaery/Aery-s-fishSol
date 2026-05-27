@@ -74,9 +74,13 @@ totalCraftedzp := 0 ;zombie potion
 totalCraftedjp := 0 ;jewelry potion
 potionCraftCount := 1
 fishingFailsafeRan := false
-limboFish := false
+restartMacroFailsafe := false
 restartingMacro := false
-
+biomeSelector := false
+selectedBiome := "Corruption"
+biomeSelectorTime := 600000
+biomeSelectorInterval := 6000000
+biomeSelectorLastRun := 0
 if (FileExist(iniFilePath)) {
     IniRead, tempRes, %iniFilePath%, Macro, resolution
     if (tempRes != "ERROR")
@@ -228,14 +232,19 @@ if (FileExist(iniFilePath)) {
     potionCraftCount := tempPotionCraftCount
     potionCraftCount2 := potionCraftCount
 
-    IniRead, tempLimboFish, %iniFilePath%, Macro, limboFish
-    if (tempLimboFish != "ERROR")
-    limboFish := (tempLimboFish = "true" || tempLimboFish = "1")
+    IniRead, tempRestartMacroFailsafe, %iniFilePath%, Macro, restartMacroFailsafe
+    if (tempRestartMacroFailsafe != "ERROR")
+    restartMacroFailsafe := (tempRestartMacroFailsafe = "true" || tempRestartMacroFailsafe = "1")
 
     IniRead, tempAdvancedThreshold, %iniFilePath%, Macro, advancedFishingThreshold
     if (tempAdvancedThreshold != "ERROR" && tempAdvancedThreshold >= 0 && tempAdvancedThreshold <= 40)
     {
         advancedFishingThreshold := tempAdvancedThreshold
+    }
+    IniRead, tempBiomeSelector, %iniFilePath%, "Macro", "biomeSelector"
+    if (tempBiomeSelector != "ERROR")
+    {
+        biomeSelector := (tempBiomeSelector = "true" || tempBiomeSelector = "1")
     }
     for i, aura in AuraListOrder {
         IniRead, tempEnabled, %iniFilePath%, EnabledAuras, %aura%
@@ -250,7 +259,7 @@ IniWrite, false, %iniFilePath%, Macro, checkGhostServer
 
 
 
-version := "Aery's v1.6"
+version := "Aery's v1.61"
 
 devNames    := [["maxstellar","ivelchampion249","cresqnt"],["maxstellar","cresqnt","ivelchampion249"],["cresqnt","ivelchampion249","maxstellar"],["cresqnt","maxstellar","ivelchampion249"],["ivelchampion249","maxstellar","cresqnt"],["ivelchampion249","cresqnt","maxstellar"]]
 devRoles    := {"maxstellar":"Lead Developer","ivelchampion249":"Original Creator","cresqnt":"Frontend Developer", "Nadir Rift":"General Programmer"}
@@ -268,7 +277,7 @@ dev3_img :=  A_ScriptDir . "\img\yui3.png"
 
 Gui, Color, 041024
 Gui, Font, s15 cWhite Bold, Segoe UI
-Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.6
+Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.61
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Text, x160 y35 w290 h20 Center BackgroundTrans c0xFFAA00, (Only Works In 1080p and Needs VIP)
 
@@ -302,7 +311,13 @@ Gui, Font, s11 cWhite Bold
 Gui, Add, Text, x120 y178 w80 h25 BackgroundTrans, 1080p
 
 
-Gui, Add, GroupBox, x305 y85 w260 h120 cWhite, Limbo Fish
+Gui, Add, GroupBox, x305 y85 w260 h120 cWhite, Restart Macro Failsafe
+Gui, Font, s9 cWhite Normal
+Gui, Add, Text, x318 y105 h45 w240 BackgroundTrans c0xCCCCCC, Toggle if you want the macro to automatically restart if it detects that nothing has happened in 5 minutes.
+Gui, Font, s10 cWhite Bold
+Gui, Add, Button, x318 y160 w80 h25 gToggleRestartMacroFailsafe vRestartMacroFailsafeBtn, Toggle
+Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Add, Text, x405 y163 w60 h25 vRestartMacroFailsafeStatus BackgroundTrans, OFF
 
 Gui, Add, GroupBox, x30 y215 w535 h120 cWhite, Loop Count Settings
 Gui, Font, s10 cWhite Bold
@@ -647,7 +662,7 @@ Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y490 w480 h1 0x10 BackgroundTrans
 
 Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y500 w500 h15 BackgroundTrans, Aery's fishSol v1.6 (2026-05-03)
+Gui, Add, Text, x50 y500 w500 h15 BackgroundTrans, Aery's fishSol v1.61 (2026-05-27)
 Gui, Add, Text, x300 y500 w500 h15 BackgroundTrans, If you need help, message me on discord. (noaery)
 Gui, Add, Text, x50 y525 w500 h15 BackgroundTrans c0x0088FF gReleasesClick +0x200, https://github.com/knowaery/Aery-s-Fishsol
 
@@ -658,7 +673,7 @@ Gui, Add, GroupBox, x33 y270 w534 h120 cWhite, Detect and Contract Eden (Tempora
 Gui, Font, s8 c0xCCCCCC Normal
 Gui, Add, Text, x45 y363 w520 h145 BackgroundTrans, Not tested, not much thought into it, sorry if it dont work
 Gui, Font, s10 c0xCCCCCC Normal
-Gui, Add, Text, x45 y290 w520 h145 BackgroundTrans, Automatically detects if Eden has spawned in and contracts with it. (Uses Check Pixels so it may not be fully accurate, but should work in most cases)
+Gui, Add, Text, x45 y290 w520 h145 BackgroundTrans, Automatically detects if Eden has spawned in and contracts with it. (You must stand where it spawns.)
 Gui, Font, s10 cWhite Bold
 Gui, Add, Text, x230 y330 w400 h135 BackgroundTrans, ! This automatically starts when toggle is ON !
 Gui, Font, s10 cWhite Bold, Segoe UI
@@ -677,9 +692,35 @@ Gui, Add, Text, x46 y160 w90 h20 BackgroundTrans, Delay (sec):
 Gui, Font, s9 cBlack Bold
 Gui, Add, Edit, x131 y160 w60 h22 vAutoClickDelay, 60
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x43 y110 w255 h135 BackgroundTrans c0xCCCCCC, Automatically clicks after the desired seconds to prevent disconnection.
+Gui, Add, Text, x43 y110 w255 h135 BackgroundTrans c0xCCCCCC, Automatically clicks after the desired seconds.
+/*
+Gui, Font, s11 cWhite Bold
+Gui, Add, Text, x45 y446 w150 h25 BackgroundTrans, Biome Selector:
+Gui, Font, s10 cWhite Bold
+Gui, Add, Button, x200 y457 w80 h25 gToggleBiomeSelector vBiomeSelectorBtn, Toggle
+Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Add, Text, x290 y462 w60 h25 vBiomeSelectorStatus BackgroundTrans, OFF
 
-Gui, Show, w600 h570,  Aery's fishSol v1.6
+
+Gui, Add, Progress, x41 y456 w1 h27 Background696868
+Gui, Add, Progress, x190 y456 w1 h27 Background696868
+Gui, Add, Progress, x41 y482 w149 h1 Background696868
+Gui, Add, Progress, x159 y456 w31 h1 Background696868
+Gui, Font, s10 cWhite Normal
+Gui, Add, Text, x47 y464 w500 h40 BackgroundTrans c0xCCCCCC, Uses every 60 minutes.
+
+Gui, Font, s10 cWhite Normal
+Gui, Add, Text, x327 y462 w500 h15 BackgroundTrans, Automatically uses Biome Selector.
+
+Gui, Font, s11 cWhite Bold
+Gui, Add, Text, x45 y495 w150 h25 BackgroundTrans, Select Biome:
+Gui, Font, s10 cWhite Bold
+Gui, Add, DropDownList, x200 y497 w100 h200 vSelectedBiome gUpdateSelectedBiome, Windy|Snowy|Rainy|Heaven|Hell|Starfall|Corruption|SandStorm|Null
+Gui, Font, s10 cWhite Normal
+Gui, Add, Text, x315 y493 w250 h100 BackgroundTrans, Select what biome you want to be used with the Biome Selector. Use at your own risk, it has not been tested.
+*/
+
+Gui, Show, w600 h570,  Aery's fishSol v1.61
 
 GuiControl, Choose, Resolution, 1
 
@@ -896,14 +937,24 @@ if (biomeDetect) {
     GuiControl,, BiomeDetectStatus, OFF
     GuiControl, +c0xFF4444, BiomeDetectStatus
 }
-if (limboFish) {
-    GuiControl,, LimboFishStatus, ON
-    GuiControl, +c0x00DD00, LimboFishStatus
+
+if (restartMacroFailsafe) {
+    GuiControl,, RestartMacroFailsafeStatus, ON
+    GuiControl, +c0x00DD00, RestartMacroFailsafeStatus
 } else {
-    GuiControl,, LimboFishStatus, OFF
-    GuiControl, +c0xFF4444, LimboFishStatus
+    GuiControl,, RestartMacroFailsafeStatus, OFF
+    GuiControl, +c0xFF4444, RestartMacroFailsafeStatus
 }
 
+if (biomeSelector) {
+    GuiControl,, BiomeSelectorStatus, ON
+    GuiControl, +c0x00DD00, BiomeSelectorStatus
+} else {
+    GuiControl,, BiomeSelectorStatus, OFF
+    GuiControl, +c0xFF4444, BiomeSelectorStatus
+}
+
+GuiControl, ChooseString, SelectedBiome, %selectedBiome%
 SetTimer, AuraBiomeDetect, 1000
 
 
@@ -972,6 +1023,12 @@ UpdatePotionCraft:
         potionCraftCount := PotionCraftInput
         IniWrite, %potionCraftCount%, %iniFilePath%, Macro, potionCraftCount
     }
+return
+
+UpdateSelectedBiome:
+    Gui, Submit, nohide
+    selectedBiome := SelectedBiome
+    IniWrite, %selectedBiome%, %iniFilePath%, "Macro", "selectedBiome"
 return
 
 ToggleSellAll:
@@ -1302,18 +1359,29 @@ ToggleBiomeDetect:
     IniWrite, % (biomeDetect ? "true" : "false"), %iniFilePath%, Macro, biomeDetect
 return
 
-ToggleLimboFish:
-    limboFish := !limboFish
-    if (limboFish) {
-        GuiControl,, LimboFishStatus, ON
-        GuiControl, +c0x00DD00, LimboFishStatus
+ToggleRestartMacroFailsafe:
+    restartMacroFailsafe := !restartMacroFailsafe
+    if (restartMacroFailsafe) {
+        GuiControl,, RestartMacroFailsafeStatus, ON
+        GuiControl, +c0x00DD00, RestartMacroFailsafeStatus
     } else {
-        GuiControl,, LimboFishStatus, OFF
-        GuiControl, +c0xFF4444, LimboFishStatus
+        GuiControl,, RestartMacroFailsafeStatus, OFF
+        GuiControl, +c0xFF4444, RestartMacroFailsafeStatus
     }
-    IniWrite, % (limboFish ? "true" : "false"), %iniFilePath%, Macro, limboFish
+    IniWrite, % (restartMacroFailsafe ? "true" : "false"), %iniFilePath%, Macro, restartMacroFailsafe
 return
 
+ToggleBiomeSelector:
+    biomeSelector := !biomeSelector
+    if (biomeSelector) {
+        GuiControl,, BiomeSelectorStatus, ON
+        GuiControl, +c0x00DD00, BiomeSelectorStatus
+    } else {
+        GuiControl,, BiomeSelectorStatus, OFF
+        GuiControl, +c0xFF4444, BiomeSelectorStatus
+    }
+    IniWrite, % (biomeSelector ? "true" : "false"), %iniFilePath%, Macro, biomeSelector
+return
 
 UpdatePrivateServer:
     Gui, Submit, NoHide
@@ -1441,7 +1509,7 @@ global auracolor := 0
                             . """embeds"": [{"
                             . """description"": "" ### Aura Equipped - " auraName ""","
                             . """color"": " auracolor ","
-                            . """footer"": {""text"": ""Aery's fishSol v1.6"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                            . """footer"": {""text"": ""Aery's fishSol v1.61"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                             . """timestamp"": """ timestamp """"
                             . "}]}"
 
@@ -1457,7 +1525,7 @@ global auracolor := 0
                                 . """embeds"": [{"
                                 . """description"": "" ### Aura Equipped - " auraName ""","
                                 . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.6"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                                . """footer"": {""text"": ""Aery's fishSol v1.61"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                                 . """timestamp"": """ timestamp """"
                                 . "}]}"
                             http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
@@ -1469,7 +1537,7 @@ global auracolor := 0
                                 . """embeds"": [{"
                                 . """description"": "" ### Aura Equipped - " auraName ""","
                                 . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.6"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                                . """footer"": {""text"": ""Aery's fishSol v1.61"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                                 . """timestamp"": """ timestamp """"
                                 . "}]}"
                             http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
@@ -1485,7 +1553,7 @@ global auracolor := 0
                                 . """embeds"": [{"
                                 . """description"": "" ### Aura Equipped - " auraName ""","
                                 . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.6"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                                . """footer"": {""text"": ""Aery's fishSol v1.61"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                                 . """timestamp"": """ timestamp """"
                                 . "}]}"
                             http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
@@ -1541,7 +1609,7 @@ global auracolor := 0
                 } else if (auraName = "illusionary") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**<>;'100110101000110101002010-,><';[][[[[][100011001l} \nThe Ultimate ####'# \nP█e█r█f#█3█cT p█##UpP█3█T  ** \n**:)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :) **\n**(:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (: **" auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Illusionary_curation.gif")
+                        SendWebhook2("**<>;'10011010100011101002010-,><';[][[[[][100011001l} \nThe Ultimate ####'# \nP█e█r█f#█3█cT p█##UpP█3█T  ** \n**:)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :) **\n**(:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (: **" auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Illusionary_curation.gif")
                     }
                 }
                 
@@ -1570,10 +1638,21 @@ global auracolor := 0
                         pendingUnequip := true
                     }
                 }
-            prevState := state
-            brainrot67 := ""
-        }
-    }
+
+                prevState := state
+                brainrot67 := ""
+                if (!detectionrunning) {
+                    starttimedetectionrunning := A_TickCount
+                    detectionrunning := true
+                }
+                if (starttimedetectionrunning > 7200000) {
+                        starttimedetectionrunning := 0
+                        SetTimer, AuraBiomeDetect, Off
+                        SetTimer, AuraBiomeDetect, 1000
+                        detectionrunning := false
+                    }
+                }
+            }
     
 
     if (strangeController || biomeRandomizer || autoWarp || biomeDetect) {
@@ -1642,7 +1721,7 @@ global auracolor := 0
                         }
                     }
                 
-            if (biome = "CYBERSPACE" && toggle && autoWarp) {
+            if (biome = "CYBERSPACE" && toggle && autoWarp && (prevBiome != "CYBERSPACE" || prevBiome = "")) {
                 pendingSkips := true
             }
 
@@ -1831,7 +1910,7 @@ SendWebhook(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.6"","
+    . """text"": ""Aery's fishSol v1.61"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1875,7 +1954,7 @@ SendWebhook2(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.6"","
+    . """text"": ""Aery's fishSol v1.61"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1909,7 +1988,7 @@ SendWebhook3(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.6"","
+    . """text"": ""Aery's fishSol v1.61"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1953,7 +2032,7 @@ SendWebhook4(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.6"","
+    . """text"": ""Aery's fishSol v1.61"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -2353,6 +2432,281 @@ DoBiomeRandomizer() {
     sleep, 600
 }
 
+/*
+
+QuickBiomeCheck:
+    ROBLOX_LOGS := LocalAppData "\Roblox\logs\*.log"
+    currentBiome := "None"
+
+    newestTime := 0
+    newestFile := ""
+
+    Loop, Files, %ROBLOX_LOGS%, F
+    {
+        if (A_LoopFileTimeModified > newestTime) {
+            newestTime := A_LoopFileTimeModified
+            newestFile := A_LoopFileFullPath
+        }
+    }
+
+
+    file := FileOpen(newestFile, "r")
+    if !IsObject(file)
+        return
+
+    size := file.Length
+    chunkSize := 10240
+    if (size > chunkSize)
+        file.Seek(-chunkSize, 2)
+    content := file.Read()
+    file.Close()
+
+    lines := StrSplit(content, "`n")
+    foundRPC := false
+
+    Loop % lines.MaxIndex()
+    {
+        line := lines[lines.MaxIndex() - A_Index + 1]
+        if InStr(line, "[BloxstrapRPC]")
+        {
+            foundRPC := true
+            if RegExMatch(line, """state"":""((?:\\.|[^""])*)"".*?""largeImage"":\{""hoverText"":""((?:\\.|[^""])*)""", m) {
+                biome := m2
+                break
+            }
+        }
+    }
+
+    if (biome and biome != "" and biome != prevBiome) {
+        currentBiome := biome
+        prevBiome    := biome
+    }
+    else if (!biome or biome = "") {
+        currentBiome := "None"
+    }
+return
+
+DoBiomeSelector() {
+    global res
+    global selectedBiome
+    global currentBiome
+    SetBatchLines, -1
+    gosub, QuickBiomeCheck
+    if (selectedBiome = "") {
+        return
+    }
+
+    StringUpper, normalizedSelected, % StrReplace(selectedBiome, " ", "")
+    StringUpper, normalizedCurrent, % StrReplace(currentBiome, " ", "")
+
+
+    if (normalizedSelected = normalizedCurrent && currentBiome != "None") {
+        return
+    }
+
+    tryCount := 0
+
+    biomeDetected := false
+
+    Starfall := "0x1C73FF"
+    Hell := "0xFF3737"
+    Null := "0xFFFFFF"
+    Corruption := "0x972EFF"
+    SandStorm := "0xFFBC86"
+    Snowy := "0x9EECFF"
+    Rainy := "0x589BFF"
+    Windy := "0x8AFFBD"
+    Heaven := "0xFFCE80"
+
+    switch selectedBiome
+    {
+        case "Starfall":
+            COLOR := Starfall
+        case "Hell":
+            COLOR := Hell
+        case "Null":
+            COLOR := Null
+        case "Corruption":
+            COLOR := Corruption
+        case "SandStorm":
+            COLOR := SandStorm
+        case "Snowy":
+            COLOR := Snowy
+        case "Rainy":
+            COLOR := Rainy
+        case "Windy":
+            COLOR := Windy
+        case "Heaven":
+            COLOR := Heaven
+    }
+
+    if (res = "1080p") {
+        MouseMove, 36, 513, 3
+        sleep 200
+        MouseClick, Left
+        sleep 200
+        MouseMove, 1272, 338, 3
+        sleep 300
+        MouseClick, Left
+        sleep 300
+        MouseMove, 1104, 368, 3
+        sleep 300
+        MouseClick, Left
+        sleep 150
+        Clipboard := "Biome Selector"
+        sleep 150
+        Send, ^v
+        sleep 300
+        MouseMove, 848, 479, 3
+        sleep 300
+        MouseClick, Left
+        sleep 500
+        Loop 3
+        {
+            if (CheckItemDescription1080p(10, 0x47c8ff, 0xff5f1f, 0xf8ac73, 0x9580ff)) {
+                MouseMove, 685, 580, 3
+                sleep 200
+                MouseClick, Left
+                inController := true
+                X_Start  := 612
+                X_End    := 614
+                Y_Start  := 370
+                Y_End    := 710
+                DRIVE_HEIGHT   := 31
+                X_Button_Center := 880
+                ConfirmX := 775
+                ConfirmY := 605
+                X_Close := 1305
+                Y_Close := 350
+                break
+            } else {
+                ; BS failsafe
+                MouseMove, 1270, 338, 3
+                sleep 300
+                MouseClick, Left
+                sleep 300
+                MouseMove, 1104, 368, 3
+                sleep 300
+                MouseClick, Left
+                sleep 150
+                Clipboard := "Biome Selector"
+                sleep 150
+                Send, ^v
+                sleep 300
+                MouseMove, 848, 479, 3
+                sleep 300
+                MouseClick, Left
+                sleep 500
+            }
+        }
+        if (!inController) {
+            MouseMove, 1305, 350, 3
+            sleep 300
+            MouseClick, Left
+            try SendWebhook(":joystick: Biome Selector couldn't be Found after retries!", "3225405")
+            return
+        }
+    }
+
+    if (inController) {
+        MouseMove, %X_Button_Center%, 100, 0
+        sleep 3000
+        if (selectedBiome = "Heaven")
+        {
+            MouseMove, % A_ScreenWidth / 2, % A_ScreenHeight / 2, 3
+            sleep 300
+            Click, WheelDown
+            sleep 30
+            MouseMove, %X_Button_Center%, 100, 3
+            sleep 3000
+        }
+        loop, 3
+        {
+            ErrorLevel := 0
+            PixelSearch, px, py, %X_Start%, %Y_Start%, %X_End%, %Y_End%, %COLOR%, 0, Fast RGB
+            if (ErrorLevel = 0)
+            {
+                PixelGetColor, out_color, %px%, %py%, RGB
+                if (COLOR = out_color)
+                {
+                    MouseMove, %X_Button_Center%, % py + (DRIVE_HEIGHT / 2), 2
+                    sleep 300
+                    MouseClick, Left
+                    biomeDetected := true
+                    break
+                }
+            }
+            Else
+            {
+                MouseMove, % A_ScreenWidth / 2, % A_ScreenHeight / 2, 3
+                sleep 300
+                Click, % A_Index = 1 ? "WheelDown" : "WheelUp"
+                sleep 30
+                MouseMove, %X_Button_Center%, 100, 3
+                sleep 3000
+            }
+        }
+
+        if (!biomeDetected) {
+            MouseMove, %X_Close%, %Y_Close%, 3
+            sleep 300
+            MouseClick, Left
+            try SendWebhook(":joystick: Biome Selector is Missing a Drive!", "3225405")
+            Return
+        }
+        else
+        {
+            sleep 1000
+            pixelsearch, x, y, % X_Close - 50, % Y_Close - 50, % X_Close + 50, % Y_Close + 50, %Color%, 0, Fast RGB
+            if (ErrorLevel != 0)
+            {
+                MouseMove, %X_Close%, %Y_Close%, 3
+                sleep 300
+                MouseClick, Left
+                try SendWebhook(":joystick: Biome Selector is Recharging!", "3225405")
+            }
+            else
+            {
+                MouseMove, %ConfirmX%, %ConfirmY%, 3
+                sleep 300
+                MouseClick, Left
+                try SendWebhook(":joystick: Biome Selector was used to select " . selectedBiome . ".", "3225405")
+            }
+        }
+        sleep 3000
+    } else {
+            try SendWebhook(":joystick: Biome Selector couldn't be Found!.", "3225405")
+    }
+}
+
+CheckItemDescription1080p(senstivity, list*) {
+    global _
+    SetBatchLines, -1
+    for c, list_color in list
+    {
+        ErrorLevel := 0
+        PixelSearch, x, y, 490, 610, 625, 700, %list_color%, %senstivity%, Fast RGB
+        if ErrorLevel = 0
+            Continue
+
+        ErrorLevel := 0
+        PixelSearch, x, y, 625, 610, 760, 700, %list_color%, %senstivity%, Fast RGB
+        if ErrorLevel = 0
+            Continue
+
+        ErrorLevel := 0
+        PixelSearch, x, y, 490, 700, 625, 790, %list_color%, %senstivity%, Fast RGB
+        if ErrorLevel = 0
+            Continue
+
+        ErrorLevel := 0
+        PixelSearch, x, y, 625, 700, 760, 790, %list_color%, %senstivity%, Fast RGB
+        if ErrorLevel != 0
+            return false
+    }
+    return true
+}
+*/
 DoAutoUnequip() {
     MouseMove, 45, 412, 3
     sleep 150
@@ -2984,7 +3338,15 @@ RunRejoin() {
     FishingSpot()
 }
 RunRejoin2() {
-    Process, Close, RobloxPlayerBeta.exe
+    Process, Exist, RobloxPlayerBeta.exe
+    if (ErrorLevel != 0) {
+        WinActivate, ahk_exe RobloxPlayerBeta.exe
+        Send {Esc}
+        sleep, 100
+        Send, {L}
+        sleep, 100
+        Send, {Enter}
+    }
     SendWebhook("Rejoining Server link...", 0)
     Run, % "powershell -NoProfile -Command ""Start-Process '" . privateServerLink . "'"""
 }
@@ -3037,35 +3399,122 @@ FishingSpot() {
     Send, {%keyW% Down}
     sleep 2670
     Send, {%keyW% Up}
-    if (restartingMacro) {
-        if (MaxLoopInput > 0) {
-            maxLoopCount := MaxLoopInput
-        }
-        if (FishingLoopInput > 0) {
-            fishingLoopCount := FishingLoopInput
-        }
-        toggle := true
-        strangeControllerLastRun := 0
-        biomeRandomizerLastRun := 0
-        checkGhostServerLastRun := 0
+}
 
-        if (startTick = "") {
-            startTick := A_TickCount
+FishingSpotSelling() {
+    global keyW, keyA, azertyPathing, res, toggle, maxLoopCount, fishingLoopCount
+    global strangeControllerLastRun, biomeRandomizerLastRun, checkGhostServerLastRun
+    global startTick, cycleCount, restartingMacro, MaxLoopInput, FishingLoopInput
+    keyW := azertyPathing ? "z" : "w"
+    keyA := azertyPathing ? "q" : "a"
+    Send, {%keyW% Down}
+    Send, {%keyA% Down}
+    sleep 4150
+    Send, {%keyW% Up}
+    sleep 600
+    Send {%keyA% Up}
+    sleep 200
+    Send {%keyW% Down}
+    sleep 400
+    Send {%keyW% Up}
+    sleep 300
+    Send {d Down}
+    sleep 180
+    Send {d Up}
+    sleep 150
+    Send {%keyW% Down}
+    sleep 1100
+    Send {%keyW% Up}
+    sleep 300
+    Send {s Down}
+    sleep 300
+    Send {S Up}
+    sleep 300
+    Send {Space Down}
+    sleep 25
+    Send {%keyW% Down}
+    sleep 1300
+    Send {Space Up}
+    sleep 200
+    Send {%keyW% Up}
+    sleep 300
+    Send, {Shift Down}
+    Sleep, 300
+    Send, {Shift Up}
+    Sleep, 300
+    Send {e Down}
+    sleep 300
+    Send {e Up}
+    sleep 300
+    MouseMove, 956, 803, 3
+    sleep 50
+    MouseClick, Left
+    sleep 50
+    MouseClick, Left
+    sleep 200
+    MouseMove, 956, 938, 3
+    sleep 200
+    MouseClick, Left
+    sleep 800
+    loopCount := 0
+
+    while (loopCount < fishingLoopCount) {
+        MouseMove, 828, 404, 3
+        sleep 200
+        MouseClick, Left
+        sleep 200
+        if (sellAllToggle) {
+            MouseMove, 680, 804, 3
+        } else {
+            MouseMove, 512, 804, 3
         }
-        if (cycleCount = "") {
-            cycleCount := 0
-        }
-        strangeControllerLastRun := 0
-        biomeRandomizerLastRun := 0
-        checkGhostServerLastRun := 0
-        WinActivate, ahk_exe RobloxPlayerBeta.exe
-        ManualGUIUpdate()
-        EnsureFullscreen()
-        SetTimer, UpdateGUI, 1000
-        SetTimer, DoMouseMove, 100
-        try SendWebhook(":green_circle: Macro Started!", "7909721")
-        restartingMacro := false
+        sleep 200
+        MouseClick, Left
+        sleep 300
+        MouseMove, 801, 626, 3
+        sleep 200
+        MouseClick, Left
+        sleep 1000
+        loopCount++
     }
+
+    MouseMove, 1458, 266, 3
+    sleep 200
+    MouseClick, Left
+    sleep 200
+    Send, {%keyA% Down}
+    sleep 1300
+    Send, {%keyA% Up}
+    sleep 75
+    Send, {%keyW% Down}
+    sleep 2682
+    Send, {%keyW% Up}
+    if (MaxLoopInput > 0) {
+        maxLoopCount := MaxLoopInput
+    }
+    if (FishingLoopInput > 0) {
+        fishingLoopCount := FishingLoopInput
+    }
+    toggle := true
+    strangeControllerLastRun := 0
+    biomeRandomizerLastRun := 0
+    checkGhostServerLastRun := 0
+
+    if (startTick = "") {
+        startTick := A_TickCount
+    }
+    if (cycleCount = "") {
+        cycleCount := 0
+    }
+    strangeControllerLastRun := 0
+    biomeRandomizerLastRun := 0
+    checkGhostServerLastRun := 0
+    WinActivate, ahk_exe RobloxPlayerBeta.exe
+    ManualGUIUpdate()
+    EnsureFullscreen()
+    SetTimer, UpdateGUI, 1000
+    SetTimer, DoMouseMove, 100
+    try SendWebhook(":green_circle: Macro Started!", "7909721")
 }
 
 CraftSelected2:
@@ -3330,7 +3779,6 @@ if (toggle) {
             } else if (checkGhostServer && privateServerLink = "") {
                 SendWebhook3("NO PRIVATE SERVER LINK", 14495300)
             }
-        
 
         if (strangeController) {
                     elapsed := A_TickCount - startTick
@@ -3368,7 +3816,6 @@ if (toggle) {
                 try SendWebhook3("Max Storage Detected \nDisabling Macro", 0)
             Reload
         }
-        
 
         if (pendingCraft && manualCraft && selectedItem2 != "") {
 
@@ -3420,78 +3867,77 @@ if (toggle) {
 
         loopCount++
         if (loopCount > maxLoopCount) {
-        sleep, 1000
-        Send, {Esc}
-        Sleep, 650
-        Send, R
-        Sleep, 650
-        Send, {Enter}
-        sleep 5000  
-
-
-        if (autoCloseChat) {
-            PixelGetColor, chatcolor, 138, 40, RGB
-            if (chatcolor != 0x121215) {
-                Send, {Esc}
-                Sleep, 300
-                MouseMove, 800, 210, 3
-                Sleep, 300
-                Click, Left
-                MouseMove, 800, 460, 3
-                Sleep, 300
-                Click, WheelUp, 25
-                Sleep, 600
-                Click, WheelDown, 2
-                MouseMove, 1280, 720, 3
-                Sleep, 300
-                Click, Left
-                Sleep, 300
-                Send, {Esc}
-                Sleep, 1000
-            }
-
-            PixelGetColor, chatcolor2, 138, 40, RGB
-            if (chatcolor2 = 0xF7F7F8) {
-                Sleep, 300
-                MouseMove, 145, 40, 3
-                Sleep, 300
-                MouseClick, Left
-                Sleep, 300
-            } else if (chatcolor2 = 0x121215) {
-                Sleep, 300
-            }
-        }
-
-        sleep, 1000
-        MouseMove, 47, 467, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        MouseMove, 382, 126, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        Click, WheelUp 80
-        sleep 500
-        Click, WheelDown 45
-
-        if (manualCraft = true && selectedItem2 != "") {
             sleep, 1000
-            ManualCraftMovement()
-            Sleep, 500
-            Send, f
-            Sleep, 1000
-        if (potionCraftCount > 0) {
-                Loop {
-                    Gosub, CraftSelected2
+            Send, {Esc}
+            Sleep, 650
+            Send, R
+            Sleep, 650
+            Send, {Enter}
+            sleep 5000
+
+            if (autoCloseChat) {
+                PixelGetColor, chatcolor, 138, 40, RGB
+                if (chatcolor != 0x121215) {
+                    Send, {Esc}
+                    Sleep, 300
+                    MouseMove, 800, 210, 3
+                    Sleep, 300
+                    Click, Left
+                    MouseMove, 800, 460, 3
+                    Sleep, 300
+                    Click, WheelUp, 25
+                    Sleep, 600
+                    Click, WheelDown, 2
+                    MouseMove, 1280, 720, 3
+                    Sleep, 300
+                    Click, Left
+                    Sleep, 300
+                    Send, {Esc}
                     Sleep, 1000
-                    potionCraftCount--
-                    if (potionCraftCount <= 0) {
-                        potionCraftCount := potionCraftCount2
-                        break
-                    }
+                }
+
+                PixelGetColor, chatcolor2, 138, 40, RGB
+                if (chatcolor2 = 0xF7F7F8) {
+                    Sleep, 300
+                    MouseMove, 145, 40, 3
+                    Sleep, 300
+                    MouseClick, Left
+                    Sleep, 300
+                } else if (chatcolor2 = 0x121215) {
+                    Sleep, 300
                 }
             }
+
+            sleep, 1000
+            MouseMove, 47, 467, 3
+            sleep 220
+            Click, Left
+            sleep 220
+            MouseMove, 382, 126, 3
+            sleep 220
+            Click, Left
+            sleep 220
+            Click, WheelUp 80
+            sleep 500
+            Click, WheelDown 45
+
+            if (manualCraft = true && selectedItem2 != "") {
+                sleep, 1000
+                ManualCraftMovement()
+                Sleep, 500
+                Send, f
+                Sleep, 1000
+                if (potionCraftCount > 0) {
+                    Loop {
+                        Gosub, CraftSelected2
+                        Sleep, 1000
+                        potionCraftCount--
+                        if (potionCraftCount <= 0) {
+                            potionCraftCount := potionCraftCount2
+                            break
+                        }
+                    }
+                }
 
                 if (selectedItem2 = "Heavenly Potion") {
                     SendWebhook( selectedItem2 " has been crafted " totalCraftedhp " times", 0)
@@ -3541,97 +3987,93 @@ if (toggle) {
                 sleep 300
             }
 
-
-
-
-        if (pathingMode = "Vip Pathing") {
-            ; VIP Pathing
-            Send, {%keyW% Down}
-            Send, {%keyA% Down}
-            sleep 4150
-            Send, {%keyW% Up}
-            sleep 600
-            Send {%keyA% Up}
-            sleep 200
-            Send {%keyW% Down}
-            sleep 400
-            Send {%keyW% Up}
-            sleep 300
-            Send {d Down}
-            sleep 180
-            Send {d Up}
-            sleep 150
-            Send {%keyW% Down}
-            sleep 1100
-            Send {%keyW% Up}
-            sleep 300
-            Send {s Down}
-            sleep 300
-            Send {S Up}
-            sleep 300
-            Send {Space Down}
-            sleep 25
-            Send {%keyW% Down}
-            sleep 1300
-            Send {Space Up}
-            sleep 200
-            Send {%keyW% Up}
-            sleep 300
-            Send, {Shift Down}
-            Sleep, 300
-            Send, {Shift Up}
-            Sleep, 300
-            Send {e Down}
-            sleep 300
-            Send {e Up}
-            sleep 300
-            MouseMove, 956, 803, 3
-            sleep 50
-            MouseClick, Left
-            sleep 50
-            MouseClick, Left
-            sleep 200
-            MouseMove, 956, 938, 3
-            sleep 200
-            MouseClick, Left
-            sleep 800
-            loopCount := 0
-
-            while (loopCount < fishingLoopCount) {
-                MouseMove, 828, 404, 3
+            if (pathingMode = "Vip Pathing") {
+                ; VIP Pathing
+                Send, {%keyW% Down}
+                Send, {%keyA% Down}
+                sleep 4150
+                Send, {%keyW% Up}
+                sleep 600
+                Send {%keyA% Up}
                 sleep 200
-                MouseClick, Left
-                sleep 200
-                if (sellAllToggle) {
-                    MouseMove, 680, 804, 3
-                } else {
-                    MouseMove, 512, 804, 3
-                }
-                sleep 200
-                MouseClick, Left
+                Send {%keyW% Down}
+                sleep 400
+                Send {%keyW% Up}
                 sleep 300
-                MouseMove, 801, 626, 3
+                Send {d Down}
+                sleep 180
+                Send {d Up}
+                sleep 150
+                Send {%keyW% Down}
+                sleep 1100
+                Send {%keyW% Up}
+                sleep 300
+                Send {s Down}
+                sleep 300
+                Send {S Up}
+                sleep 300
+                Send {Space Down}
+                sleep 25
+                Send {%keyW% Down}
+                sleep 1300
+                Send {Space Up}
+                sleep 200
+                Send {%keyW% Up}
+                sleep 300
+                Send, {Shift Down}
+                Sleep, 300
+                Send, {Shift Up}
+                Sleep, 300
+                Send {e Down}
+                sleep 300
+                Send {e Up}
+                sleep 300
+                MouseMove, 956, 803, 3
+                sleep 50
+                MouseClick, Left
+                sleep 50
+                MouseClick, Left
+                sleep 200
+                MouseMove, 956, 938, 3
                 sleep 200
                 MouseClick, Left
-                sleep 1000
-                loopCount++
-            }
+                sleep 800
+                loopCount := 0
 
-            MouseMove, 1458, 266, 3
-            sleep 200
-            MouseClick, Left
-            sleep 200
-            Send, {%keyA% Down}
-            sleep 1300
-            Send, {%keyA% Up}
-            sleep 75
-            Send, {%keyW% Down}
-            sleep 2682
-            Send, {%keyW% Up}
-            loopCount := 0
+                while (loopCount < fishingLoopCount) {
+                    MouseMove, 828, 404, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 200
+                    if (sellAllToggle) {
+                        MouseMove, 680, 804, 3
+                    } else {
+                        MouseMove, 512, 804, 3
+                    }
+                    sleep 200
+                    MouseClick, Left
+                    sleep 300
+                    MouseMove, 801, 626, 3
+                    sleep 200
+                    MouseClick, Left
+                    sleep 1000
+                    loopCount++
+                }
+
+                MouseMove, 1458, 266, 3
+                sleep 200
+                MouseClick, Left
+                sleep 200
+                Send, {%keyA% Down}
+                sleep 1300
+                Send, {%keyA% Up}
+                sleep 75
+                Send, {%keyW% Down}
+                sleep 2682
+                Send, {%keyW% Up}
+                loopCount := 0
+            }
         }
-     }
- 
 
         MouseMove, 862, 843, 3
         Sleep 300
@@ -3643,47 +4085,46 @@ if (toggle) {
         ; Check for white pixel
         startWhitePixelSearch := A_TickCount
         fishingFailsafeRan := false
+        failsafeTime := 0
         Loop {
-        PixelGetColor, color, 1176, 836, RGB
-        if (color = 0xFFFFFF) {
-        MouseMove, 950, 880, 3
-        ; Get randomized bar color
-        Sleep 50
-        PixelGetColor, barColor, 955, 767, RGB
-        SetTimer, DoMouseMove, Off
-        break
-        }
-        
-        if (!toggle) {
-        Return
-        }
-        }
+            PixelGetColor, color, 1176, 836, RGB
+            if (color = 0xFFFFFF) {
+                MouseMove, 950, 880, 3
+                Sleep 50
+                PixelGetColor, barColor, 955, 767, RGB
+                SetTimer, DoMouseMove, Off
+                break
+            }
 
-        if (A_TickCount - startWhitePixelSearch > (61000) && !fishingFailsafeRan) {
-            MouseMove, 1368, 950, 3
-            sleep 300
-            MouseClick, Left
-            sleep 300
-            MouseMove, 1167, 476, 3
-            sleep 300
-            MouseClick, Left
-            sleep 300
-            MouseMove, 1113, 342, 3
-            sleep 300
-            MouseClick, left
-            sleep 300
-            MouseMove, 851, 832, 3
-            sleep 300
-            MouseClick, Left
-            fishingFailsafeRan := true
-            try SendWebhook3(":grey_question: Fishing failsafe was triggered.", "13424349")
-        }
+            if (!toggle) {
+                Return
+            }
 
-        /*
-        if (A_TickCount - startWhitePixelSearch > (180000) && fishingFailsafeRan) {
-            if (privateServerLink != "") {
-                try SendWebhook3("No Activity Detected in 3 Minutes \nRestarting Macro...", "14495300")
-                restartingMacro := true
+            ; Trigger failsafe after 61 seconds of no activity
+            if (A_TickCount - startWhitePixelSearch > 61000 && !fishingFailsafeRan) {
+                MouseMove, 1368, 950, 3
+                sleep 300
+                MouseClick, Left
+                sleep 300
+                MouseMove, 1167, 476, 3
+                sleep 300
+                MouseClick, Left
+                sleep 300
+                MouseMove, 1113, 342, 3
+                sleep 300
+                MouseClick, left
+                sleep 300
+                MouseMove, 851, 832, 3
+                sleep 300
+                MouseClick, Left
+                fishingFailsafeRan := true
+                failsafeTime := A_TickCount
+                try SendWebhook3(":grey_question: Fishing failsafe was triggered.", "13424349")
+            }
+
+            ; If failsafe ran and 5 more minutes pass with no activity, restart
+            if (restartMacroFailsafe && failsafeTime > 0 && A_TickCount - failsafeTime > 300000) {
+                try SendWebhook3("No Activity Detected for 5 Minutes \nSelling fish, then Restarting Macro...", "14495300")
                 toggle := false
                 SetTimer, DoMouseMove, Off
                 SetTimer, UpdateGUI, Off
@@ -3695,67 +4136,61 @@ if (toggle) {
                 Send, {e up}
                 Send, {esc up}
                 Send, {r up}
-                RunRejoin()
-            } else {
-                try SendWebhook3("No Activity Detected in 3 Minutes \nRestarting Macro without Rejoining...", "14495300")
-                restartingMacro := true
-                toggle := false
-                SetTimer, DoMouseMove, Off
-                SetTimer, UpdateGUI, Off
                 Send, {Esc}
                 Sleep, 650
                 Send, R
                 Sleep, 650
                 Send, {Enter}
                 sleep 10000
-                FishingSpot()
+                FishingSpotSelling()
+                return
             }
         }
-        */
 
         ; PixelSearch loop with 9-second timeout
         startTime := A_TickCount
         Loop {
-        if (!toggle)
-        break
-        if (A_TickCount - startTime > 9000)
-        break
+            if (!toggle)
+                break
+            if (A_TickCount - startTime > 9000)
+                break
 
-        ; Advanced detection
-        if (advancedFishingDetection) {
-            ErrorLevel := 0
-            PixelSearch, leftX, leftY, 757, 767, 1161, 767, barColor, 5, Fast RGB
-            if (ErrorLevel = 0) {
-                rightX := leftX
-                Loop {
-                    testX := rightX + 1
-                    if (testX > 1161)
-                        break
-                    PixelGetColor, testColor, %testX%, 767, RGB
-                    if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
-                        rightX := testX
-                    } else {
-                        break
+            ; Advanced detection
+            if (advancedFishingDetection) {
+                ErrorLevel := 0
+                PixelSearch, leftX, leftY, 757, 767, 1161, 767, barColor, 5, Fast RGB
+                if (ErrorLevel = 0) {
+                    rightX := leftX
+                    Loop {
+                        testX := rightX + 1
+                        if (testX > 1161)
+                            break
+                        PixelGetColor, testColor, %testX%, 767, RGB
+                        if (Abs((testColor & 0xFF) - (barColor & 0xFF)) <= 10 && Abs(((testColor >> 8) & 0xFF) - ((barColor >> 8) & 0xFF)) <= 10 && Abs(((testColor >> 16) & 0xFF) - ((barColor >> 16) & 0xFF)) <= 10) {
+                            rightX := testX
+                        } else {
+                            break
+                        }
                     }
-                }
-                barWidth := rightX - leftX
-                if (barWidth < advancedFishingThreshold) {
+                    barWidth := rightX - leftX
+                    if (barWidth < advancedFishingThreshold) {
+                        MouseClick, left
+                        sleep 25
+                    }
+                } else {
                     MouseClick, left
-                    sleep 25
                 }
+                sleep 10
             } else {
-                MouseClick, left
-            }
-            sleep 10
-        } else {
-            ErrorLevel := 0
-            PixelSearch, FoundX, FoundY, 757, 762, 1161, 782, barColor, 5, Fast RGB
-            if (ErrorLevel = 0) {
-            } else {
-                MouseClick, left
+                ErrorLevel := 0
+                PixelSearch, FoundX, FoundY, 757, 762, 1161, 782, barColor, 5, Fast RGB
+                if (ErrorLevel = 0) {
+                } else {
+                    MouseClick, left
+                }
             }
         }
-        }
+
         sleep 300
         MouseMove, 1113, 342, 3
         Sleep 700
@@ -3765,7 +4200,6 @@ if (toggle) {
     }
 }
 Return
-
 
 
 
@@ -3897,14 +4331,6 @@ if (dev3_name = "maxstellar") {
     Run, https://www.youtube.com/@ivelchampion
 }
 return
-
-PressE:
-    Send, e
-Return
-
-MerchantClick2:
-    Click, 1265, 943, 3
-Return
 
 ReleasesClick:
     Run, https://github.com/knowaery/Aery-s-Fishsol
