@@ -252,14 +252,13 @@ if (FileExist(iniFilePath)) {
             EnabledAuras[aura] := 0
     }
 }
-
 checkGhostServer := false
 IniWrite, false, %iniFilePath%, Macro, checkGhostServer
 
 
 
 
-version := "Aery's v1.61"
+version := "Aery's v1.6.1"
 
 devNames    := [["maxstellar","ivelchampion249","cresqnt"],["maxstellar","cresqnt","ivelchampion249"],["cresqnt","ivelchampion249","maxstellar"],["cresqnt","maxstellar","ivelchampion249"],["ivelchampion249","maxstellar","cresqnt"],["ivelchampion249","cresqnt","maxstellar"]]
 devRoles    := {"maxstellar":"Lead Developer","ivelchampion249":"Original Creator","cresqnt":"Frontend Developer", "Nadir Rift":"General Programmer"}
@@ -277,7 +276,7 @@ dev3_img :=  A_ScriptDir . "\img\yui3.png"
 
 Gui, Color, 041024
 Gui, Font, s15 cWhite Bold, Segoe UI
-Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.61
+Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.6.1
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Text, x160 y35 w290 h20 Center BackgroundTrans c0xFFAA00, (Only Works In 1080p and Needs VIP)
 
@@ -662,7 +661,7 @@ Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y490 w480 h1 0x10 BackgroundTrans
 
 Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y500 w500 h15 BackgroundTrans, Aery's fishSol v1.61 (2026-05-27)
+Gui, Add, Text, x50 y500 w500 h15 BackgroundTrans, Aery's fishSol v1.6.1 (2026-05-27)
 Gui, Add, Text, x300 y500 w500 h15 BackgroundTrans, If you need help, message me on discord. (noaery)
 Gui, Add, Text, x50 y525 w500 h15 BackgroundTrans c0x0088FF gReleasesClick +0x200, https://github.com/knowaery/Aery-s-Fishsol
 
@@ -720,7 +719,7 @@ Gui, Font, s10 cWhite Normal
 Gui, Add, Text, x315 y493 w250 h100 BackgroundTrans, Select what biome you want to be used with the Biome Selector. Use at your own risk, it has not been tested.
 */
 
-Gui, Show, w600 h570,  Aery's fishSol v1.61
+Gui, Show, w600 h570,  Aery's fishSol v1.6.1
 
 GuiControl, Choose, Resolution, 1
 
@@ -1509,7 +1508,7 @@ global auracolor := 0
                             . """embeds"": [{"
                             . """description"": "" ### Aura Equipped - " auraName ""","
                             . """color"": " auracolor ","
-                            . """footer"": {""text"": ""Aery's fishSol v1.61"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                            . """footer"": {""text"": ""Aery's fishSol v1.6.1"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                             . """timestamp"": """ timestamp """"
                             . "}]}"
 
@@ -1525,7 +1524,7 @@ global auracolor := 0
                                 . """embeds"": [{"
                                 . """description"": "" ### Aura Equipped - " auraName ""","
                                 . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.61"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                                . """footer"": {""text"": ""Aery's fishSol v1.6.1"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                                 . """timestamp"": """ timestamp """"
                                 . "}]}"
                             http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
@@ -1537,7 +1536,7 @@ global auracolor := 0
                                 . """embeds"": [{"
                                 . """description"": "" ### Aura Equipped - " auraName ""","
                                 . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.61"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                                . """footer"": {""text"": ""Aery's fishSol v1.6.1"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                                 . """timestamp"": """ timestamp """"
                                 . "}]}"
                             http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
@@ -1553,7 +1552,7 @@ global auracolor := 0
                                 . """embeds"": [{"
                                 . """description"": "" ### Aura Equipped - " auraName ""","
                                 . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.61"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                                . """footer"": {""text"": ""Aery's fishSol v1.6.1"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                                 . """timestamp"": """ timestamp """"
                                 . "}]}"
                             http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
@@ -1910,7 +1909,7 @@ SendWebhook(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.61"","
+    . """text"": ""Aery's fishSol v1.6.1"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1954,7 +1953,7 @@ SendWebhook2(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.61"","
+    . """text"": ""Aery's fishSol v1.6.1"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1988,7 +1987,7 @@ SendWebhook3(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.61"","
+    . """text"": ""Aery's fishSol v1.6.1"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -2032,7 +2031,7 @@ SendWebhook4(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.61"","
+    . """text"": ""Aery's fishSol v1.6.1"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -3463,11 +3462,7 @@ FishingSpotSelling() {
         sleep 200
         MouseClick, Left
         sleep 200
-        if (sellAllToggle) {
-            MouseMove, 680, 804, 3
-        } else {
-            MouseMove, 512, 804, 3
-        }
+        MouseMove, 680, 804, 3
         sleep 200
         MouseClick, Left
         sleep 300
@@ -4045,11 +4040,7 @@ if (toggle) {
                     sleep 200
                     MouseClick, Left
                     sleep 200
-                    if (sellAllToggle) {
-                        MouseMove, 680, 804, 3
-                    } else {
-                        MouseMove, 512, 804, 3
-                    }
+                    MouseMove, 680, 804, 3
                     sleep 200
                     MouseClick, Left
                     sleep 300
