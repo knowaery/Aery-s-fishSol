@@ -1665,7 +1665,7 @@ global auracolor := 0
                             
                             if (biomeData = "") {
                                 biomeData := {}
-                                biomeData["NORMAL"]      := {color: 12582656,  thumbnail: "https://maxstellar.github.io/biome_thumb/GLITCHED.png"}
+                                biomeData["NORMAL"]      := {color: 0,  thumbnail: "https://maxstellar.github.io/biome_thumb/NORMAL.png"}
                                 biomeData["EGGLAND"]     := {color: 13958285,  thumbnail: "https://raw.githubusercontent.com/xVapure/Noteab-Macro/refs/heads/main/images/EGGLAND.png"}
                                 biomeData["WINDY"]       := {color: 10150399,  thumbnail: "https://maxstellar.github.io/biome_thumb/WINDY.png"}
                                 biomeData["RAINY"]       := {color: 163773,    thumbnail: "https://maxstellar.github.io/biome_thumb/RAINY.png"}
