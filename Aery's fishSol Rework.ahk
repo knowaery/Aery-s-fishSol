@@ -169,6 +169,7 @@ failsafeTime := 0
 fishInLimbo := false
 decideAuraClip := false
 MacroUptime := 0
+limboFailsafe := false
 
 if (FileExist(iniFilePath)) {
     IniRead, tempRes, %iniFilePath%, Macro, resolution
@@ -357,6 +358,10 @@ if (FileExist(iniFilePath)) {
     if (tempFishInLimbo != "ERROR")
         fishInLimbo := (tempFishInLimbo = "true" || tempFishInLimbo = "1")
 
+    IniRead, tempLimboFailsafe, %iniFilePath%, Macro, limboFailsafe
+    if (tempLimboFailsafe != "ERROR")
+        limboFailsafe := (tempLimboFailsafe = "true" || tempLimboFailsafe = "1")
+
 
 Devs := [{dev_name:"maxstellar"
          , dev_role:"Twitch"
@@ -449,7 +454,12 @@ Gui, Add, Text, x317 y105 h45 w255 BackgroundTrans c0xCCCCCC, (During Macro) Aut
 Gui, Font, s10 cWhite Bold
 Gui, Add, Button, x320 y160 w80 h25 gTogglefishInLimbo vfishInLimboBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x415 y163 w60 h25 vfishInLimboStatus BackgroundTrans, OFF
+Gui, Add, Text, x410 y163 w60 h25 vfishInLimboStatus BackgroundTrans, OFF
+
+Gui, Font, s9 c0xCCCCCC Bold, Segoe UI
+Gui, Add, Button, x445 y159 w124 h25 gTogglelimboFailsafe vlimboFailsafeBtn, Toggle Limbo Failsafe
+Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Add, Text, x491 y188 w60 h25 vlimboFailsafeStatus BackgroundTrans, OFF
 
 Gui, Add, GroupBox, x30 y215 w535 h120 cWhite, Loop Count Settings
 Gui, Font, s10 cWhite Bold
@@ -713,6 +723,8 @@ Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Button, x45 y355 w80 h25 gToggleBiomeDetect vBiomeDetectBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, Text, x143 y358 w70 h25 vBiomeDetectStatus BackgroundTrans, OFF
+Gui, Font, s11 cWhite Bold, Segoe UI
+Gui, Add, Button, x405 y355 w100 h25 gClearLogs, Clear Logs
 
 Gui, Tab, Webhook
 
@@ -1080,9 +1092,16 @@ if (fishInLimbo) {
     GuiControl,, FishInLimboStatus, OFF
     GuiControl, +c0xFF4444, FishInLimboStatus
 }
+if (limboFailsafe) {
+    GuiControl,, LimboFailsafeStatus, ON
+    GuiControl, +c0x00DD00, LimboFailsafeStatus
+} else {
+    GuiControl,, LimboFailsafeStatus, OFF
+    GuiControl, +c0xFF4444, LimboFailsafeStatus
+}
 
 GuiControl, ChooseString, SelectedBiome, %selectedBiome%
-SetTimer, AuraBiomeDetect, 1000
+;SetTimer, AuraBiomeDetect, 1000
 
 
 
@@ -1500,6 +1519,18 @@ ToggleFishInLimbo:
         GuiControl, +c0xFF4444, FishInLimboStatus
     }
     IniWrite, % (fishInLimbo ? "true" : "false"), %iniFilePath%, Macro, fishInLimbo
+return
+
+ToggleLimboFailsafe:
+    limboFailsafe := !limboFailsafe
+    if (limboFailsafe) {
+        GuiControl,, LimboFailsafeStatus, ON
+        GuiControl, +c0x00DD00, LimboFailsafeStatus
+    } else {
+        GuiControl,, LimboFailsafeStatus, OFF
+        GuiControl, +c0xFF4444, LimboFailsafeStatus
+    }
+    IniWrite, % (limboFailsafe ? "true" : "false"), %iniFilePath%, Macro, limboFailsafe
 return
 
 UpdatePrivateServer:
@@ -2628,6 +2659,7 @@ DoAutoUnequip() {
     sleep 150
 }
 
+
 DoUseNothing() {
     MouseMove, 45, 412, 3
     sleep 150
@@ -2659,6 +2691,10 @@ DoUseNothing() {
     Click, Left
     sleep 150
 }
+
+F8::
+    DoUseNothing()
+return
 
 FishingSpot() {
     global keyW, keyA, azertyPathing, res, toggle, maxLoopCount, fishingLoopCount
@@ -2822,6 +2858,11 @@ FishingSpotSelling() {
     SetTimer, DoMouseMove, 100
     try SendWebhook(":green_circle: Macro Started!", "7909721")
 }
+
+ClearLogs:
+    FileDelete, %logDir%\*.log
+return
+
 
 CraftHeavenly:
     ToolTip
@@ -3417,12 +3458,6 @@ global auracolor := 0
     if !newestFile
         return
 
-        Loop, Files, %logDir%\*.log, F
-    {
-        if (A_LoopFileFullPath != newestFile)
-            FileDelete, %A_LoopFileFullPath%
-    }
-
     file := FileOpen(newestFile, "r")
     if !IsObject(file)
         return
@@ -3628,7 +3663,7 @@ global auracolor := 0
                     IniRead, isBiomeEnabled, %iniFilePath%, "Biomes", %biomeKey%, 1
 
                     ; --- BIOME ENDED WEBHOOK ---
-                    
+                    /*
                     if (prevBiome != "" && prevBiome != "Normal") {
 
                         endColor := 0
@@ -3653,13 +3688,13 @@ global auracolor := 0
                             MacroUptimeStr := "Not Started"
                         }
 
-                        description := "> ### Biome Ended - " prevBiome " \nMacro Runtime: " MacroUptimeStr
+                        enddescription := "> ### Biome Ended - " prevBiome " \nMacro Runtime: " MacroUptimeStr
 
                         endJson := "{"
                         . """embeds"": ["
                         . "  {"
                         . "    ""title"": ""<t:" endUnix ":F> (<t:" endUnix ":R>)"","
-                        . "    ""description"": """ description ""","
+                        . "    ""description"": """ enddescription ""","
                         . "    ""color"": " 0 ","
                         . "    ""footer"": {""text"": ""fishSol v1.9.7"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
                         . "    ""timestamp"": """ endTimestamp """"
@@ -3673,8 +3708,8 @@ global auracolor := 0
                         endHttp.SetRequestHeader("Content-Type", "application/json")
                         endHttp.Send(endJson)
                     }
+                    */
 
-                    
                     ; --- BIOME STARTED WEBHOOK ---
                     if ((isBiomeEnabled = 1 || biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE" || biome = "SINGULARITY") && biome != "Normal") {
                         ;biomeIndex++
@@ -3794,12 +3829,13 @@ F1::
             seconds := Floor(Mod(elapsed, 60000) / 1000)
             MacroUptimeStr := Format("{:02}:{:02}:{:02}", hours, minutes, seconds)
         }
-
+        /*
         Loop, Files, %logDir%\*.log, F
         {
             if (A_LoopFileFullPath != newestFile)
                 FileDelete, %A_LoopFileFullPath%
         }
+        */
     }
     try SendWebhook(":green_circle: Macro Started!", "7909721")
 return
@@ -4020,13 +4056,14 @@ ZeusAbility() {
 
 LimboFish() {
     sleep, 1000
-
-    Send, {Esc}
-    Sleep, 650
-    Send, R
-    Sleep, 650
-    Send, {Enter}
-    sleep 3000
+    if (limboFailsafe) {
+        Send, {Esc}
+        Sleep, 650
+        Send, R
+        Sleep, 650
+        Send, {Enter}
+        sleep 3000
+    }
     /*
     ; stop rolling
     sleep, 1000
@@ -4035,34 +4072,65 @@ LimboFish() {
     Click, Left
     sleep, 300
     */
-    ; equips nothing
+        /*
+    if (autoUnequip && !useNothing) {
+        MouseMove, 45, 412, 3
+        sleep 150
+        Click, Left
+        sleep 150
+        MouseMove, 830, 441, 3
+        sleep 150
+        Click, Left
+        sleep 150
+        MouseMove, 634, 638, 3
+        sleep 159
+        Click, Left
+        sleep 1200
+        Click, Left
+        sleep 150
+        MouseMove, 1425, 303, 3
+        sleep 150
+        Click, Left
+        sleep 500
+    }
+
+    if (autoUnequip && useNothing) {
+        MouseMove, 45, 412, 3
+        sleep 150
+        Click, Left
+        sleep 150
+        MouseMove, 820, 340, 3
+        sleep, 250
+        Click, Left
+        sleep, 250
+        MouseMove, 820, 370, 3
+        sleep 250
+        Click, Left
+        Send, Nothing
+        sleep 150
+        MouseMove, 830, 441, 3
+        sleep 500
+        Send, {WheelUp 100}
+        Sleep, 750
+        Click, Left
+        sleep 300
+        MouseMove, 634, 638, 3
+        sleep 150
+        Click, Left
+        sleep 700
+        Click, Left
+        Sleep, 250
+        MouseMove, 1425, 303, 3
+        sleep 150
+        Click, Left
+        sleep 500
+    }
+        */
+
+    ; equips zeus
     MouseMove, 45, 412, 3
     sleep 150
     Click, Left
-    sleep 150
-    MouseMove, 820, 340, 3
-    sleep, 250
-    Click, Left
-    sleep, 250
-    MouseMove, 820, 370, 3
-    sleep 250
-    Click, Left
-    Send, Nothing
-    sleep 150
-    MouseMove, 830, 441, 3
-    sleep 500
-    Send, {WheelUp 100}
-    Sleep, 750
-    Click, Left
-    sleep 300
-    MouseMove, 634, 638, 3
-    sleep 150
-    Click, Left
-    sleep 700
-    Click, Left
-    Sleep, 250
-
-    ; equips zeus
     MouseMove, 820, 370, 3
     sleep 400
     Click, Left
@@ -4109,15 +4177,17 @@ LimboFish() {
     sleep 300
     Click, Left
     sleep, 600
-
-    PixelGetColor, ifinlimbo, 1873 , 1050, RGB
-    if (ifinlimbo = 0xFCFCFD || ifinlimbo = 0xFDFDFE) {
-        try SendWebhook3("Successfully entered Limbo!", 0)
-        FishingSpot()
-    } else {
-        try SendWebhook3("Failed to enter Limbo.\n Attempting Again...", 0)
-        LimboFish()
+    if (limboFailsafe) {
+        PixelGetColor, ifinlimbo, 1873 , 1050, RGB
+        if (ifinlimbo = 0xFCFCFD || ifinlimbo = 0xFDFDFE) {
+            try SendWebhook3("Successfully entered Limbo!", 0)
+            FishingSpot()
+        } else {
+            try SendWebhook3("Failed to enter Limbo.\n Attempting Again...", 0)
+            LimboFish()
+        }
     }
+    enteredLimbo := true
 }
 
 F6::
@@ -4183,27 +4253,12 @@ if (toggle) {
             }
             pendingUnequip := false
         }
-        /*
         ; limbo stuff
         if (fishInLimbo && !enteredLimbo) {
             LimboFish()
             sleep, 5000
             SendWebhook("Mini Version")
         }
-
-        if (fishInLimbo && pendingEnterLimbo && !enteredLimbo) {
-            SendWebhook("Bigger Version")
-            PixelGetColor, checkifinlimbo, 1873, 1050, RGB
-            if (checkifinlimbo = 0xFCFCFD || checkifinlimbo = 0xFDFDFE) {
-                try SendWebhook3("Successfully entered Limbo!", 0)
-                enteredLimbo := true
-                pendingEnterLimbo := false
-            } else {
-                LimboFish()
-                sleep, 5000
-            }
-        }
-        */
         ; SC Toggle
         if (strangeController) {
             elapsed := A_TickCount - startTick
@@ -4239,13 +4294,12 @@ if (toggle) {
                 biomeSelectorLastRun := elapsed
             }
         }
-        /*
         PixelGetColor, deletebutton, 1106, 919, RGB
         if (deletebutton = 0xFF5A5D && !sentstoragefull) {
             try SendWebhook3("Max Storage Detected", 0)
             sentstoragefull := true
         }
-        /*
+        
         if (pendingCraft && manualCraft && selectedItem2 != "") {
 
             sleep, 1000
@@ -4293,10 +4347,10 @@ if (toggle) {
             Sleep, 6950
             Send, {w Up}
             if (fishInLimbo) {
-                pendingEnterLimbo := true
+                enteredLimbo := false
             }
         }
-    */
+
     loopCount++
     if (loopCount > maxLoopCount) {
         sleep, 1000
@@ -4305,6 +4359,7 @@ if (toggle) {
         Send, R
         Sleep, 650
         Send, {Enter}
+        enteredLimbo := false
         sleep 2600
         MouseMove, 47, 467, 3
         sleep 220
@@ -4527,18 +4582,16 @@ if (toggle) {
             ErrorLevel := 0
             PixelSearch, FoundX, FoundY, 757, 762, 1161, 782, barColor, 5, Fast RGB
             if (ErrorLevel = 0) {
-                timerStarted := false
-                firstfishclick := false
             } else {
-                if (!timerStarted) {
-                    timerStarted := true
-                    infiniteclickfailsafe := A_TickCount
-                    firstfishclick := true
-                }
-                if (A_TickCount - infiniteclickfailsafe > 30000) {
-                    SendWebhook3("infiniteclickfailsafe triggered", 0)
-                    Goto fixinfiniteclick
-                }
+                ;if (!timerStarted) {
+                    ;timerStarted := true
+                    ;infiniteclickfailsafe := A_TickCount
+                    ;firstfishclick := true
+                ;}
+                ;if (A_TickCount - infiniteclickfailsafe > 120000) {
+                    ;SendWebhook3("infiniteclickfailsafe triggered", 0)
+                    ;Goto fixinfiniteclick
+                ;}
                 MouseClick, left
             }
         }
