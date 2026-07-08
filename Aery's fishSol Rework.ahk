@@ -77,13 +77,13 @@ AuraListTrans := {"NYCTOPHOBIA": 1
 , "illusionary": 1}
 
 AuraListOrder := ["Chromatic_Genesis", "Starscourge_Radiant", "Spectraflow", "Lily", "Overture", "Symphony", "Twilight_Withering_Grace", "Felled", "Projection", "Impeached", "Lumenpool", "Hyper-Volt_Ever-Storm", "Astral_Legendarium", "Prophecy", "Exotic_Void", "BLOODLUST", "Overture_History", "Maelstrom", "Perpetual", "dreamer", "LOTUSFALL", "Jazz_Orchestra", "CYTOKINESIS", "Archangel", "Atlas", "Flora_Evergreen", "CHILLSEAR", "Celestial_Eclipse", "AbyssalHunter", "GARGANTUA", "APOSTOLOS", "Kyawthuite_Remembrance", "Ruins", "Matrix_Overdrive", "Gravitational_PointZero", "Sophyra", "SAILOR_ADMIRAL", "Matrix_Reality", "PYTHIOS", "Sloth", "Sovereign", "Ruins_Withered", "Aegis", "ASCENDANT", "Raven_Plauge", "Unknown", "Elude", "PROLOGUE", "Dreamscape"]
-
 AuraListTransOrder := ["NYCTOPHOBIA", "Pixelation", "Luminosity", "LEVIATHAN", "ASTRAIOS", "BREAKTHROUGH", "dreamcatcher", "EQUINOX", "MONARCH", "meta", "illusionary"]
 
 EnabledAuras := {}
 for i, aura in AuraListOrder
     EnabledAuras[aura] := 1
 
+auracolor := 0
 
 if (biomeData = "") {
     biomeData := {}
@@ -168,7 +168,6 @@ biomeSelectorInterval := 3600000
 failsafeTime := 0
 fishInLimbo := false
 decideAuraClip := false
-MacroUptime := 0
 limboFailsafe := false
 
 if (FileExist(iniFilePath)) {
@@ -434,32 +433,32 @@ Gui, Add, Tab3, x15 y55 w570 h500 vMainTabs gTabChange c0xFFFFFF, %tabList%
 Gui, Tab, Main
 
 Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Add, GroupBox, x30 y85 w260 h120 cWhite, Control Panel
+Gui, Add, GroupBox, x30 y85 w185 h120 cWhite, Control Panel
 Gui, Font, s11 cWhite Bold
 Gui, Add, Text, x45 y110 w60 h25 BackgroundTrans, Status:
 Gui, Add, Text, x98 y110 w150 h25 vStatusText BackgroundTrans c0xFF4444, Stopped
 
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Button, x45 y140 w70 h35 gStartScript vStartBtn c0x00AA00 +0x8000, Start
-Gui, Add, Button, x125 y140 w70 h35 gPauseScript vPauseBtn c0xFFAA00 +0x8000, Pause
-Gui, Add, Button, x205 y140 w70 h35 gCloseScript vStopBtn c0xFF4444 +0x8000, Stop
+;Gui, Add, Button, x125 y140 w70 h35 gPauseScript vPauseBtn c0xFFAA00 +0x8000, Pause
+Gui, Add, Button, x125 y140 w70 h35 gCloseScript vStopBtn c0xFF4444 +0x8000, Stop
 Gui, Add, Text, x45 y180 w80 h25 BackgroundTrans, Resolution:
 Gui, Font, s11 cWhite Bold
 Gui, Add, Text, x120 y178 w80 h25 BackgroundTrans, 1080p
 
 Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x305 y85 w270 h120 cWhite, Limbo Fish
+Gui, Add, GroupBox, x235 y85 w330 h120 cWhite, Limbo Fish
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x317 y105 h45 w255 BackgroundTrans c0xCCCCCC, (During Macro) Automatically uses Zeus to glitch into limbo then fish in overworld. Requires Zeus and a consistent frame rate
+Gui, Add, Text, x247 y105 h45 w295 BackgroundTrans c0xCCCCCC, (During Macro) Automatically uses Zeus to glitch into limbo then fish in overworld. Requires Zeus and a consistent frame rate (~60fps).
 Gui, Font, s10 cWhite Bold
-Gui, Add, Button, x320 y160 w80 h25 gTogglefishInLimbo vfishInLimboBtn, Toggle
+Gui, Add, Button, x250 y160 w80 h25 gTogglefishInLimbo vfishInLimboBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x410 y163 w60 h25 vfishInLimboStatus BackgroundTrans, OFF
+Gui, Add, Text, x340 y163 w60 h25 vfishInLimboStatus BackgroundTrans, OFF
 
 Gui, Font, s9 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Button, x445 y159 w124 h25 gTogglelimboFailsafe vlimboFailsafeBtn, Toggle Limbo Failsafe
+Gui, Add, Button, x385 y159 w124 h25 gTogglelimboFailsafe vlimboFailsafeBtn, Toggle Limbo Failsafe
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x491 y188 w60 h25 vlimboFailsafeStatus BackgroundTrans, OFF
+Gui, Add, Text, x521 y162 w60 h25 vlimboFailsafeStatus BackgroundTrans, OFF
 
 Gui, Add, GroupBox, x30 y215 w535 h120 cWhite, Loop Count Settings
 Gui, Font, s10 cWhite Bold
@@ -1101,7 +1100,7 @@ if (limboFailsafe) {
 }
 
 GuiControl, ChooseString, SelectedBiome, %selectedBiome%
-;SetTimer, AuraBiomeDetect, 1000
+SetTimer, AuraBiomeDetect, 1000
 
 
 
@@ -1716,6 +1715,7 @@ SendWebhook3(text, color := 16777215) {
 
     allowedMentions := ""
     content := "<@" webhookID ">"
+    ;content := "<@1498277476600905940>"
 
 
     json := "{"
@@ -1811,6 +1811,7 @@ RunStrangeController() {
 RunBiomeSelector() {
     global selectedBiome
     global currentBiome
+    global res
     SetBatchLines, -1
     if (selectedBiome = "") {
         return
@@ -1825,8 +1826,6 @@ RunBiomeSelector() {
     }
 
     tryCount := 0
-
-    biomeDetected := false
 
     Starfall := "0x1C73FF"
     Hell := "0xFF3737"
@@ -1880,8 +1879,7 @@ RunBiomeSelector() {
         sleep 300
         MouseClick, Left
         sleep 500
-        Loop 3
-        {
+        Loop 3  {   
             if (CheckItemDescription1080p(10, 0x47c8ff, 0xff5f1f, 0xf8ac73, 0x9580ff)) {
                 MouseMove, 685, 580, 3
                 sleep 200
@@ -3441,8 +3439,7 @@ ManualCraftMovement() {
 }
 
 AuraBiomeDetect:
-global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome, webResponse, biomeIndex, MacroUptimeStr
-global auracolor := 0
+global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome, webResponse, biomeIndex, auraColor
     logDir := LocalAppData "\Roblox\logs"
 
     newestTime := 0
@@ -3620,7 +3617,7 @@ global auracolor := 0
                 } else if (auraName = "illusionary") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**<>;'10011010100011101002010-,><';[][[[][100011001l} \nThe Ultimate ####'# \nP█e█r█f#█3█cT p█##UpP█3█T  ** \n**:)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :) **\n**(:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (: **" auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Illusionary_curation.gif")
+                        SendWebhook2("# The Ultimate ####'# \nP█e█r█f#█3█cT p█##UpP█3█T \n**:)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :) **\n**(:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (: **" auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Illusionary_curation.gif")
                     }
                 }
                 
@@ -3656,14 +3653,12 @@ global auracolor := 0
             }
     
         
-        if (strangeController || biomeRandomizer || autoWarp || biomeDetect) {
-            if (biome && biome != "" && biome != prevBiome) {
-                if (biomeDetect && toggle) {
+    if (strangeController || biomeRandomizer || autoWarp || biomeDetect) {
+                if (biome && biome != "" && biome != prevBiome) {
+                    if (biomeDetect && toggle) {
                     biomeKey := "Biome" StrReplace(biome, " ", "")
-                    IniRead, isBiomeEnabled, %iniFilePath%, "Biomes", %biomeKey%, 1
 
-                    ; --- BIOME ENDED WEBHOOK ---
-                    /*
+                    ; end
                     if (prevBiome != "" && prevBiome != "Normal") {
 
                         endColor := 0
@@ -3673,11 +3668,11 @@ global auracolor := 0
                             ;endThumb := biomeData[prevBiome].thumbnail
                         }
 
-                        endTime := A_NowUTC
-                        endTimestamp := SubStr(endTime,1,4) "-" SubStr(endTime,5,2) "-" SubStr(endTime,7,2) "T" SubStr(endTime,9,2) ":" SubStr(endTime,11,2) ":" SubStr(endTime,13,2) ".000Z"
-                        endUnix := A_NowUTC
-                        EnvSub, endUnix, 19700101000000, Seconds
-
+                        endwebhookTime := A_NowUTC
+                        endTimestamp := SubStr(endwebhookTime,1,4) "-" SubStr(endwebhookTime,5,2) "-" SubStr(endwebhookTime,7,2) "T" SubStr(endwebhookTime,9,2) ":" SubStr(endwebhookTime,11,2) ":" SubStr(endwebhookTime,13,2) ".000Z"
+                        endwebhookUnix := A_NowUTC
+                        EnvSub, endwebhookUnix, 19700101000000, Seconds
+                        /*
                         if (MacroUptime > 0) {
                             elapsed := A_TickCount - MacroUptime
                             hours   := Floor(elapsed / 3600000)
@@ -3687,16 +3682,16 @@ global auracolor := 0
                         } else {
                             MacroUptimeStr := "Not Started"
                         }
-
-                        enddescription := "> ### Biome Ended - " prevBiome " \nMacro Runtime: " MacroUptimeStr
+                        */
+                        enddescription := "> ### Biome Ended - " prevBiome " "
 
                         endJson := "{"
                         . """embeds"": ["
                         . "  {"
-                        . "    ""title"": ""<t:" endUnix ":F> (<t:" endUnix ":R>)"","
+                        . "    ""title"": ""<t:" endwebhookUnix ":F> (<t:" endwebhookUnix ":R>)"","
                         . "    ""description"": """ enddescription ""","
                         . "    ""color"": " 0 ","
-                        . "    ""footer"": {""text"": ""fishSol v1.9.7"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
+                        . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
                         . "    ""timestamp"": """ endTimestamp """"
                         . "  }"
                         . "],"
@@ -3708,24 +3703,22 @@ global auracolor := 0
                         endHttp.SetRequestHeader("Content-Type", "application/json")
                         endHttp.Send(endJson)
                     }
-                    */
 
-                    ; --- BIOME STARTED WEBHOOK ---
-                    if ((isBiomeEnabled = 1 || biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE" || biome = "SINGULARITY") && biome != "Normal") {
-                        ;biomeIndex++
-                        ;IniWrite, %biomeIndex%, %iniFilePath%, Macro, biomeIndex
+                    
+                    ; start
+                if ((isBiomeEnabled = 1 || biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE" || biome = "SINGULARITY") && biome != "Normal") {
 
                         if (biomeData.HasKey(biome)) {
                             biomeColor    := biomeData[biome].color
                             thumbnail_url := biomeData[biome].thumbnail
                         }
 
-                        time := A_NowUTC
-                        timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2) "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
-                        startTime := A_NowUTC
-                        EnvSub, startTime, 19700101000000, Seconds
-                        unixTS := startTime
-
+                        startwebhookTime := A_NowUTC
+                        timestamp := SubStr(startwebhookTime,1,4) "-" SubStr(startwebhookTime,5,2) "-" SubStr(startwebhookTime,7,2) "T" SubStr(startwebhookTime,9,2) ":" SubStr(startwebhookTime,11,2) ":" SubStr(startwebhookTime,13,2) ".000Z"
+                        startwebookUnix := A_NowUTC
+                        EnvSub, startwebookUnix, 19700101000000, Seconds
+                        unixTS := startwebookUnix
+                        /*
                         if (MacroUptime > 0) {
                             elapsed := A_TickCount - MacroUptime
                             hours   := Floor(elapsed / 3600000)
@@ -3735,23 +3728,23 @@ global auracolor := 0
                         } else {
                             MacroUptimeStr := "Not Started"
                         }
-
+                        */
                         if (biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE") {
                             content := "@everyone"
                         } else {
                             content := ""
                         }
 
-                        description := "> ## Biome Started - " biome "\n> ### [Join Server](" privateServerLink ") \nMacro Runtime: " MacroUptimeStr
+                        startdescription := "> ## Biome Started - " biome "\n> ### [Join Server](" privateServerLink ")"
 
                         json := "{"
                         . """embeds"": ["
                         . "  {"
-                        . "    ""title"": ""<t:" unixTS ":F> (<t:" unixTS ":R>)"","
-                        . "    ""description"": """ description ""","
+                        . "    ""title"": ""<t:" startwebookUnix ":F> (<t:" startwebookUnix ":R>)"","
+                        . "    ""description"": """ startdescription ""","
                         . "    ""color"": " biomeColor ","
                         . "    ""thumbnail"": {""url"": """ thumbnail_url """},"
-                        . "    ""footer"": {""text"": ""fishSol v1.9.7"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
+                        . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
                         . "    ""timestamp"": """ timestamp """"
                         . "  }"
                         . "],"
@@ -3810,6 +3803,7 @@ F1::
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
         checkGhostServerLastRun := 0
+        enteredLimbo := false
         IniWrite, %selectedItem2%, %iniFilePath%, Macro, selectedItem2
         IniWrite, %res%, %iniFilePath%, Macro, resolution
         IniWrite, %maxLoopCount%, %iniFilePath%, Macro, maxLoopCount
@@ -3820,24 +3814,14 @@ F1::
         SetTimer, UpdateGUI, 1000
         if (res = "1080p") {
             SetTimer, DoMouseMove, 100
+            /*
             if (MacroUptime = 0) {
                 MacroUptime := A_TickCount
             }
-            elapsed := A_TickCount - MacroUptime
-            hours   := Floor(elapsed / 3600000)
-            minutes := Floor(Mod(elapsed, 3600000) / 60000)
-            seconds := Floor(Mod(elapsed, 60000) / 1000)
-            MacroUptimeStr := Format("{:02}:{:02}:{:02}", hours, minutes, seconds)
+            */
         }
-        /*
-        Loop, Files, %logDir%\*.log, F
-        {
-            if (A_LoopFileFullPath != newestFile)
-                FileDelete, %A_LoopFileFullPath%
-        }
-        */
-    }
     try SendWebhook(":green_circle: Macro Started!", "7909721")
+    }
 return
 
 
@@ -3857,7 +3841,6 @@ F2::
     IniWrite, %selectedItem%, %iniFilePath%, Macro, selectedItem
     autocrafting := true
 
-    EnsureFullscreen()
     ToolTip, Crafting will start in 5 seconds..., 900, 10
     Sleep, 1000
     ToolTip, Crafting will start in 4 seconds..., 900, 10
@@ -3867,6 +3850,7 @@ F2::
     ToolTip, Crafting will start in 2 seconds..., 900, 10
     Sleep, 1000
     ToolTip, Crafting will start in 1 second..., 900, 10
+    EnsureFullscreen()
     Sleep, 1000
     ToolTip
     try SendWebhook("Crafting Started on " selectedItem ":tools:", 0)
@@ -3884,7 +3868,8 @@ F3::
     Send, {esc up}
     Send, {r up}
     Send, {f up}
-    MacroUptime := 0
+    enteredlimbo := false
+    ;MacroUptime := 0
     if (toggle) {
         try SendWebhook(":red_circle: Macro Stopped.", "0")
     } else if (autocrafting) {
@@ -3915,21 +3900,12 @@ global blehblehbleh, webResponse, auraName
 return
 
 F7::
-
-global auraName, biome, biomeColor, biomeIndex, privateServerLink, timestamp, content, webhookURL, thumbnail_url, MacroUptime
-    if (MacroUptime > 0) {
-        elapsed := A_TickCount - MacroUptime
-        hours   := Floor(elapsed / 3600000)
-        minutes := Floor(Mod(elapsed, 3600000) / 60000)
-        seconds := Floor(Mod(elapsed, 60000) / 1000)
-        MacroUptimeStr := Format("{:02}:{:02}:{:02}", hours, minutes, seconds)
-    } else {
-        MacroUptimeStr := "Not Started"
-    }
+global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome, webResponse, biomeIndex
+    RunBiomeSelector()
     ;try SendWebhook(auraName, 0)
     ;try SendWebhook(biome, 0)
     ;try SendWebhook(MacroUptimeStr, 0)
-    try SendWebhook(A_TickCount - infiniteclickfailsafe, 0)
+    ;try SendWebhook3(A_TickCount - infiniteclickfailsafe , 0)
     /*
     ; stop rolling
     sleep, 1000
@@ -4048,7 +4024,7 @@ global auraName, biome, biomeColor, biomeIndex, privateServerLink, timestamp, co
     sleep 300
     */
 return
-*/
+
 ZeusAbility() {
     Send, {f up}
     Send, {f down}
@@ -4256,7 +4232,7 @@ if (toggle) {
         ; limbo stuff
         if (fishInLimbo && !enteredLimbo) {
             LimboFish()
-            sleep, 5000
+            enteredLimbo := true
             SendWebhook("Mini Version")
         }
         ; SC Toggle
@@ -4511,7 +4487,7 @@ if (toggle) {
         fishingFailsafeRan := true
         SendWebhook3("Fishing Failsafe Activiated")
         }
-
+        /*
         if (restartMacroFailsafe && failsafeTime > 0 && A_TickCount - failsafeTime > 240000) {
         try SendWebhook3("No Activity Detected for 4 Minutes \nSelling fish, then Restarting Macro...", "14495300")
         toggle := false
@@ -4534,14 +4510,22 @@ if (toggle) {
         FishingSpotSelling()
         return
         }
-        if (!toggle) {
-        return
+        */
+        ; Pathing Failsafe
+        if (A_TickCount - startWhitePixelSearch > (61 * 1000)) {
+        restartPathing := true
+        try SendWebhook3(" Pathing failsafe was triggered.", "6693139")
+        break
         }
+        if (!toggle) {
+        Return
         }
 
         if (restartPathing) {
         continue
         }
+        }
+
 
         ; PixelSearch loop
         startTime := A_TickCount
@@ -4583,15 +4567,6 @@ if (toggle) {
             PixelSearch, FoundX, FoundY, 757, 762, 1161, 782, barColor, 5, Fast RGB
             if (ErrorLevel = 0) {
             } else {
-                ;if (!timerStarted) {
-                    ;timerStarted := true
-                    ;infiniteclickfailsafe := A_TickCount
-                    ;firstfishclick := true
-                ;}
-                ;if (A_TickCount - infiniteclickfailsafe > 120000) {
-                    ;SendWebhook3("infiniteclickfailsafe triggered", 0)
-                    ;Goto fixinfiniteclick
-                ;}
                 MouseClick, left
             }
         }
@@ -4619,31 +4594,14 @@ if (toggle) {
 return
 
 StartScript:
-if (!toggle) {
-    Gui, Submit, nohide
-    if (MaxLoopInput > 0) {
-        maxLoopCount := MaxLoopInput
+    if (manualCraft && selectedItem2 = "") {
+        ManualCraftAlert()
     }
-    if (FishingLoopInput > 0) {
-        fishingLoopCount := FishingLoopInput
-    }
-    toggle := true
-    if (startTick = "") {
-        startTick := A_TickCount
-    }
-    if (cycleCount = "") {
-        cycleCount := 0
-    }
-    WinActivate, ahk_exe RobloxPlayerBeta.exe
-    ManualGUIUpdate()
-    SetTimer, UpdateGUI, 1000
-    SetTimer, DoMouseMove, 100
-    try SendWebhook(":green_circle: Macro Started!", "7909721")
-}
-return
 
-StartScript(res) {
-    if (!toggle) {
+    if (!res) {
+        res := "1080p"
+    }
+    if (!toggle && offsides != true) {
         Gui, Submit, nohide
         if (MaxLoopInput > 0) {
             maxLoopCount := MaxLoopInput
@@ -4652,58 +4610,95 @@ StartScript(res) {
             fishingLoopCount := FishingLoopInput
         }
         toggle := true
+        strangeControllerLastRun := 0
+        biomeRandomizerLastRun := 0
+        checkGhostServerLastRun := 0
+
         if (startTick = "") {
             startTick := A_TickCount
         }
         if (cycleCount = "") {
             cycleCount := 0
         }
+        strangeControllerLastRun := 0
+        biomeRandomizerLastRun := 0
+        checkGhostServerLastRun := 0
+        IniWrite, %selectedItem2%, %iniFilePath%, Macro, selectedItem2
+        IniWrite, %res%, %iniFilePath%, Macro, resolution
+        IniWrite, %maxLoopCount%, %iniFilePath%, Macro, maxLoopCount
+        IniWrite, %fishingLoopCount%, %iniFilePath%, Macro, fishingLoopCount
         WinActivate, ahk_exe RobloxPlayerBeta.exe
         ManualGUIUpdate()
+        EnsureFullscreen()
         SetTimer, UpdateGUI, 1000
+        if (res = "1080p") {
             SetTimer, DoMouseMove, 100
-        try SendWebhook(":green_circle: Macro Started!", "7909721")
+        }
     }
-    return
-}
-
-PauseScript:
-if (toggle) {
-if (biomeDetectionRunning) {
-    DetectHiddenWindows, On
-    SetTitleMatchMode, 2
-
-    target := "biomes.ahk"
-    WinGet, id, ID, %target% ahk_class AutoHotkey
-    if (id) {
-        WinClose, ahk_id %id%
-    }
-    biomeDetectionRunning := false
-}
-toggle := false
-firstLoop := true
-SetTimer, DoMouseMove, Off
-SetTimer, UpdateGUI, Off
-ManualGUIUpdate()
-ToolTip
-try SendWebhook(":yellow_circle: Macro Paused", "16632664")
-}
+    try SendWebhook(":green_circle: Macro Started!", "7909721")
 return
 
-CloseScript:
-if (biomeDetectionRunning) {
-    DetectHiddenWindows, On
-    SetTitleMatchMode, 2
+StartScript(res) {
+        if (manualCraft && selectedItem2 = "") {
+            ManualCraftAlert()
+        }
 
-    target := "biomes.ahk"
-    WinGet, id, ID, %target% ahk_class AutoHotkey
-    if (id) {
-        WinClose, ahk_id %id%
+        if (!res) {
+            res := "1080p"
+        }
+        if (!toggle && offsides != true) {
+            Gui, Submit, nohide
+            if (MaxLoopInput > 0) {
+                maxLoopCount := MaxLoopInput
+            }
+            if (FishingLoopInput > 0) {
+                fishingLoopCount := FishingLoopInput
+            }
+            toggle := true
+            strangeControllerLastRun := 0
+            biomeRandomizerLastRun := 0
+            checkGhostServerLastRun := 0
+
+            if (startTick = "") {
+                startTick := A_TickCount
+            }
+            if (cycleCount = "") {
+                cycleCount := 0
+            }
+            strangeControllerLastRun := 0
+            biomeRandomizerLastRun := 0
+            checkGhostServerLastRun := 0
+            IniWrite, %selectedItem2%, %iniFilePath%, Macro, selectedItem2
+            IniWrite, %res%, %iniFilePath%, Macro, resolution
+            IniWrite, %maxLoopCount%, %iniFilePath%, Macro, maxLoopCount
+            IniWrite, %fishingLoopCount%, %iniFilePath%, Macro, fishingLoopCount
+            WinActivate, ahk_exe RobloxPlayerBeta.exe
+            ManualGUIUpdate()
+            EnsureFullscreen()
+            SetTimer, UpdateGUI, 1000
+            if (res = "1080p") {
+                SetTimer, DoMouseMove, 100
+        }
+        try SendWebhook(":green_circle: Macro Started!", "7909721")
     }
-    biomeDetectionRunning := false
 }
-try SendWebhook(":red_circle: Macro Stopped.", "14495300")
-ExitApp
+
+CloseScript:
+    Send, {w up}
+    Send, {a up}
+    Send, {s up}
+    Send, {d up}
+    Send, {space up}
+    Send, {e up}
+    Send, {esc up}
+    Send, {r up}
+    Send, {f up}
+    if (toggle) {
+        try SendWebhook(":red_circle: Macro Stopped.", "0")
+    } else if (autocrafting) {
+        try SendWebhook(":red_circle: Auto Crafting Stopped.", "0")
+    }
+    Reload
 return
 
 SelectRes:
@@ -4785,7 +4780,7 @@ NeedHelpClick:
 Run, https://discord.gg/nPvA54ShTm
 return
 
-
+/*
 Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetScriptTitle)
 {
     VarSetCapacity(CopyDataStruct, 3 * A_PtrSize, 0)
@@ -4801,6 +4796,7 @@ Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetScriptTitle)
     SetTitleMatchMode %Prev_TitleMatchMode%
     return ErrorLevel
 }
+*/
 /*
     Receive_WM_COPYDATA(wParam, lParam)
     {
@@ -4840,6 +4836,7 @@ DoChatWait:
         PixelGetColor, ChatCheck, 132, 35, RGB
     }
 return
+
 
 
 LazyCheckItemDescription(senstivity, list*) {
