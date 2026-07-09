@@ -3735,13 +3735,13 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                             content := ""
                         }
 
-                        startdescription := "> ## Biome Started - " biome "\n> ### [Join Server](" privateServerLink ")"
+                        ;startdescription := "> ## Biome Started - " biome "\n> ### [Join Server](" privateServerLink ")"
 
                         json := "{"
                         . """embeds"": ["
                         . "  {"
                         . "    ""title"": ""<t:" startwebookUnix ":F> (<t:" startwebookUnix ":R>)"","
-                        . "    ""description"": """ startdescription ""","
+                        . "    ""description"": ""> ### Biome Started - " biome "\n> ### [Join Server](" privateServerLink ")"","
                         . "    ""color"": " biomeColor ","
                         . "    ""thumbnail"": {""url"": """ thumbnail_url """},"
                         . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
