@@ -3666,14 +3666,13 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                         endThumb := ""
                         if (biomeData.HasKey(prevBiome)) {
                             endColor := biomeData[prevBiome].color
-                            ;endThumb := biomeData[prevBiome].thumbnail
                         }
 
                         endwebhookTime := A_NowUTC
                         endTimestamp := SubStr(endwebhookTime,1,4) "-" SubStr(endwebhookTime,5,2) "-" SubStr(endwebhookTime,7,2) "T" SubStr(endwebhookTime,9,2) ":" SubStr(endwebhookTime,11,2) ":" SubStr(endwebhookTime,13,2) ".000Z"
                         endwebhookUnix := A_NowUTC
                         EnvSub, endwebhookUnix, 19700101000000, Seconds
-                        
+
                         enddescription := "> ### Biome Ended - " prevBiome " "
 
                         endJson := "{"
@@ -3697,7 +3696,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
 
                     
                     ; start
-                if ((isBiomeEnabled = 1 || biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE" || biome = "SINGULARITY") && biome != "Normal") {
+                    if ((isBiomeEnabled = 1 || biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE" || biome = "SINGULARITY") && biome != "Normal") {
 
                         if (biomeData.HasKey(biome)) {
                             biomeColor    := biomeData[biome].color
@@ -3706,8 +3705,9 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
 
                         startwebhookTime := A_NowUTC
                         timestamp := SubStr(startwebhookTime,1,4) "-" SubStr(startwebhookTime,5,2) "-" SubStr(startwebhookTime,7,2) "T" SubStr(startwebhookTime,9,2) ":" SubStr(startwebhookTime,11,2) ":" SubStr(startwebhookTime,13,2) ".000Z"
-                        startwebookUnix := A_NowUTC
-                        EnvSub, startwebookUnix, 19700101000000, Seconds
+                        startTime := A_NowUTC
+                        EnvSub, startTime, 19700101000000, Seconds
+
 
                         if (biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE") {
                             content := "@everyone"
@@ -3715,13 +3715,13 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                             content := ""
                         }
 
-                        startdescription := "> ## Biome Started - " biome "\n> ### [Join Server](" privateServerLink ")"
+                        description := "> ## Biome Started - " biome "\n> ### [Join Server](" privateServerLink ")  "
 
                         json := "{"
                         . """embeds"": ["
                         . "  {"
-                        . "    ""title"": ""<t:" startwebookUnix ":F> (<t:" startwebookUnix ":R>)"","
-                        . "    ""description"": """ startdescription ""","
+                        . "    ""title"": ""<t:" startTime ":F> (<t:" startTime ":R>)"","
+                        . "    ""description"": """ description ""","
                         . "    ""color"": " biomeColor ","
                         . "    ""thumbnail"": {""url"": """ thumbnail_url """},"
                         . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
