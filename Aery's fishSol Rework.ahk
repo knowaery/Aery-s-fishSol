@@ -3657,6 +3657,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                 if (biome && biome != "" && biome != prevBiome) {
                     if (biomeDetect && toggle) {
                     biomeKey := "Biome" StrReplace(biome, " ", "")
+                    IniRead, isBiomeEnabled, %iniFilePath%, "Biomes", %biomeKey%, 1
 
                     ; end
                     if (prevBiome != "" && prevBiome != "Normal") {
@@ -3672,17 +3673,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                         endTimestamp := SubStr(endwebhookTime,1,4) "-" SubStr(endwebhookTime,5,2) "-" SubStr(endwebhookTime,7,2) "T" SubStr(endwebhookTime,9,2) ":" SubStr(endwebhookTime,11,2) ":" SubStr(endwebhookTime,13,2) ".000Z"
                         endwebhookUnix := A_NowUTC
                         EnvSub, endwebhookUnix, 19700101000000, Seconds
-                        /*
-                        if (MacroUptime > 0) {
-                            elapsed := A_TickCount - MacroUptime
-                            hours   := Floor(elapsed / 3600000)
-                            minutes := Floor(Mod(elapsed, 3600000) / 60000)
-                            seconds := Floor(Mod(elapsed, 60000) / 1000)
-                            MacroUptimeStr := Format("{:02}:{:02}:{:02}", hours, minutes, seconds)
-                        } else {
-                            MacroUptimeStr := "Not Started"
-                        }
-                        */
+                        
                         enddescription := "> ### Biome Ended - " prevBiome " "
 
                         endJson := "{"
@@ -3717,31 +3708,20 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                         timestamp := SubStr(startwebhookTime,1,4) "-" SubStr(startwebhookTime,5,2) "-" SubStr(startwebhookTime,7,2) "T" SubStr(startwebhookTime,9,2) ":" SubStr(startwebhookTime,11,2) ":" SubStr(startwebhookTime,13,2) ".000Z"
                         startwebookUnix := A_NowUTC
                         EnvSub, startwebookUnix, 19700101000000, Seconds
-                        unixTS := startwebookUnix
-                        /*
-                        if (MacroUptime > 0) {
-                            elapsed := A_TickCount - MacroUptime
-                            hours   := Floor(elapsed / 3600000)
-                            minutes := Floor(Mod(elapsed, 3600000) / 60000)
-                            seconds := Floor(Mod(elapsed, 60000) / 1000)
-                            MacroUptimeStr := Format("{:02}:{:02}:{:02}", hours, minutes, seconds)
-                        } else {
-                            MacroUptimeStr := "Not Started"
-                        }
-                        */
+
                         if (biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE") {
                             content := "@everyone"
                         } else {
                             content := ""
                         }
 
-                        ;startdescription := "> ## Biome Started - " biome "\n> ### [Join Server](" privateServerLink ")"
+                        startdescription := "> ## Biome Started - " biome "\n> ### [Join Server](" privateServerLink ")"
 
                         json := "{"
                         . """embeds"": ["
                         . "  {"
                         . "    ""title"": ""<t:" startwebookUnix ":F> (<t:" startwebookUnix ":R>)"","
-                        . "    ""description"": ""> ### Biome Started - " biome "\n> ### [Join Server](" privateServerLink ")"","
+                        . "    ""description"": """ startdescription ""","
                         . "    ""color"": " biomeColor ","
                         . "    ""thumbnail"": {""url"": """ thumbnail_url """},"
                         . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
