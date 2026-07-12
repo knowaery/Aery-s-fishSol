@@ -17,10 +17,12 @@ AuraList := {"Starscourge_Radiant": 1
 , "Chromatic_Genesis": 1
 , "Spectraflow": 1
 , "Lily": 1
+, "Sharkyn_HammerHead": 1
 , "Overture": 1
 , "Symphony": 1
 , "Twilight_Withering_Grace": 1
 , "Felled": 1
+, "BOUNDED_AICHMALOTOS": 1
 , "Projection": 1
 , "Impeached": 1
 , "Lumenpool": 1
@@ -57,6 +59,8 @@ AuraList := {"Starscourge_Radiant": 1
 , "Sovereign": 1
 , "Ruins_Withered": 1
 , "Aegis": 1
+, "Eisveil": 1
+, "Poseidon_Atlantis": 1
 , "ASCENDANT": 1
 , "PROLOGUE": 1
 , "Unknown": 1
@@ -76,7 +80,7 @@ AuraListTrans := {"NYCTOPHOBIA": 1
 , "meta": 1
 , "illusionary": 1}
 
-AuraListOrder := ["Chromatic_Genesis", "Starscourge_Radiant", "Spectraflow", "Lily", "Overture", "Symphony", "Twilight_Withering_Grace", "Felled", "Projection", "Impeached", "Lumenpool", "Hyper-Volt_Ever-Storm", "Astral_Legendarium", "Prophecy", "Exotic_Void", "BLOODLUST", "Overture_History", "Maelstrom", "Perpetual", "dreamer", "LOTUSFALL", "Jazz_Orchestra", "CYTOKINESIS", "Archangel", "Atlas", "Flora_Evergreen", "CHILLSEAR", "Celestial_Eclipse", "AbyssalHunter", "GARGANTUA", "APOSTOLOS", "Kyawthuite_Remembrance", "Ruins", "Matrix_Overdrive", "Gravitational_PointZero", "Sophyra", "SAILOR_ADMIRAL", "Matrix_Reality", "PYTHIOS", "Sloth", "Sovereign", "Ruins_Withered", "Aegis", "ASCENDANT", "Raven_Plauge", "Unknown", "Elude", "PROLOGUE", "Dreamscape"]
+AuraListOrder := ["Chromatic_Genesis", "Starscourge_Radiant", "Spectraflow", "Lily", "Sharkyn_HammerHead", "Overture", "Symphony", "Twilight_Withering_Grace", "Felled", "BOUNDED_AICHMALOTOS", "Projection", "Impeached", "Lumenpool", "Hyper-Volt_Ever-Storm", "Astral_Legendarium", "Prophecy", "Exotic_Void", "BLOODLUST", "Overture_History", "Maelstrom", "Perpetual", "dreamer", "LOTUSFALL", "Jazz_Orchestra", "CYTOKINESIS", "Archangel", "Atlas", "Flora_Evergreen", "CHILLSEAR", "Celestial_Eclipse", "AbyssalHunter", "GARGANTUA", "APOSTOLOS", "Kyawthuite_Remembrance", "Ruins", "Matrix_Overdrive", "Gravitational_PointZero", "Sophyra", "SAILOR_ADMIRAL", "Matrix_Reality", "PYTHIOS", "Sloth", "Sovereign", "Ruins_Withered", "Aegis", "Eisveil", "Poseidon_Atlantis", "ASCENDANT", "Raven_Plauge", "Unknown", "Elude", "PROLOGUE", "Dreamscape"]
 AuraListTransOrder := ["NYCTOPHOBIA", "Pixelation", "Luminosity", "LEVIATHAN", "ASTRAIOS", "BREAKTHROUGH", "dreamcatcher", "EQUINOX", "MONARCH", "meta", "illusionary"]
 
 EnabledAuras := {}
@@ -164,7 +168,7 @@ potionCraftCount := 1
 selectedItem := ""
 selectedItem2 := ""
 autoClicker := false
-biomeSelectorInterval := 3600000
+biomeSelectorInterval := 3660000
 failsafeTime := 0
 fishInLimbo := false
 decideAuraClip := false
@@ -449,16 +453,16 @@ Gui, Add, Text, x120 y178 w80 h25 BackgroundTrans, 1080p
 Gui, Font, s11 cWhite Bold
 Gui, Add, GroupBox, x235 y85 w330 h120 cWhite, Limbo Fish
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x247 y105 h45 w295 BackgroundTrans c0xCCCCCC, (During Macro) Automatically uses Zeus to glitch into limbo then fish in overworld. Requires Zeus and a consistent frame rate (~60fps).
+Gui, Add, Text, x247 y105 h45 w295 BackgroundTrans c0xCCCCCC, (During Macro) Automatically uses Zeus to glitch into limbo then fish in overworld. Requires Zeus and a consistent frame rate (~60fps). (In development)
 Gui, Font, s10 cWhite Bold
-Gui, Add, Button, x250 y160 w80 h25 gTogglefishInLimbo vfishInLimboBtn, Toggle
+;Gui, Add, Button, x250 y160 w80 h25 gTogglefishInLimbo vfishInLimboBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x340 y163 w60 h25 vfishInLimboStatus BackgroundTrans, OFF
+;Gui, Add, Text, x340 y163 w60 h25 vfishInLimboStatus BackgroundTrans, OFF
 
 Gui, Font, s9 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Button, x385 y159 w124 h25 gTogglelimboFailsafe vlimboFailsafeBtn, Toggle Limbo Failsafe
+;Gui, Add, Button, x385 y159 w124 h25 gTogglelimboFailsafe vlimboFailsafeBtn, Toggle Limbo Failsafe
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x521 y162 w60 h25 vlimboFailsafeStatus BackgroundTrans, OFF
+;Gui, Add, Text, x521 y162 w60 h25 vlimboFailsafeStatus BackgroundTrans, OFF
 
 Gui, Add, GroupBox, x30 y215 w535 h120 cWhite, Loop Count Settings
 Gui, Font, s10 cWhite Bold
@@ -557,7 +561,7 @@ Gui, Add, Button, x157 y450 w80 h25 gToggleBiomeSelector vBiomeSelectorBtn, Togg
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, Text, x257 y455 w60 h25 vBiomeSelectorStatus BackgroundTrans, OFF
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x30 y468 w500 h40 BackgroundTrans c0xCCCCCC,Uses every 60 minutes.
+Gui, Add, Text, x30 y468 w500 h40 BackgroundTrans c0xCCCCCC,Uses every 61 minutes.
 Gui, Font, s9 cWhite Bold
 Gui, Add, DropDownList, x30 y487 w100 h200 vSelectedBiome gUpdateSelectedBiome, Windy|Snowy|Rainy|Heaven|Hell|Starfall|Corruption|SandStorm|Null
 
@@ -834,7 +838,7 @@ Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y490 w480 h1 0x10 BackgroundTrans
 
 Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y500 w500 h15 BackgroundTrans, Aery's fishSol v1.7 (2026-06-22)
+Gui, Add, Text, x50 y500 w500 h15 BackgroundTrans, Aery's fishSol v1.7 (2026-07-12)
 Gui, Add, Text, x300 y500 w500 h15 BackgroundTrans, If you need help, message me on discord. (noaery)
 Gui, Add, Text, x50 y525 w500 h15 BackgroundTrans c0x0088FF gReleasesClick +0x200, https://github.com/knowaery/Aery-s-Fishsol
 
@@ -1715,7 +1719,7 @@ SendWebhook3(text, color := 16777215) {
 
     allowedMentions := ""
     content := "<@" webhookID ">"
-    ;content := "<@1498277476600905940>"
+    ;content := "<@1055676132306989076>"
 
 
     json := "{"
@@ -3879,11 +3883,12 @@ global blehblehbleh, webResponse, auraName
     }
 return
 
+/*
 F7::
 global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome, webResponse, biomeIndex
-    RunBiomeSelector()
+    ;RunBiomeSelector()
     ;try SendWebhook(auraName, 0)
-    ;try SendWebhook(biome, 0)
+    try SendWebhook("biome: " biome, 0)
     ;try SendWebhook(MacroUptimeStr, 0)
     ;try SendWebhook3(A_TickCount - infiniteclickfailsafe , 0)
     /*
@@ -4002,9 +4007,8 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
     sleep 300
     Click, Left
     sleep 300
-    */
 return
-
+*/
 ZeusAbility() {
     Send, {f up}
     Send, {f down}
@@ -4467,7 +4471,7 @@ if (toggle) {
         fishingFailsafeRan := true
         SendWebhook3("Fishing Failsafe Activiated")
         }
-        /*
+        
         if (restartMacroFailsafe && failsafeTime > 0 && A_TickCount - failsafeTime > 240000) {
         try SendWebhook3("No Activity Detected for 4 Minutes \nSelling fish, then Restarting Macro...", "14495300")
         toggle := false
@@ -4490,7 +4494,7 @@ if (toggle) {
         FishingSpotSelling()
         return
         }
-        */
+        
         ; Pathing Failsafe
         if (A_TickCount - startWhitePixelSearch > (61 * 1000)) {
         restartPathing := true
