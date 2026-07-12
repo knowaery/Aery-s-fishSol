@@ -3709,8 +3709,8 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
 
                         startwebhookTime := A_NowUTC
                         timestamp := SubStr(startwebhookTime,1,4) "-" SubStr(startwebhookTime,5,2) "-" SubStr(startwebhookTime,7,2) "T" SubStr(startwebhookTime,9,2) ":" SubStr(startwebhookTime,11,2) ":" SubStr(startwebhookTime,13,2) ".000Z"
-                        startTime := A_NowUTC
-                        EnvSub, startTime, 19700101000000, Seconds
+                        startwebhookUnix := A_NowUTC
+                        EnvSub, startwebhookUnix, 19700101000000, Seconds
 
 
                         if (biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE") {
@@ -3724,7 +3724,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                         json := "{"
                         . """embeds"": ["
                         . "  {"
-                        . "    ""title"": ""<t:" startTime ":F> (<t:" startTime ":R>)"","
+                        . "    ""title"": ""<t:" startwebhookUnix ":F> (<t:" startwebhookUnix ":R>)"","
                         . "    ""description"": """ description ""","
                         . "    ""color"": " biomeColor ","
                         . "    ""thumbnail"": {""url"": """ thumbnail_url """},"
