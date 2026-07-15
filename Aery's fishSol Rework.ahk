@@ -101,7 +101,7 @@ if (biomeData = "") {
     biomeData["CORRUPTION"]  := {color: 7155368,   thumbnail: "https://purestellenium.github.io/biome_thumb/CORRUPTION.png"}
     biomeData["NULL"]        := {color: 8618883,   thumbnail: "https://purestellenium.github.io/biome_thumb/NULL.png"}
     biomeData["GLITCHED"]    := {color: 12582656,  thumbnail: "https://purestellenium.github.io/biome_thumb/GLITCHED.png"}
-    biomeData["DREAMSPACE"]  := {color: 15376858,  thumbnail: "http://github.com/xVapure/Noteab-Macro/blob/main/images/Screenshot_2026-01-03_021107.png?raw=true"}
+    biomeData["DREAMSPACE"]  := {color: 15376858,  thumbnail: "https://purestellenium.github.io/biome_thumb/DREAMSPACE.png"}
     biomeData["HEAVEN"]      := {color: 16769184,  thumbnail: "https://purestellenium.github.io/biome_thumb/HEAVEN.png"}
     biomeData["CYBERSPACE"]  := {color: 663101,    thumbnail: "https://raw.githubusercontent.com/xVapure/Noteab-Macro/refs/heads/main/images/CYBERSPACE.png"}
     biomeData["SINGULARITY"] := {color: 13582371,  thumbnail: "https://raw.githubusercontent.com/xVapure/Noteab-Macro/refs/heads/main/images/SINGULARITY.png"}
