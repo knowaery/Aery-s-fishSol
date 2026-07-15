@@ -91,18 +91,18 @@ auracolor := 0
 
 if (biomeData = "") {
     biomeData := {}
-    biomeData["NORMAL"]      := {color: 0,         thumbnail: "https://maxstellar.github.io/biome_thumb/NORMAL.png"}
-    biomeData["WINDY"]       := {color: 10150399,  thumbnail: "https://maxstellar.github.io/biome_thumb/WINDY.png"}
-    biomeData["RAINY"]       := {color: 163773,    thumbnail: "https://maxstellar.github.io/biome_thumb/RAINY.png"}
-    biomeData["SNOWY"]       := {color: 14479353,  thumbnail: "https://maxstellar.github.io/biome_thumb/SNOWY.png"}
-    biomeData["SAND STORM"]  := {color: 9401431,   thumbnail: "https://maxstellar.github.io/biome_thumb/SAND%20STORM.png"}
-    biomeData["HELL"]        := {color: 16730905,  thumbnail: "https://maxstellar.github.io/biome_thumb/HELL.png"}
-    biomeData["STARFALL"]    := {color: 72375,     thumbnail: "https://maxstellar.github.io/biome_thumb/STARFALL.png"}
-    biomeData["CORRUPTION"]  := {color: 7155368,   thumbnail: "https://maxstellar.github.io/biome_thumb/CORRUPTION.png"}
-    biomeData["NULL"]        := {color: 8618883,   thumbnail: "https://maxstellar.github.io/biome_thumb/NULL.png"}
-    biomeData["GLITCHED"]    := {color: 12582656,  thumbnail: "https://maxstellar.github.io/biome_thumb/GLITCHED.png"}
+    biomeData["NORMAL"]      := {color: 0,         thumbnail: "https://purestellenium.github.io/biome_thumb/NORMAL.png"}
+    biomeData["WINDY"]       := {color: 10150399,  thumbnail: "https://purestellenium.github.io/biome_thumb/WINDY.png"}
+    biomeData["RAINY"]       := {color: 163773,    thumbnail: "https://purestellenium.github.io/biome_thumb/RAINY.png"}
+    biomeData["SNOWY"]       := {color: 14479353,  thumbnail: "https://purestellenium.github.io/biome_thumb/SNOWY.png"}
+    biomeData["SAND STORM"]  := {color: 9401431,   thumbnail: "https://purestellenium.github.io/biome_thumb/SAND%20STORM.png"}
+    biomeData["HELL"]        := {color: 16730905,  thumbnail: "https://purestellenium.github.io/biome_thumb/HELL.png"}
+    biomeData["STARFALL"]    := {color: 72375,     thumbnail: "https://purestellenium.github.io/biome_thumb/STARFALL.png"}
+    biomeData["CORRUPTION"]  := {color: 7155368,   thumbnail: "https://purestellenium.github.io/biome_thumb/CORRUPTION.png"}
+    biomeData["NULL"]        := {color: 8618883,   thumbnail: "https://purestellenium.github.io/biome_thumb/NULL.png"}
+    biomeData["GLITCHED"]    := {color: 12582656,  thumbnail: "https://purestellenium.github.io/biome_thumb/GLITCHED.png"}
     biomeData["DREAMSPACE"]  := {color: 15376858,  thumbnail: "http://github.com/xVapure/Noteab-Macro/blob/main/images/Screenshot_2026-01-03_021107.png?raw=true"}
-    biomeData["HEAVEN"]      := {color: 16769184,  thumbnail: "https://maxstellar.github.io/biome_thumb/HEAVEN.png"}
+    biomeData["HEAVEN"]      := {color: 16769184,  thumbnail: "https://purestellenium.github.io/biome_thumb/HEAVEN.png"}
     biomeData["CYBERSPACE"]  := {color: 663101,    thumbnail: "https://raw.githubusercontent.com/xVapure/Noteab-Macro/refs/heads/main/images/CYBERSPACE.png"}
     biomeData["SINGULARITY"] := {color: 13582371,  thumbnail: "https://raw.githubusercontent.com/xVapure/Noteab-Macro/refs/heads/main/images/SINGULARITY.png"}
 }
@@ -2041,28 +2041,6 @@ if (toggle) {
 }
 return
 
-ManualGUIUpdate() {
-    if (toggle) {
-        GuiControl,, StatusText, Running
-        GuiControl, +c0x00DD00, StatusText
-        GuiControl,, ResStatusText, Active - %res%
-
-        elapsed := A_TickCount - startTick
-        hours := elapsed // 3600000
-        minutes := (elapsed - hours * 3600000) // 60000
-        seconds := (elapsed - hours * 3600000 - minutes * 60000) // 1000
-        timeStr := Format("{:02d}:{:02d}:{:02d}", hours, minutes, seconds)
-        GuiControl,, RuntimeText, %timeStr%
-        GuiControl, +c0x00DD00, RuntimeText
-        GuiControl,, CyclesText, %cycleCount%
-        GuiControl, +c0x00DD00, CyclesText
-
-    } else {
-        GuiControl,, StatusText, Stopped
-        GuiControl, +c0xFF4444, StatusText
-        GuiControl,, ResStatusText, Ready
-    }
-}
 ; misc functions
 RainbowText:
     hue += 3
@@ -2854,7 +2832,6 @@ FishingSpotSelling() {
     biomeRandomizerLastRun := 0
     checkGhostServerLastRun := 0
     WinActivate, ahk_exe RobloxPlayerBeta.exe
-    ManualGUIUpdate()
     EnsureFullscreen()
     SetTimer, UpdateGUI, 1000
     SetTimer, DoMouseMove, 100
@@ -3665,9 +3642,6 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
 
                     ; end
                     if (prevBiome != "" && prevBiome != "Normal") {
-
-                        endColor := 0
-                        endThumb := ""
                         if (biomeData.HasKey(prevBiome)) {
                             endColor := biomeData[prevBiome].color
                         }
@@ -3684,8 +3658,8 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                         . "  {"
                         . "    ""title"": ""<t:" endwebhookUnix ":F> (<t:" endwebhookUnix ":R>)"","
                         . "    ""description"": """ enddescription ""","
-                        . "    ""color"": " 0 ","
-                        . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
+                        . "    ""color"": " biomeColor ","
+                        . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://purestellenium.github.io/fishSol%20icon.png""},"
                         . "    ""timestamp"": """ endTimestamp """"
                         . "  }"
                         . "],"
@@ -3708,7 +3682,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                         }
 
                         startwebhookTime := A_NowUTC
-                        timestamp := SubStr(startwebhookTime,1,4) "-" SubStr(startwebhookTime,5,2) "-" SubStr(startwebhookTime,7,2) "T" SubStr(startwebhookTime,9,2) ":" SubStr(startwebhookTime,11,2) ":" SubStr(startwebhookTime,13,2) ".000Z"
+                        startTimestamp := SubStr(startwebhookTime,1,4) "-" SubStr(startwebhookTime,5,2) "-" SubStr(startwebhookTime,7,2) "T" SubStr(startwebhookTime,9,2) ":" SubStr(startwebhookTime,11,2) ":" SubStr(startwebhookTime,13,2) ".000Z"
                         startwebhookUnix := A_NowUTC
                         EnvSub, startwebhookUnix, 19700101000000, Seconds
 
@@ -3728,8 +3702,8 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                         . "    ""description"": """ description ""","
                         . "    ""color"": " biomeColor ","
                         . "    ""thumbnail"": {""url"": """ thumbnail_url """},"
-                        . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://maxstellar.github.io/fishSol%20icon.png""},"
-                        . "    ""timestamp"": """ timestamp """"
+                        . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://purestellenium.github.io/fishSol%20icon.png""},"
+                        . "    ""timestamp"": """ startTimestamp """"
                         . "  }"
                         . "],"
                         . """content"": """ content """"
@@ -3793,17 +3767,11 @@ F1::
         IniWrite, %maxLoopCount%, %iniFilePath%, Macro, maxLoopCount
         IniWrite, %fishingLoopCount%, %iniFilePath%, Macro, fishingLoopCount
         WinActivate, ahk_exe RobloxPlayerBeta.exe
-        ManualGUIUpdate()
-        EnsureFullscreen()
-        SetTimer, UpdateGUI, 1000
-        if (res = "1080p") {
-            SetTimer, DoMouseMove, 100
-            /*
-            if (MacroUptime = 0) {
-                MacroUptime := A_TickCount
-            }
-            */
+        if (webhookID = "912451579918041118") {
+            EnsureFullscreen()
         }
+        SetTimer, UpdateGUI, 1000
+        SetTimer, DoMouseMove, 100
     try SendWebhook(":green_circle: Macro Started!", "7909721")
     }
 return
@@ -4495,18 +4463,9 @@ if (toggle) {
         return
         }
         
-        ; Pathing Failsafe
-        if (A_TickCount - startWhitePixelSearch > (61 * 1000)) {
-        restartPathing := true
-        try SendWebhook3(" Pathing failsafe was triggered.", "6693139")
-        break
-        }
+
         if (!toggle) {
         Return
-        }
-
-        if (restartPathing) {
-        continue
         }
         }
 
@@ -4612,7 +4571,6 @@ StartScript:
         IniWrite, %maxLoopCount%, %iniFilePath%, Macro, maxLoopCount
         IniWrite, %fishingLoopCount%, %iniFilePath%, Macro, fishingLoopCount
         WinActivate, ahk_exe RobloxPlayerBeta.exe
-        ManualGUIUpdate()
         EnsureFullscreen()
         SetTimer, UpdateGUI, 1000
         if (res = "1080p") {
@@ -4657,7 +4615,6 @@ StartScript(res) {
             IniWrite, %maxLoopCount%, %iniFilePath%, Macro, maxLoopCount
             IniWrite, %fishingLoopCount%, %iniFilePath%, Macro, fishingLoopCount
             WinActivate, ahk_exe RobloxPlayerBeta.exe
-            ManualGUIUpdate()
             EnsureFullscreen()
             SetTimer, UpdateGUI, 1000
             if (res = "1080p") {
@@ -4683,19 +4640,6 @@ CloseScript:
         try SendWebhook(":red_circle: Auto Crafting Stopped.", "0")
     }
     Reload
-return
-
-SelectRes:
-Gui, Submit, nohide
-res := Resolution
-IniWrite, %res%, %iniFilePath%, Macro, resolution
-ManualGUIUpdate()
-return
-
-SelectPathing:
-Gui, Submit, nohide
-IniWrite, %PathingMode%, %iniFilePath%, Macro, pathingMode
-pathingMode := PathingMode
 return
 
 Dev1NameClick:
