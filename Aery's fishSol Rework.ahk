@@ -91,20 +91,20 @@ auracolor := 0
 
 if (biomeData = "") {
     biomeData := {}
-    biomeData["NORMAL"]      := {color: 0,         thumbnail: "https://purestellenium.github.io/biome_thumb/NORMAL.png"}
-    biomeData["WINDY"]       := {color: 10150399,  thumbnail: "https://purestellenium.github.io/biome_thumb/WINDY.png"}
-    biomeData["RAINY"]       := {color: 163773,    thumbnail: "https://purestellenium.github.io/biome_thumb/RAINY.png"}
-    biomeData["SNOWY"]       := {color: 14479353,  thumbnail: "https://purestellenium.github.io/biome_thumb/SNOWY.png"}
-    biomeData["SAND STORM"]  := {color: 9401431,   thumbnail: "https://purestellenium.github.io/biome_thumb/SAND%20STORM.png"}
-    biomeData["HELL"]        := {color: 16730905,  thumbnail: "https://purestellenium.github.io/biome_thumb/HELL.png"}
-    biomeData["STARFALL"]    := {color: 72375,     thumbnail: "https://purestellenium.github.io/biome_thumb/STARFALL.png"}
-    biomeData["CORRUPTION"]  := {color: 7155368,   thumbnail: "https://purestellenium.github.io/biome_thumb/CORRUPTION.png"}
-    biomeData["NULL"]        := {color: 8618883,   thumbnail: "https://purestellenium.github.io/biome_thumb/NULL.png"}
-    biomeData["GLITCHED"]    := {color: 12582656,  thumbnail: "https://purestellenium.github.io/biome_thumb/GLITCHED.png"}
-    biomeData["DREAMSPACE"]  := {color: 15376858,  thumbnail: "https://purestellenium.github.io/biome_thumb/DREAMSPACE.png"}
-    biomeData["HEAVEN"]      := {color: 16769184,  thumbnail: "https://purestellenium.github.io/biome_thumb/HEAVEN.png"}
-    biomeData["CYBERSPACE"]  := {color: 663101,    thumbnail: "https://raw.githubusercontent.com/xVapure/Noteab-Macro/refs/heads/main/images/CYBERSPACE.png"}
-    biomeData["SINGULARITY"] := {color: 13582371,  thumbnail: "https://raw.githubusercontent.com/xVapure/Noteab-Macro/refs/heads/main/images/SINGULARITY.png"}
+    biomeData["NORMAL"]      := {color: 0,         thumbnail: "https://cdn.mongoosee.com/assets/biomes/NORMAL.png"}
+    biomeData["WINDY"]       := {color: 10150399,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/WINDY.png"}
+    biomeData["RAINY"]       := {color: 163773,    thumbnail: "https://cdn.mongoosee.com/assets/biomes/RAINY.png"}
+    biomeData["SNOWY"]       := {color: 14479353,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/SNOWY.png"}
+    biomeData["SAND STORM"]  := {color: 9401431,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/SAND%20STORM.png"}
+    biomeData["HELL"]        := {color: 16730905,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/HELL.png"}
+    biomeData["STARFALL"]    := {color: 72375,     thumbnail: "https://cdn.mongoosee.com/assets/biomes/STARFALL.png"}
+    biomeData["CORRUPTION"]  := {color: 7155368,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/CORRUPTION.png"}
+    biomeData["NULL"]        := {color: 8618883,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/NULL.png"}
+    biomeData["GLITCHED"]    := {color: 12582656,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/GLITCHED.png"}
+    biomeData["DREAMSPACE"]  := {color: 15376858,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/DREAMSPACE.png"}
+    biomeData["HEAVEN"]      := {color: 16769184,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/HEAVEN.png"}
+    biomeData["CYBERSPACE"]  := {color: 663101,    thumbnail: "https://cdn.mongoosee.com/assets/biomes/CYBERSPACE.png"}
+    biomeData["SINGULARITY"] := {color: 13582371,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/SINGULARITY.png"}
 }
 
 res := "1080p"
@@ -135,7 +135,6 @@ fishingFailsafeTime := 31
 autoRejoinFailsafeTime := 320
 advancedFishingThreshold := 25
 webhookURL := ""
-biomesPrivateServerLink := ""
 prevBiome := "None"
 prevState := "None"
 currentBiome := "None"
@@ -173,6 +172,7 @@ failsafeTime := 0
 fishInLimbo := false
 decideAuraClip := false
 limboFailsafe := false
+pscode := ""
 
 if (FileExist(iniFilePath)) {
     IniRead, tempRes, %iniFilePath%, Macro, resolution
@@ -255,11 +255,6 @@ if (FileExist(iniFilePath)) {
     if (tempWebhook != "ERROR")
     {
         webhookURL := tempWebhook
-    }
-    IniRead, tempBiomesPS, %iniFilePath%, Macro, biomesPrivateServerLink
-    if (tempBiomesPS != "ERROR")
-    {
-        biomesPrivateServerLink := tempBiomesPS
     }
     IniRead, tempAuraDetection, %iniFilePath%, Macro, auraDetection
     if (tempAuraDetection != "ERROR")
@@ -366,11 +361,16 @@ if (FileExist(iniFilePath)) {
         limboFailsafe := (tempLimboFailsafe = "true" || tempLimboFailsafe = "1")
 
 
-Devs := [{dev_name:"maxstellar"
-         , dev_role:"Twitch"
-         , dev_discord:"Lead Developer"
-         , dev_img: A_ScriptDir . "\img\maxstellar.png"
-         , dev_link:"https://www.twitch.tv/maxstellar"}
+RegExMatch(privateServerLink, "code=([^&]+)", codeMatch)
+code := codeMatch1
+privateServerLinkDeepLink := "roblox://navigation/share_links?code=" . code . "&type=Server"
+
+Devs := [{dev_name:"mongoosee"
+         , dev_role:"Biome Image Credits"
+         , dev_discord:"Website"
+         , dev_img: A_ScriptDir . "\img\mongoosee.png"
+         , dev_link:"https://mongoosee.com/"
+         , dev_website:"https://mongoosee.com/"}
         ,{dev_name:"ivelchampion249"
          , dev_role:"YouTube"
          , dev_discord:"Original Creator"
@@ -2161,17 +2161,9 @@ RunRejoin() {
 }
 
 RunRejoin2() {
-    Process, Exist, RobloxPlayerBeta.exe
-    if (ErrorLevel != 0) {
-        WinActivate, ahk_exe RobloxPlayerBeta.exe
-        Send {Esc}
-        sleep, 100
-        Send, {L}
-        sleep, 100
-        Send, {Enter}
-    }
+    global privateServerLinkDeepLink
     SendWebhook("Rejoining Server link...", 0)
-    Run, % "powershell -NoProfile -Command ""Start-Process '" . privateServerLink . "'"""
+    Run, % "powershell -NoProfile -Command ""Start-Process '" . privateServerLinkDeepLink . "'"""
 }
 
 ; countdown functions
@@ -3641,7 +3633,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                     IniRead, isBiomeEnabled, %iniFilePath%, "Biomes", %biomeKey%, 1
 
                     ; end
-                    if (prevBiome != "" && prevBiome != "Normal") {
+                    if ((prevBiome != "" && prevBiome != "Normal") || (prevBiome = "GLITCHED" || prevBiome = "DREAMSPACE" || prevBiome = "CYBERSPACE" || prevBiome = "SINGULARITY") && (biome != prevBiome)) {
                         if (biomeData.HasKey(prevBiome)) {
                             endColor := biomeData[prevBiome].color
                         }
@@ -3720,7 +3712,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                     pendingSkips := true
                 }
 
-                if ((toggle) && (detectGlobal || detectTrans) && (prevBiome = "GLITCHED" || prevBiome = "DREAMSPACE" || prevBiome = "CYBERSPACE" || prevBiome = "SINGULARITY") && (biome != prevBiome)) {
+                if ((toggle) && (detectGlobal || detectTrans) && (prevBiome = "GLITCHED" || prevBiome = "DREAMSPACE" || prevBiome = "CYBERSPACE") && (biome != prevBiome)) {
                     ClipBiome()
                 }
 
@@ -3851,7 +3843,7 @@ global blehblehbleh, webResponse, auraName
     }
 return
 
-/*
+
 F7::
 global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome, webResponse, biomeIndex
     ;RunBiomeSelector()
@@ -3975,8 +3967,9 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
     sleep 300
     Click, Left
     sleep 300
+    */
 return
-*/
+
 ZeusAbility() {
     Send, {f up}
     Send, {f down}
@@ -4407,6 +4400,7 @@ if (toggle) {
         globalFailsafeTimer := A_TickCount
         }
         fishingFailsafeRan := false
+        failsafeTime := 0
         Loop {
         PixelGetColor, color, 1176, 836, RGB
         if (color = 0xFFFFFF) {
@@ -4437,6 +4431,7 @@ if (toggle) {
         sleep 300
         MouseClick, Left
         fishingFailsafeRan := true
+        failsafeTime := A_TickCount
         SendWebhook3("Fishing Failsafe Activiated")
         }
         
