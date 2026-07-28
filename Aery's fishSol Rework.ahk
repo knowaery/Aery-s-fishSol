@@ -74,14 +74,14 @@ AuraListTrans := {"NYCTOPHOBIA": 1
 , "LEVIATHAN": 1
 , "ASTRAIOS": 1
 , "BREAKTHROUGH": 1
-, "dreamcatcher": 1
+, "Dream Catcher": 1
 , "EQUINOX": 1
 , "MONARCH": 1
 , "meta": 1
 , "illusionary": 1}
 
-AuraListOrder := ["Chromatic_Genesis", "Starscourge_Radiant", "Spectraflow", "Lily", "Sharkyn_HammerHead", "Overture", "Symphony", "Twilight_Withering_Grace", "Felled", "BOUNDED_AICHMALOTOS", "Projection", "Impeached", "Lumenpool", "Hyper-Volt_Ever-Storm", "Astral_Legendarium", "Prophecy", "Exotic_Void", "BLOODLUST", "Overture_History", "Maelstrom", "Perpetual", "dreamer", "LOTUSFALL", "Jazz_Orchestra", "CYTOKINESIS", "Archangel", "Atlas", "Flora_Evergreen", "CHILLSEAR", "Celestial_Eclipse", "AbyssalHunter", "GARGANTUA", "APOSTOLOS", "Kyawthuite_Remembrance", "Ruins", "Matrix_Overdrive", "Gravitational_PointZero", "Sophyra", "SAILOR_ADMIRAL", "Matrix_Reality", "PYTHIOS", "Sloth", "Sovereign", "Ruins_Withered", "Aegis", "Eisveil", "Poseidon_Atlantis", "ASCENDANT", "Raven_Plauge", "Unknown", "Elude", "PROLOGUE", "Dreamscape"]
-AuraListTransOrder := ["NYCTOPHOBIA", "Pixelation", "Luminosity", "LEVIATHAN", "ASTRAIOS", "BREAKTHROUGH", "dreamcatcher", "EQUINOX", "MONARCH", "meta", "illusionary"]
+AuraListOrder := ["Chromatic_Genesis", "Starscourge_Radiant", "Spectraflow", "Lily", "Sharkyn_HammerHead", "Overture", "Symphony", "Twilight_Withering_Grace", "Felled", "BOUNDED_AICHMALOTOS", "Projection", "Impeached", "Lumenpool", "Hyper-Volt_Ever-Storm", "Virtual Memory", "Astral_Legendarium", "Prophecy", "Exotic_Void", "BLOODLUST", "Overture_History", "Maelstrom", "Perpetual", "dreamer", "LOTUSFALL", "Jazz_Orchestra", "CYTOKINESIS", "Archangel", "Atlas", "Flora_Evergreen", "CHILLSEAR", "Celestial_Eclipse", "AbyssalHunter", "GARGANTUA", "APOSTOLOS", "Kyawthuite_Remembrance", "Ruins", "Matrix_Overdrive", "Gravitational_PointZero", "Sophyra", "SAILOR_ADMIRAL", "Matrix_Reality", "PYTHIOS", "Sloth", "Sovereign", "Ruins_Withered", "Aegis", "Eisveil", "Poseidon_Atlantis", "ASCENDANT", "Raven_Plauge", "Unknown", "Elude", "PROLOGUE", "Dreamscape"]
+AuraListTransOrder := ["NYCTOPHOBIA", "Pixelation", "Luminosity", "LEVIATHAN", "ASTRAIOS", "BREAKTHROUGH", "Dream Catcher", "EQUINOX", "MONARCH", "meta", "illusionary"]
 
 EnabledAuras := {}
 for i, aura in AuraListOrder
@@ -360,10 +360,14 @@ if (FileExist(iniFilePath)) {
     if (tempLimboFailsafe != "ERROR")
         limboFailsafe := (tempLimboFailsafe = "true" || tempLimboFailsafe = "1")
 
-
-RegExMatch(privateServerLink, "code=([^&]+)", codeMatch)
-code := codeMatch1
-privateServerLinkDeepLink := "roblox://navigation/share_links?code=" . code . "&type=Server"
+    for i, aura in AuraListOrder {
+        IniRead, savedVal, %iniFilePath%, EnabledAuras, %aura%, 1
+        EnabledAuras[aura] := savedVal
+    }
+    for i, aura in AuraListTransOrder {
+        IniRead, savedVal, %iniFilePath%, EnabledAuras, %aura%, 1
+        EnabledAuras[aura] := savedVal
+    }
 
 Devs := [{dev_name:"mongoosee"
          , dev_role:"Biome Image Credits"
@@ -616,14 +620,14 @@ Gui, Add, Text, x33 y93 w400 h75 BackgroundTrans, [ Aura Detection ]
 Gui, Font, s11 cWhite Bold, Segoe UI
 Gui, Add, Text, x365 y93 w515 h135 BackgroundTrans,Clip Type:
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, DropDownList, x440 y93 w128 vClipVersion gclipType, Nvidia: Alt + F10|Medal: F8
+Gui, Add, DropDownList, x440 y93 w128 vClipVersion gclipType, Nvidia: Alt + F10
 IniRead, clipType, %iniFilePath%, Macro, clipType
 GuiControl, Choose, ClipVersion, %clipType%
 
 Gui, Font, s11 cWhite Bold, Segoe UI
 Gui, Add, GroupBox, x33 y280 w534 h100 cWhite, Clip Globals
 Gui, Font, s10 c0xCCCCCC Normal
-Gui, Add, Text, x45 y300 w515 h135 BackgroundTrans, Automatically clips with Nvidia's Instant Replay or Medal when detecting a Global has been equipped. (Works for Biome Native Globals and Limbo Globals)
+Gui, Add, Text, x45 y300 w515 h135 BackgroundTrans, Automatically clips with Nvidia's Instant Replay when detecting a Global has been equipped. (Works for Biome Native Globals and Limbo Globals)
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Button, x45 y339 w80 h25 gToggleDetectGlobal vDetectGlobalBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
@@ -632,7 +636,7 @@ Gui, Add, Text, x143 y341 w70 h25 vDetectGlobalStatus BackgroundTrans, OFF
 Gui, Font, s11 cWhite Bold
 Gui, Add, GroupBox, x33 y385 w534 h100 cWhite, Clip Transcendents
 Gui, Font, s10 c0xCCCCCC Normal
-Gui, Add, Text, x45 y405 w515 h145 BackgroundTrans, Automatically clips with Nvidia's Instant Replay or Medal when detecting a Transcendent's has been equipped. Also gives a special webhook!
+Gui, Add, Text, x45 y405 w515 h145 BackgroundTrans, Automatically clips with Nvidia's Instant Replay when detecting a Transcendent's has been equipped. Also gives a special webhook!
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Button, x45 y445 w80 h25 gToggleDetectTrans vDetectTransBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
@@ -1105,7 +1109,8 @@ if (limboFailsafe) {
 
 GuiControl, ChooseString, SelectedBiome, %selectedBiome%
 SetTimer, AuraBiomeDetect, 1000
-
+SetTimer, ServerLinkConverter, 1000
+;IniRead, EnabledAuras, %iniFilePath%, EnabledAuras
 
 
 AuraCheckChange:
@@ -2078,6 +2083,13 @@ HSLtoRGB(h, s, l) {
     return Format("{:02X}{:02X}{:02X}", r, g, b)
 }
 
+ServerLinkConverter() {
+    global privateServerLink, privateServerLinkDeepLink
+    RegExMatch(privateServerLink, "code=([^&]+)", codeMatch)
+    code := codeMatch1
+    privateServerLinkDeepLink := "roblox://navigation/share_links?code=" . code . "&type=Server"
+}
+
 CheckGhostServer() {
 
     SendWebhook("Checking for ghost server...", 0)
@@ -2455,10 +2467,6 @@ ClipMethod:
     if (clipType = "Nvidia: Alt + F10") {
         Send, !{F10}
     }
-
-    if (clipType = "Medal: F8") {
-        Send, {F8}
-    }
     if (clipWebhook) {
             Sleep, 1500
             if (clipType = "Nvidia: Alt + F10") {
@@ -2470,8 +2478,6 @@ ClipMethod:
                     try SendWebhook4("Turning on Nvidia Replay...", 0)
                     TurnOnNvidiaReplay()
                 }
-            } else {
-                try SendWebhook4(auraName . " has been Clipped!\nClip Type: Medal", 0)
             }
         }
     ToolTip
@@ -2495,11 +2501,7 @@ TurnOnNvidiaReplay() {
 }
 
 ClipBiome() {
-    if (clipType = "Medal: F8") {
-        Send, {F8}
-    } else {
-        Send, !{F10}
-    }
+    Send, !{F10}
 }
 
 PopSkips() {
@@ -3209,8 +3211,6 @@ OpenNvidiaNotes:
     - Instant Replay must be enabled, with the keybind set to ALT + F10
     - Replay length should be set between 2-5 minutes
 
-    Requirements for Medal:
-
     This Replay System can be used even if you're not using the macro
         )
 
@@ -3227,8 +3227,7 @@ OpenAuraFilter:
     Gui, AuraFilter:New, +AlwaysOnTop, Aura Filter
     Gui, AuraFilter:Color, 041024
     Gui, AuraFilter:Font, s10 cWhite Bold, Segoe UI
-    ;Gui, AuraFilter:Add, Text, x-15 y10 w600 h20 Center BackgroundTrans c0x00D4FF,Toggle which aura will have a webhook/clip. (Requires Aura Detection and Aura Filter)
-    Gui, AuraFilter:Add, Text, x-15 y10 w600 h20 Center BackgroundTrans c0x00D4FF,Temporarily disabled
+    Gui, AuraFilter:Add, Text, x-15 y10 w600 h20 Center BackgroundTrans c0x00D4FF,Toggle which aura will have a webhook/clip. (Requires Aura Detection and Aura Filter)
     Gui, AuraFilter:Font, s9 cWhite Bold
     Gui, AuraFilter:Add, Text, x10 y35 w100 h20 BackgroundTrans c0xFFAA00, Globals: 
     Gui, AuraFilter:Font, s9 cWhite Normal
@@ -3252,8 +3251,7 @@ OpenAuraFilter:
     saveBtnY := nextY
     Gui, AuraFilter:Add, Button, x190 y%saveBtnY% w180 h30 gSaveAuraFilter, Save Aura Filter
 
-    ;winH := saveBtnY + 50
-    winH := 30
+    winH := saveBtnY + 50
     Gui, AuraFilter:Show, w580 h%winH%, Aura Filter
     auraFilterReady := true
 return
@@ -3849,6 +3847,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
     ;RunBiomeSelector()
     ;try SendWebhook(auraName, 0)
     try SendWebhook("biome: " biome, 0)
+    try SendWebhook(privateServerLinkDeepLink, 0)
     ;try SendWebhook(MacroUptimeStr, 0)
     ;try SendWebhook3(A_TickCount - infiniteclickfailsafe , 0)
     /*
@@ -4453,7 +4452,26 @@ if (toggle) {
         Send, R
         Sleep, 650
         Send, {Enter}
-        sleep 10000
+        sleep 5000
+        MouseMove, 47, 467, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        MouseMove, 382, 126, 3
+        sleep 220
+        Click, Left
+        sleep 220
+        Loop, 80
+            {
+            Click, WheelUp
+            sleep 25
+        }
+        sleep 500
+        Loop, 45
+            {
+            Click, WheelDown
+            sleep 25
+        }
         FishingSpotSelling()
         return
         }
