@@ -173,6 +173,7 @@ fishInLimbo := false
 decideAuraClip := false
 limboFailsafe := false
 pscode := ""
+clipType := "Nvidia: Alt + F10"
 
 if (FileExist(iniFilePath)) {
     IniRead, tempRes, %iniFilePath%, Macro, resolution
@@ -2834,6 +2835,7 @@ FishingSpotSelling() {
 
 ClearLogs:
     FileDelete, %logDir%\*.log
+    FileDelete, %ROBLOX_LOGS%
 return
 
 
@@ -4219,7 +4221,11 @@ if (toggle) {
             try SendWebhook3("Max Storage Detected", 0)
             sentstoragefull := true
         }
-        
+    
+
+    loopCount++
+    if (loopCount > maxLoopCount) {
+        pendingCraft := true
         if (pendingCraft && manualCraft && selectedItem2 != "") {
 
             sleep, 1000
@@ -4233,7 +4239,7 @@ if (toggle) {
             sleep 220
             Click, WheelUp 80
             sleep 500
-            Click, WheelDown 45
+            Click, WheelDown 25
             sleep 300
 
             Send, {Esc}
@@ -4254,25 +4260,12 @@ if (toggle) {
             Sleep, 500
             Click, Left
             Sleep, 500
-
-            Send, {Esc}
-            Sleep, 650
-            Send, R
-            Sleep, 650
-            Send, {Enter}
-            sleep 3000
             pendingCraft := false
 
-            Send, {w Down}
-            Sleep, 6950
-            Send, {w Up}
             if (fishInLimbo) {
                 enteredLimbo := false
             }
         }
-
-    loopCount++
-    if (loopCount > maxLoopCount) {
         sleep, 1000
         Send, {Esc}
         Sleep, 650
@@ -4289,18 +4282,9 @@ if (toggle) {
         sleep 220
         Click, Left
         sleep 220
-        Loop, 80
-            {
-            Click, WheelUp
-            sleep 25
-        }
+        Click, WheelUp 80
         sleep 500
-        Loop, 45
-            {
-            Click, WheelDown
-            sleep 25
-        }
-        sleep 300
+        Click, WheelDown 25
 
 
      if (pathingMode = "Vip Pathing") {
@@ -4461,17 +4445,10 @@ if (toggle) {
         sleep 220
         Click, Left
         sleep 220
-        Loop, 80
-            {
-            Click, WheelUp
-            sleep 25
-        }
+        Click, WheelUp 80
         sleep 500
-        Loop, 45
-            {
-            Click, WheelDown
-            sleep 25
-        }
+        Click, WheelDown 25
+        sleep 300
         FishingSpotSelling()
         return
         }
