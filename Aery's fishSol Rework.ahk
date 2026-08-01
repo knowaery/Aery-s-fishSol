@@ -62,6 +62,7 @@ AuraList := {"Starscourge_Radiant": 1
 , "Eisveil": 1
 , "Poseidon_Atlantis": 1
 , "ASCENDANT": 1
+, "Pool Party": 1
 , "PROLOGUE": 1
 , "Unknown": 1
 , "Elude": 1
@@ -80,7 +81,7 @@ AuraListTrans := {"NYCTOPHOBIA": 1
 , "meta": 1
 , "illusionary": 1}
 
-AuraListOrder := ["Chromatic_Genesis", "Starscourge_Radiant", "Spectraflow", "Lily", "Sharkyn_HammerHead", "Overture", "Symphony", "Twilight_Withering_Grace", "Felled", "BOUNDED_AICHMALOTOS", "Projection", "Impeached", "Lumenpool", "Hyper-Volt_Ever-Storm", "Virtual Memory", "Astral_Legendarium", "Prophecy", "Exotic_Void", "BLOODLUST", "Overture_History", "Maelstrom", "Perpetual", "dreamer", "LOTUSFALL", "Jazz_Orchestra", "CYTOKINESIS", "Archangel", "Atlas", "Flora_Evergreen", "CHILLSEAR", "Celestial_Eclipse", "AbyssalHunter", "GARGANTUA", "APOSTOLOS", "Kyawthuite_Remembrance", "Ruins", "Matrix_Overdrive", "Gravitational_PointZero", "Sophyra", "SAILOR_ADMIRAL", "Matrix_Reality", "PYTHIOS", "Sloth", "Sovereign", "Ruins_Withered", "Aegis", "Eisveil", "Poseidon_Atlantis", "ASCENDANT", "Raven_Plauge", "Unknown", "Elude", "PROLOGUE", "Dreamscape"]
+AuraListOrder := ["Chromatic_Genesis", "Starscourge_Radiant", "Spectraflow", "Lily", "Sharkyn_HammerHead", "Overture", "Symphony", "Twilight_Withering_Grace", "Felled", "BOUNDED_AICHMALOTOS", "Projection", "Impeached", "Lumenpool", "Hyper-Volt_Ever-Storm", "Virtual Memory", "Astral_Legendarium", "Prophecy", "Exotic_Void", "BLOODLUST", "Overture_History", "Maelstrom", "Perpetual", "dreamer", "LOTUSFALL", "Jazz_Orchestra", "CYTOKINESIS", "Archangel", "Atlas", "Flora_Evergreen", "CHILLSEAR", "Celestial_Eclipse", "AbyssalHunter", "GARGANTUA", "APOSTOLOS", "Kyawthuite_Remembrance", "Ruins", "Matrix_Overdrive", "Gravitational_PointZero", "Sophyra", "SAILOR_ADMIRAL", "Matrix_Reality", "PYTHIOS", "Sloth", "Sovereign", "Ruins_Withered", "Aegis", "Eisveil", "Poseidon_Atlantis", "ASCENDANT", "Pool Party", "Raven_Plauge", "Unknown", "Elude", "PROLOGUE", "Dreamscape"]
 AuraListTransOrder := ["NYCTOPHOBIA", "Pixelation", "Luminosity", "LEVIATHAN", "ASTRAIOS", "BREAKTHROUGH", "Dream Catcher", "EQUINOX", "MONARCH", "meta", "illusionary"]
 
 EnabledAuras := {}
@@ -91,20 +92,25 @@ auracolor := 0
 
 if (biomeData = "") {
     biomeData := {}
-    biomeData["NORMAL"]      := {color: 0,         thumbnail: "https://cdn.mongoosee.com/assets/biomes/NORMAL.png"}
-    biomeData["WINDY"]       := {color: 10150399,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/WINDY.png"}
-    biomeData["RAINY"]       := {color: 163773,    thumbnail: "https://cdn.mongoosee.com/assets/biomes/RAINY.png"}
-    biomeData["SNOWY"]       := {color: 14479353,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/SNOWY.png"}
-    biomeData["SAND STORM"]  := {color: 9401431,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/SAND%20STORM.png"}
-    biomeData["HELL"]        := {color: 16730905,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/HELL.png"}
-    biomeData["STARFALL"]    := {color: 72375,     thumbnail: "https://cdn.mongoosee.com/assets/biomes/STARFALL.png"}
-    biomeData["CORRUPTION"]  := {color: 7155368,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/CORRUPTION.png"}
-    biomeData["NULL"]        := {color: 8618883,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/NULL.png"}
-    biomeData["GLITCHED"]    := {color: 12582656,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/GLITCHED.png"}
-    biomeData["DREAMSPACE"]  := {color: 15376858,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/DREAMSPACE.png"}
-    biomeData["HEAVEN"]      := {color: 16769184,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/HEAVEN.png"}
-    biomeData["CYBERSPACE"]  := {color: 663101,    thumbnail: "https://cdn.mongoosee.com/assets/biomes/CYBERSPACE.png"}
-    biomeData["SINGULARITY"] := {color: 13582371,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/SINGULARITY.png"}
+    biomeData["NORMAL"]       := {color: 0,         thumbnail: "https://cdn.mongoosee.com/assets/biomes/NORMAL.png"}
+    biomeData["WINDY"]        := {color: 10150399,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/WINDY.png"}
+    biomeData["RAINY"]        := {color: 163773,    thumbnail: "https://cdn.mongoosee.com/assets/biomes/RAINY.png"}
+    biomeData["SNOWY"]        := {color: 14479353,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/SNOWY.png"}
+    biomeData["SAND STORM"]   := {color: 9401431,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/SAND%20STORM.png"}
+    biomeData["HELL"]         := {color: 16730905,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/HELL.png"}
+    biomeData["STARFALL"]     := {color: 72375,     thumbnail: "https://cdn.mongoosee.com/assets/biomes/STARFALL.png"}
+    biomeData["CORRUPTION"]   := {color: 7155368,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/CORRUPTION.png"}
+    biomeData["NULL"]         := {color: 8618883,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/NULL.png"}
+    biomeData["GLITCHED"]     := {color: 12582656,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/GLITCHED.png"}
+    biomeData["DREAMSPACE"]   := {color: 15376858,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/DREAMSPACE.png"}
+    biomeData["HEAVEN"]       := {color: 16769184,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/HEAVEN.png"}
+    biomeData["CYBERSPACE"]   := {color: 663101,    thumbnail: "https://cdn.mongoosee.com/assets/biomes/CYBERSPACE.png"}
+    biomeData["SINGULARITY"]  := {color: 13582371,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/SINGULARITY.png"}
+    biomeData["BLAZING SUN"]  := {color: 16106050,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/BLAZING%20SUN.png"}
+    biomeData["AURORA"]       := {color: 9065205, thumbnail: "https://cdn.mongoosee.com/assets/biomes/AURORA.png"}
+    biomeData["GRAVEYARD"]    := {color: 0, thumbnail: "https://cdn.mongoosee.com/assets/biomes/GRAVEYARD.png"}
+    biomeData["PUMPKIN MOON"] := {color: 0, thumbnail: "https://cdn.mongoosee.com/assets/biomes/PUMPKIN%20MOON.png"}
+    biomeData["BLOOD RAIN"]   := {color: 0, thumbnail: "https://cdn.mongoosee.com/assets/biomes/BLOOD%20RAIN.png"}
 }
 
 res := "1080p"
@@ -1111,7 +1117,6 @@ if (limboFailsafe) {
 GuiControl, ChooseString, SelectedBiome, %selectedBiome%
 SetTimer, AuraBiomeDetect, 1000
 SetTimer, ServerLinkConverter, 1000
-;IniRead, EnabledAuras, %iniFilePath%, EnabledAuras
 
 
 AuraCheckChange:
@@ -1774,6 +1779,48 @@ SendWebhook4(text, color := 16777215, imageURL := "") {
     json := "{"
     . """content"": """ content ""","
     . allowedMentions
+    . """embeds"": [{"
+    . """title"": """ text ""","
+    . """color"": " color ","
+    . imageBlock
+    . """footer"": {"
+    . """text"": ""Aery's fishSol v1.7"","
+    . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
+    . "},"
+    . """timestamp"": """ timestamp """"
+    . "}]"
+    . "}"
+
+    http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    http.Open("POST", webhookURL, false)
+    http.SetRequestHeader("Content-Type", "application/json")
+    http.Send(json)
+}
+
+SendWebhookMonarch(text, color := 16777215, imageURL := "") {
+    global webhookURL, webhookID, doPing3, auraName
+
+    if (!InStr(webhookURL, "discord"))
+        return
+
+    time := A_NowUTC
+    timestamp := SubStr(time,1,4) "-" SubStr(time,5,2) "-" SubStr(time,7,2)
+              . "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
+
+    content := ""
+    ;allowedMentions := ""
+
+    content := "# All Hail... <@" webhookID ">"
+    ;allowedMentions := """allowed_mentions"": {""users"": [""" webhookID """]},"
+
+    imageBlock := ""
+    if (imageURL != "") {
+        imageBlock := """image"": {""url"": """ imageURL """},"
+    }
+
+    json := "{"
+    . """content"": """ content ""","
+    ;. allowedMentions
     . """embeds"": [{"
     . """title"": """ text ""","
     . """color"": " color ","
@@ -3545,12 +3592,12 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                 if (auraName = "Pixelation") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2(":tada: **Game Start!** :tada: \nAura detected: " auraName, 0, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/PixelationCollection.webp")
+                        SendWebhook2(":tada: **Mania!** :tada: \nAura detected: " auraName, 3348986, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/PixelationCollection.webp")
                     }
                 } else if (auraName = "Luminosity") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2( ":tada: **The Absolute Radiant** :tada: \nAura detected: " auraName , 11393254, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/ReworkedLumiCollection.webp")
+                        SendWebhook2( ":tada: **The Absolute Radiance** :tada: \nAura detected: " auraName , 11393254, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/ReworkedLumiCollection.webp")
                     }
                 } else if (auraName = "LEVIATHAN") {
                     ClipCountdownGlobal()
@@ -3560,32 +3607,32 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                 } else if (auraName = "ASTRAIOS") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**The Ruler of Cosmos** \nAura detected: " auraName, 0, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Astraios.gif")
+                        SendWebhook2("**Dragon** \nAura detected: " auraName, 3920232, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Astraios.gif")
                     }
                 } else if (auraName = "BREAKTHROUGH") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**rune i: starting with a few** \n**rune ii: only less it gets.** \n**rune iii: time by time, now empty** \n**rune iv: and there was nothing left.** \n**get out of my head.** \nAura detected: " auraName, 0, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/BreakthroughCollection.webp")
+                        SendWebhook2("**How much do you believe in this world?** \nAura detected: " auraName, 3289154, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/BreakthroughCollection.webp")
                     }
-                } else if (auraName = "dreamcatcher") {
+                } else if (auraName = "Dream Catcher") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("** I close my eyes...\n Is this a dream? ** \nAura detected: " auraName, 0, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/DreamcatcherCollection.webp")
+                        SendWebhook2("** I close my eyes...\n Is this a dream? ** \nAura detected: " auraName, 12476663, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/DreamcatcherCollection.webp")
                     }
                 } else if (auraName = "EQUINOX") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**Now your getting yourself closer.. to the.. ZERO** \nAura detected: " auraName, 0, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/EquinoxNewCollection.webp")
+                        SendWebhook2("**Equilibrium Incarnate** \nAura detected: " auraName, 16777215, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/EquinoxNewCollection.webp")
                     }
-                } else if (auraName = "MONARCH") {
+                } else if (auraName = "Monarch") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**The fallen ruler that retained power. \nAll Hail... <@" webhookID ">** \nAura detected: " auraName, 0, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MonarchCollection.webp")
+                        SendWebhookMonarch("**Aura detected: **" auraName, 4330383, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MonarchCollection.webp")
                     }
                 } else if (auraName = "meta") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**I came from somewhere. Where could that be? \nAura detected: **" auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MetaCollection.webp")
+                        SendWebhook2("**Aura detected: **" auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MetaCollection.webp")
                     }
                 } else if (auraName = "illusionary") {
                     ClipCountdownGlobal()
@@ -3785,6 +3832,9 @@ F2::
     IniWrite, %selectedItem%, %iniFilePath%, Macro, selectedItem
     autocrafting := true
 
+    if (webhookID = "912451579918041118") {
+        EnsureFullscreen()
+    }
     ToolTip, Crafting will start in 5 seconds..., 900, 10
     Sleep, 1000
     ToolTip, Crafting will start in 4 seconds..., 900, 10
@@ -3794,7 +3844,6 @@ F2::
     ToolTip, Crafting will start in 2 seconds..., 900, 10
     Sleep, 1000
     ToolTip, Crafting will start in 1 second..., 900, 10
-    EnsureFullscreen()
     Sleep, 1000
     ToolTip
     try SendWebhook("Crafting Started on " selectedItem ":tools:", 0)
@@ -3812,13 +3861,14 @@ F3::
     Send, {esc up}
     Send, {r up}
     Send, {f up}
+    send, {shift up}
     enteredlimbo := false
-    ;MacroUptime := 0
     if (toggle) {
         try SendWebhook(":red_circle: Macro Stopped.", "0")
     } else if (autocrafting) {
         try SendWebhook(":red_circle: Auto Crafting Stopped.", "0")
     }
+    toggle := false
     Reload
 return
 
@@ -3849,8 +3899,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
     ;RunBiomeSelector()
     ;try SendWebhook(auraName, 0)
     try SendWebhook("biome: " biome, 0)
-    try SendWebhook(privateServerLinkDeepLink, 0)
-    ;try SendWebhook(MacroUptimeStr, 0)
+    ;try SendWebhook(privateServerLinkDeepLink, 0)
     ;try SendWebhook3(A_TickCount - infiniteclickfailsafe , 0)
     /*
     ; stop rolling
@@ -4432,6 +4481,7 @@ if (toggle) {
         Send, {esc up}
         Send, {r up}
         Send, {Esc}
+        Send, {shift up}
         Sleep, 650
         Send, R
         Sleep, 650
