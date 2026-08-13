@@ -4,92 +4,56 @@
 #SingleInstance Force
 BatchLine_Default := A_BatchLines
 SetBatchLines, -1
+EnvGet, LocalAppData, LOCALAPPDATA
 SetWorkingDir %A_ScriptDir%
 CoordMode, Mouse, Screen
 CoordMode, Pixel, Screen
-iniFilePath := A_ScriptDir "\settings.ini"
 iconFilePath := A_ScriptDir "\img\icon.ico"
+
+/* Put settings & AuraList into LocalAppData
+fishSolFilePath := LocalAppData . "\Aery's fishSol"
+FileCreateDir, %fishSolFilePath%
+fishSolSettingsFilePath := fishSolFilePath . "\settings.ini"
+fishSolAuraFilePath := fishSolFilePath . "\AuraList.ini"
+*/
+
+fishSolSettingsFilePath := A_ScriptDir "\settings.ini"
+fishSolAuraFilePath := A_ScriptDir "\AuraList.ini"
+
 if (FileExist(iconFilePath)) {
     Menu, Tray, Icon, %iconFilePath%
 }
 
-AuraList := {"Starscourge_Radiant": 1
-, "Chromatic_Genesis": 1
-, "Spectraflow": 1
-, "Lily": 1
-, "Sharkyn_HammerHead": 1
-, "Overture": 1
-, "Symphony": 1
-, "Twilight_Withering_Grace": 1
-, "Felled": 1
-, "BOUNDED_AICHMALOTOS": 1
-, "Projection": 1
-, "Impeached": 1
-, "Lumenpool": 1
-, "Hyper-Volt_Ever-Storm": 1
-, "Virtual Memory": 1
-, "Astral_Legendarium": 1
-, "Prophecy": 1
-, "Exotic_Void": 1
-, "BLOODLUST": 1
-, "Overture_History": 1
-, "Maelstrom": 1
-, "Perpetual": 1
-, "dreamer": 1
-, "LOTUSFALL": 1
-, "CYTOKINESIS": 1
-, "Jazz_Orchestra": 1
-, "Archangel": 1
-, "Atlas": 1
-, "Flora_Evergreen": 1
-, "CHILLSEAR": 1
-, "Celestial_Eclipse": 1
-, "AbyssalHunter": 1
-, "GARGANTUA": 1
-, "APOSTOLOS": 1
-, "Kyawthuite_Remembrance": 1
-, "Ruins": 1
-, "Matrix_Overdrive": 1
-, "Gravitational_PointZero": 1
-, "SAILOR_ADMIRAL": 1
-, "Sophyra": 1
-, "Matrix_Reality": 1
-, "PYTHIOS": 1
-, "Sloth": 1
-, "Sovereign": 1
-, "Ruins_Withered": 1
-, "Aegis": 1
-, "Eisveil": 1
-, "Poseidon_Atlantis": 1
-, "ASCENDANT": 1
-, "Pool Party": 1
-, "PROLOGUE": 1
-, "Unknown": 1
-, "Elude": 1
-, "Dreamscape": 1
-, "Raven_Plauge": 1}
+AurasURL := "https://raw.githubusercontent.com/knowaery/Aery-s-fishSol/main/AuraList.ini"
+try {
+    UrlDownloadToFile, %AurasURL%, %fishSolAuraFilePath%
+} catch {
+    if !FileExist(fishSolAuraFilePath) {
+        MsgBox, 16, Error, Failed to download Auras and no local backup exists. Please download the Aura List from https://github.com/knowaery/Aery-s-fishSol/releases and place it into the backup folder.
+        BackupAurasURL := "\backup\AuraList.ini"
+        if FileExist(BackupAurasURL) {
+            FileCopy, %BackupAurasURL%, %fishSolAuraFilePath%
+        }
+    }
+}
 
-AuraListTrans := {"NYCTOPHOBIA": 1
-, "Pixelation": 1
-, "Luminosity": 1
-, "LEVIATHAN": 1
-, "ASTRAIOS": 1
-, "BREAKTHROUGH": 1
-, "Dream Catcher": 1
-, "EQUINOX": 1
-, "MONARCH": 1
-, "meta": 1
-, "illusionary": 1}
+IniRead, AuraListOrderRaw, %fishSolAuraFilePath%, AuraListOrder, Order
+IniRead, AuraListTransOrderRaw, %fishSolAuraFilePath%, AuraListTransOrder, Order
+AuraListOrder := StrSplit(AuraListOrderRaw, ",")
+AuraListTransOrder := StrSplit(AuraListTransOrderRaw, ",")
+AuraList := {}
+for i, aura in AuraListOrder
+    AuraList[aura] := 1
 
-AuraListOrder := ["Chromatic_Genesis", "Starscourge_Radiant", "Spectraflow", "Lily", "Sharkyn_HammerHead", "Overture", "Symphony", "Twilight_Withering_Grace", "Felled", "BOUNDED_AICHMALOTOS", "Projection", "Impeached", "Lumenpool", "Hyper-Volt_Ever-Storm", "Virtual Memory", "Astral_Legendarium", "Prophecy", "Exotic_Void", "BLOODLUST", "Overture_History", "Maelstrom", "Perpetual", "dreamer", "LOTUSFALL", "Jazz_Orchestra", "CYTOKINESIS", "Archangel", "Atlas", "Flora_Evergreen", "CHILLSEAR", "Celestial_Eclipse", "AbyssalHunter", "GARGANTUA", "APOSTOLOS", "Kyawthuite_Remembrance", "Ruins", "Matrix_Overdrive", "Gravitational_PointZero", "Sophyra", "SAILOR_ADMIRAL", "Matrix_Reality", "PYTHIOS", "Sloth", "Sovereign", "Ruins_Withered", "Aegis", "Eisveil", "Poseidon_Atlantis", "ASCENDANT", "Pool Party", "Raven_Plauge", "Unknown", "Elude", "PROLOGUE", "Dreamscape"]
-AuraListTransOrder := ["NYCTOPHOBIA", "Pixelation", "Luminosity", "LEVIATHAN", "ASTRAIOS", "BREAKTHROUGH", "Dream Catcher", "EQUINOX", "MONARCH", "meta", "illusionary"]
+AuraListTrans := {}
+for i, aura in AuraListTransOrder
+    AuraListTrans[aura] := 1
 
 EnabledAuras := {}
 for i, aura in AuraListOrder
     EnabledAuras[aura] := 1
 
 auracolor := 0
-
 if (biomeData = "") {
     biomeData := {}
     biomeData["NORMAL"]       := {color: 0,         thumbnail: "https://cdn.mongoosee.com/assets/biomes/NORMAL.png"}
@@ -113,11 +77,11 @@ if (biomeData = "") {
     biomeData["BLOOD RAIN"]   := {color: 0, thumbnail: "https://cdn.mongoosee.com/assets/biomes/BLOOD%20RAIN.png"}
 }
 
+ROBLOX_LOGS := LocalAppData "\Roblox\logs\*.log"
 res := "1080p"
-maxLoopCount := 15
+maxLoopCount := 30
 fishingLoopCount := 15
-sellAllToggle := true
-advancedFishingDetection := true
+advancedFishingDetection := false
 pathingMode := "Vip Pathing"
 azertyPathing := false
 autoUnequip := false
@@ -125,10 +89,9 @@ strangeController := false
 biomeRandomizer := false
 biomeSelector := false
 selectedBiome := "Windy"
-FixedMaxFish := 56
-strangeControllerTime := 1000
+strangeControllerTime := 0
 biomeRandomizerTime := 360000
-biomeSelectorTime := 1
+biomeSelectorTime := 1000
 strangeControllerInterval := 1260000
 biomeRandomizerInterval := 1260000
 elapsed := 0
@@ -144,8 +107,6 @@ webhookURL := ""
 prevBiome := "None"
 prevState := "None"
 currentBiome := "None"
-EnvGet, LocalAppData, LOCALAPPDATA
-ROBLOX_LOGS := LocalAppData "\Roblox\logs\*.log"
 sentstoragefull := false
 triggerDelayGlobal := 10000
 triggerDelayTrans := 20000
@@ -153,14 +114,12 @@ auraDetection := false
 detectGlobal := false
 detectTrans := false
 clipWebhook := false
-doPing2 := false
-doPing3 := false
+clipWebhookPing := false
+globalTranscendentPing := false
 useCelestial := false
 useExotic := false
 useBounded := false
-manualCraft := false
 auraFilter := false
-detectPotion := false
 detectEden := false
 checkGhostServer := false
 biomeDetect := false
@@ -170,8 +129,8 @@ autoWarp := false
 webhookID := ""
 biomeIndex := 0
 potionCraftCount := 1
-selectedItem := ""
-selectedItem2 := ""
+selectedItem := "Heavenly Potion"
+selectedItem2 := "Heavenly Potion"
 autoClicker := false
 biomeSelectorInterval := 3660000
 failsafeTime := 0
@@ -179,202 +138,234 @@ fishInLimbo := false
 decideAuraClip := false
 limboFailsafe := false
 pscode := ""
-clipType := "Nvidia: Alt + F10"
+ClipType := "Nvidia: Alt + F10"
+SkipType := "Warp Potion"
+CloseCollectionType := "Click"
+activationMessage := false
+biomeItemMessage := false
+failsafeMessage := false
+failsafeMessagePing := false
+restartMacroFailsafePing := false
 
-if (FileExist(iniFilePath)) {
-    IniRead, tempRes, %iniFilePath%, Macro, resolution
+if (FileExist(fishSolSettingsFilePath)) {
+        IniRead, tempRes, %fishSolSettingsFilePath%, Macro, resolution
     if (tempRes != "ERROR")
     {
         res := tempRes
     }
-    IniRead, tempMaxLoop, %iniFilePath%, Macro, maxLoopCount
+    IniRead, tempMaxLoop, %fishSolSettingsFilePath%, Macro, maxLoopCount
     if (tempMaxLoop != "ERROR" && tempMaxLoop > 0)
     {
         maxLoopCount := tempMaxLoop
     }
-    IniRead, tempFishingLoop, %iniFilePath%, Macro, fishingLoopCount
+    IniRead, tempFishingLoop, %fishSolSettingsFilePath%, Macro, fishingLoopCount
     if (tempFishingLoop != "ERROR" && tempFishingLoop > 0)
     {
         fishingLoopCount := tempFishingLoop
     }
-    IniRead, tempPathing, %iniFilePath%, Macro, pathingMode
+    IniRead, tempPathing, %fishSolSettingsFilePath%, Macro, pathingMode
     if (tempPathing != "ERROR")
     {
         pathingMode := tempPathing
     }
-    IniRead, tempAzerty, %iniFilePath%, Macro, azertyPathing
+    IniRead, tempAzerty, %fishSolSettingsFilePath%, Macro, azertyPathing
     if (tempAzerty != "ERROR")
     {
         azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
     }
-    IniRead, tempPrivateServer, %iniFilePath%, Macro, privateServerLink
+    IniRead, tempPrivateServer, %fishSolSettingsFilePath%, Macro, privateServerLink
     if (tempPrivateServer != "ERROR")
     {
         privateServerLink := tempPrivateServer
     }
-    IniRead, tempAdvancedDetection, %iniFilePath%, Macro, advancedFishingDetection, "1"
+    IniRead, tempAdvancedDetection, %fishSolSettingsFilePath%, Macro, advancedFishingDetection, "1"
     if (tempAdvancedDetection != "ERROR")
     {
         advancedFishingDetection := (tempAdvancedDetection = "true" || tempAdvancedDetection = "1")
     }
-    IniRead, tempAutoRejoinFailsafe, %iniFilePath%, Macro, autoRejoinFailsafeTime
+    IniRead, tempAutoRejoinFailsafe, %fishSolSettingsFilePath%, Macro, autoRejoinFailsafeTime
     if (tempAutoRejoinFailsafe != "ERROR" && tempAutoRejoinFailsafe > 0)
     {
         autoRejoinFailsafeTime := tempAutoRejoinFailsafe
     }
-    IniRead, tempAutoUnequip, %iniFilePath%, Macro, autoUnequip
+    IniRead, tempAutoUnequip, %fishSolSettingsFilePath%, Macro, autoUnequip
     if (tempAutoUnequip != "ERROR")
     {
         autoUnequip := (tempAutoUnequip = "true" || tempAutoUnequip = "1")
     }
-    IniRead, tempAzerty, %iniFilePath%, Macro, azertyPathing
+    IniRead, tempAzerty, %fishSolSettingsFilePath%, Macro, azertyPathing
     if (tempAzerty != "ERROR")
     {
         azertyPathing := (tempAzerty = "true" || tempAzerty = "1")
     }
-    IniRead, tempAdvancedThreshold, %iniFilePath%, Macro, advancedFishingThreshold
+    IniRead, tempAdvancedThreshold, %fishSolSettingsFilePath%, Macro, advancedFishingThreshold
     if (tempAdvancedThreshold != "ERROR" && tempAdvancedThreshold >= 0 && tempAdvancedThreshold <= 40)
     {
         advancedFishingThreshold := tempAdvancedThreshold
     }
-    IniRead, tempStrangeController, %iniFilePath%, Macro, strangeController
+    IniRead, tempStrangeController, %fishSolSettingsFilePath%, Macro, strangeController
     if (tempStrangeController != "ERROR")
     {
         strangeController := (tempStrangeController = "true" || tempStrangeController = "1")
     }
-    IniRead, tempBiomeRandomizer, %iniFilePath%, Macro, biomeRandomizer
+    IniRead, tempBiomeRandomizer, %fishSolSettingsFilePath%, Macro, biomeRandomizer
     if (tempBiomeRandomizer != "ERROR")
     {
         biomeRandomizer := (tempBiomeRandomizer = "true" || tempBiomeRandomizer = "1")
     }
-    IniRead, tempBiomeSelector, %iniFilePath%, Macro, biomeSelector
+    IniRead, tempBiomeSelector, %fishSolSettingsFilePath%, Macro, biomeSelector
     if (tempBiomeSelector != "ERROR")
     {
         biomeSelector := (tempBiomeSelector = "true" || tempBiomeSelector = "1")
     }
-    IniRead, tempSelectedBiome, %iniFilePath%, Macro, selectedBiome
+    IniRead, tempSelectedBiome, %fishSolSettingsFilePath%, Macro, selectedBiome
     if (tempSelectedBiome != "ERROR")
     {
         selectedBiome := tempSelectedBiome
     }
-    }
-    IniRead, tempWebhook, %iniFilePath%, Macro, webhookURL
+    IniRead, tempWebhook, %fishSolSettingsFilePath%, Macro, webhookURL
     if (tempWebhook != "ERROR")
     {
         webhookURL := tempWebhook
     }
-    IniRead, tempAuraDetection, %iniFilePath%, Macro, auraDetection
+    IniRead, tempAuraDetection, %fishSolSettingsFilePath%, Macro, auraDetection
     if (tempAuraDetection != "ERROR")
         auraDetection := (tempAuraDetection = "true" || tempAuraDetection = "1")
 
-    IniRead, tempDetectGlobal, %iniFilePath%, Macro, detectGlobal
+    IniRead, tempDetectGlobal, %fishSolSettingsFilePath%, Macro, detectGlobal
     if (tempDetectGlobal != "ERROR")
         detectGlobal := (tempDetectGlobal = "true" || tempDetectGlobal = "1")
 
-    IniRead, tempDetectTrans, %iniFilePath%, Macro, detectTrans
+    IniRead, tempDetectTrans, %fishSolSettingsFilePath%, Macro, detectTrans
     if (tempDetectTrans != "ERROR")
         detectTrans := (tempDetectTrans = "true" || tempDetectTrans = "1")
 
-    IniRead, tempClipWebhook, %iniFilePath%, Macro, clipWebhook
+    IniRead, tempClipWebhook, %fishSolSettingsFilePath%, Macro, clipWebhook
     if (tempClipWebhook != "ERROR")
         clipWebhook := (tempClipWebhook = "true" || tempClipWebhook = "1")
 
-    IniRead, tempDoPing2, %iniFilePath%, Macro, doPing2
-    if (tempDoPing2 != "ERROR")
-        doPing2 := (tempDoPing2 = "true" || tempDoPing2 = "1")
+    IniRead, tempClipWebhookPing, %fishSolSettingsFilePath%, Macro, clipWebhookPing
+    if (tempClipWebhookPing != "ERROR")
+        clipWebhookPing := (tempClipWebhookPing = "true" || tempClipWebhookPing = "1")
 
-    IniRead, tempDoPing3, %iniFilePath%, Macro, doPing3
-    if (tempDoPing3 != "ERROR")
-        doPing3 := (tempDoPing3 = "true" || tempDoPing3 = "1")
+    IniRead, tempGlobalTranscendentPing, %fishSolSettingsFilePath%, Macro, globalTranscendentPing
+    if (tempGlobalTranscendentPing != "ERROR")
+        globalTranscendentPing := (tempGlobalTranscendentPing = "true" || tempGlobalTranscendentPing = "1")
 
-    IniRead, tempUseCelestial, %iniFilePath%, Macro, useCelestial
+    IniRead, tempUseCelestial, %fishSolSettingsFilePath%, Macro, useCelestial
     if (tempUseCelestial != "ERROR")
         useCelestial := (tempUseCelestial = "true" || tempUseCelestial = "1")
 
-    IniRead, tempUseExotic, %iniFilePath%, Macro, useExotic
+    IniRead, tempUseExotic, %fishSolSettingsFilePath%, Macro, useExotic
     if (tempUseExotic != "ERROR")
         useExotic := (tempUseExotic = "true" || tempUseExotic = "1")
 
-    IniRead, tempUseBounded, %iniFilePath%, Macro, useBounded
+    IniRead, tempUseBounded, %fishSolSettingsFilePath%, Macro, useBounded
     if (tempUseBounded != "ERROR")
         useBounded := (tempUseBounded = "true" || tempUseBounded = "1")
 
-    IniRead, tempManualCraft, %iniFilePath%, Macro, manualCraft
-    if (tempManualCraft != "ERROR")
-        manualCraft := (tempManualCraft = "true" || tempManualCraft = "1")
-
-    IniRead, tempAuraFilter, %iniFilePath%, Macro, auraFilter
+    IniRead, tempAuraFilter, %fishSolSettingsFilePath%, Macro, auraFilter
     if (tempAuraFilter != "ERROR")
         auraFilter := (tempAuraFilter = "true" || tempAuraFilter = "1")
 
-    IniRead, tempDetectPotion, %iniFilePath%, Macro, detectPotion
-    if (tempDetectPotion != "ERROR")
-        detectPotion := (tempDetectPotion = "true" || tempDetectPotion = "1")
-
-    IniRead, tempDetectEden, %iniFilePath%, Macro, detectEden
+    IniRead, tempDetectEden, %fishSolSettingsFilePath%, Macro, detectEden
     if (tempDetectEden != "ERROR")
         detectEden := (tempDetectEden = "true" || tempDetectEden = "1")
 
-    IniRead, tempCheckGhostServer, %iniFilePath%, Macro, checkGhostServer
+    IniRead, tempCheckGhostServer, %fishSolSettingsFilePath%, Macro, checkGhostServer
     if (tempCheckGhostServer != "ERROR")
         checkGhostServer := (tempCheckGhostServer = "true" || tempCheckGhostServer = "1")
 
-    IniRead, tempBiomeDetect, %iniFilePath%, Macro, biomeDetect
+    IniRead, tempBiomeDetect, %fishSolSettingsFilePath%, Macro, biomeDetect
     if (tempBiomeDetect != "ERROR")
         biomeDetect := (tempBiomeDetect = "true" || tempBiomeDetect = "1")
 
-    IniRead, tempRestartMacroFailsafe, %iniFilePath%, Macro, restartMacroFailsafe
+    IniRead, tempRestartMacroFailsafe, %fishSolSettingsFilePath%, Macro, restartMacroFailsafe
     if (tempRestartMacroFailsafe != "ERROR")
         restartMacroFailsafe := (tempRestartMacroFailsafe = "true" || tempRestartMacroFailsafe = "1")
 
-    IniRead, tempUseNothing, %iniFilePath%, Macro, useNothing
+    IniRead, tempUseNothing, %fishSolSettingsFilePath%, Macro, useNothing
     if (tempUseNothing != "ERROR")
         useNothing := (tempUseNothing = "true" || tempUseNothing = "1")
 
-    IniRead, tempAutoWarp, %iniFilePath%, Macro, autoWarp
+    IniRead, tempAutoWarp, %fishSolSettingsFilePath%, Macro, autoWarp
     if (tempAutoWarp != "ERROR")
         autoWarp := (tempAutoWarp = "true" || tempAutoWarp = "1")
 
-    IniRead, tempWebhookID, %iniFilePath%, Macro, webhookID
+    IniRead, tempWebhookID, %fishSolSettingsFilePath%, Macro, webhookID
     if (tempWebhookID != "ERROR")
         webhookID := tempWebhookID
 
-    IniRead, tempBiomeIndex, %iniFilePath%, Macro, biomeIndex
+    IniRead, tempBiomeIndex, %fishSolSettingsFilePath%, Macro, biomeIndex
     if (tempBiomeIndex != "ERROR" && tempBiomeIndex > 0)
         biomeIndex := tempBiomeIndex
 
-    IniRead, tempPotionCraftCount, %iniFilePath%, Macro, potionCraftCount
+    IniRead, tempPotionCraftCount, %fishSolSettingsFilePath%, Macro, potionCraftCount
     if (tempPotionCraftCount != "ERROR" && tempPotionCraftCount > 0)
         potionCraftCount := tempPotionCraftCount
 
-    IniRead, tempSelectedItem, %iniFilePath%, Macro, selectedItem
+    IniRead, tempSelectedItem, %fishSolSettingsFilePath%, Macro, selectedItem
     if (tempSelectedItem != "ERROR")
         selectedItem := tempSelectedItem
 
-    IniRead, tempSelectedItem2, %iniFilePath%, Macro, selectedItem2
+    IniRead, tempSelectedItem2, %fishSolSettingsFilePath%, Macro, selectedItem2
     if (tempSelectedItem2 != "ERROR")
         selectedItem2 := tempSelectedItem2
 
-    IniRead, tempAutoClicker, %iniFilePath%, Macro, autoClicker
+    IniRead, tempAutoClicker, %fishSolSettingsFilePath%, Macro, autoClicker
     if (tempAutoClicker != "ERROR")
         autoClicker := (tempAutoClicker = "true" || tempAutoClicker = "1")
 
-    IniRead, tempFishInLimbo, %iniFilePath%, Macro, fishInLimbo
+    IniRead, tempFishInLimbo, %fishSolSettingsFilePath%, Macro, fishInLimbo
     if (tempFishInLimbo != "ERROR")
         fishInLimbo := (tempFishInLimbo = "true" || tempFishInLimbo = "1")
 
-    IniRead, tempLimboFailsafe, %iniFilePath%, Macro, limboFailsafe
+    IniRead, tempLimboFailsafe, %fishSolSettingsFilePath%, Macro, limboFailsafe
     if (tempLimboFailsafe != "ERROR")
         limboFailsafe := (tempLimboFailsafe = "true" || tempLimboFailsafe = "1")
 
+    IniRead, tempActivationMessage, %fishSolSettingsFilePath%, Macro, activationMessage
+    if (tempActivationMessage != "ERROR")
+        activationMessage := (tempActivationMessage = "true" || tempActivationMessage = "1")
+
+    IniRead, tempBiomeItemMessage, %fishSolSettingsFilePath%, Macro, biomeItemMessage
+    if (tempBiomeItemMessage != "ERROR")
+        biomeItemMessage := (tempBiomeItemMessage = "true" || tempBiomeItemMessage = "1")
+
+    IniRead, tempSkipType, %fishSolSettingsFilePath%, Macro, SkipType
+    if (tempSkipType != "ERROR")
+        SkipType := tempSkipType
+
+    IniRead, tempClipType, %fishSolSettingsFilePath%, Macro, ClipType
+    if (tempClipType != "ERROR")
+        ClipType := tempClipType
+
+    IniRead, tempCloseCollectionType, %fishSolSettingsFilePath%, Macro, CloseCollectionType
+    if (tempCloseCollectionType != "ERROR")
+        CloseCollectionType := tempCloseCollectionType
+
+    IniRead, tempfailsafeMessage, %fishSolSettingsFilePath%, Macro, failsafeMessage
+    if (tempfailsafeMessage != "ERROR")
+        failsafeMessage := (tempfailsafeMessage = "true" || tempfailsafeMessage = "1")
+
+    IniRead, tempfailsafeMessagePing, %fishSolSettingsFilePath%, Macro, failsafeMessagePing
+    if (tempfailsafeMessagePing != "ERROR")
+        failsafeMessagePing := (tempfailsafeMessagePing = "true" || tempfailsafeMessagePing = "1")
+
+    IniRead, temprestartMacroFailsafePing, %fishSolSettingsFilePath%, Macro, restartMacroFailsafePing
+    if (temprestartMacroFailsafePing != "ERROR")
+        restartMacroFailsafePing := (temprestartMacroFailsafePing = "true" || temprestartMacroFailsafePing = "1")
+
     for i, aura in AuraListOrder {
-        IniRead, savedVal, %iniFilePath%, EnabledAuras, %aura%, 1
+        IniRead, savedVal, %fishSolSettingsFilePath%, EnabledAuras, %aura%, 1
         EnabledAuras[aura] := savedVal
     }
     for i, aura in AuraListTransOrder {
-        IniRead, savedVal, %iniFilePath%, EnabledAuras, %aura%, 1
+        IniRead, savedVal, %fishSolSettingsFilePath%, EnabledAuras, %aura%, 1
         EnabledAuras[aura] := savedVal
     }
+}
+
 
 Devs := [{dev_name:"mongoosee"
          , dev_role:"Biome Image Credits"
@@ -427,7 +418,7 @@ Gui, Color, 041024
 
 Gui, Font, s30 cWhite Bold, Segoe UI
 Gui, Font, s17 cWhite Bold, Segoe UI
-Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.7
+Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.8
 
 Gui, Font, s9 cWhite Normal, Segoe UI
 
@@ -438,9 +429,7 @@ Gui, Font, s10 cWhite Normal Bold
 tabList := "Main"
 tabList .= "|Misc"
 tabList .= "|Auras"
-tabList .= "|Crafting"
-tabList .= "|Private Server"
-tabList .= "|Webhook"
+tabList .= "|Links"
 tabList .= "|Credits"
 tabList .= "|Extra"
 
@@ -455,7 +444,6 @@ Gui, Add, Text, x98 y110 w150 h25 vStatusText BackgroundTrans c0xFF4444, Stopped
 
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Button, x45 y140 w70 h35 gStartScript vStartBtn c0x00AA00 +0x8000, Start
-;Gui, Add, Button, x125 y140 w70 h35 gPauseScript vPauseBtn c0xFFAA00 +0x8000, Pause
 Gui, Add, Button, x125 y140 w70 h35 gCloseScript vStopBtn c0xFF4444 +0x8000, Stop
 Gui, Add, Text, x45 y180 w80 h25 BackgroundTrans, Resolution:
 Gui, Font, s11 cWhite Bold
@@ -485,7 +473,7 @@ Gui, Font, s10 cWhite Bold
 Gui, Add, Text, x45 y270 w180 h25 BackgroundTrans, Sell Loop Count:
 Gui, Add, Edit, x220 y268 w60 h25 vFishingLoopInput gUpdateLoopCount Number Background0xD3D3D3 cBlack, %fishingLoopCount%
 Gui, Font, s8 c0xCCCCCC
-Gui, Add, Text, x285 y272 w270 h15 BackgroundTrans, (There's is 56 Fish in the game. Default: 10)   
+Gui, Add, Text, x285 y272 w270 h15 BackgroundTrans, (There's is 56 Fish in the game. Default: 15)   
 
 Gui, Font, s10 cWhite Bold
 Gui, Add, Text, x45 y301 w120 h25 BackgroundTrans, Pathing Mode:
@@ -527,6 +515,11 @@ Gui, Add, Text, x30 y415 w5000 h15 BackgroundTrans, F1=Start Macro - F2=Start Au
 Gui, Add, Text, x30 y430 w5000 h15 BackgroundTrans, F3=Stop Macro/AutoCraft
 Gui, Add, Text, x30 y445 w500 h20 BackgroundTrans, F4=Stop Webhook or Clip
 Gui, Add, Text, x30 y460 w500 h20 BackgroundTrans, F6=Join Private Server Link
+
+Gui, Font, s10 cWhite Bold
+Gui, Add, GroupBox, x30 y485 w205 h55 cWhite, How to Close Collection
+Gui, Add, DropDownList, x45 y507 w150 h125 vCloseCollectionVersion gCloseCollectionType, \ Key/UI Navigation|Click
+GuiControl, Choose, CloseCollectionVersion, %closeCollectionType%
 
 Gui, Tab, Misc
 
@@ -587,7 +580,6 @@ Gui, Add, Text, x320 y211 w148 h155 BackGroundTrans, Potion Type:
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, Text, x415 y173 w60 h25 vAutoWarpStatus BackgroundTrans, OFF
 Gui, Add, DropDownList, x410 y207 w148 vSkipPotionType gskipType, Warp Potion|Transcendent Potion
-IniRead, skipType, %iniFilePath%, Macro, skipType
 GuiControl, Choose, SkipPotionType, %skipType%
 
 Gui, Add, GroupBox, x307 y290 w260 h120 cWhite, Restart Macro Failsafe
@@ -605,9 +597,9 @@ Gui, Add, Button, x100 y500 w170 h35 gOpenNvidiaNotes, Clipping Tutorial
 Gui, Add, Button, x310 y500 w150 h35 gOpenAuraFilter, Aura Filter
 
 Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x33 y125 w240 h141 cWhite, Aura Detection (Beta)
+Gui, Add, GroupBox, x33 y125 w240 h141 cWhite, Aura Detection
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x45 y145 w225 h131 BackgroundTrans c0xCCCCCC, Detects the most recent aura equipped. If a global is equipped, you can get pinged by turning on Ping if Global/Transcendent in Webhook. (Also needed for Auto Unequp.)
+Gui, Add, Text, x45 y145 w225 h131 BackgroundTrans c0xCCCCCC, Detects the most recent aura equipped. This will NOT work if the aura is automatically deleted. If you want to be pinged for a global/transcendent, enable Aura Detection Ping in Webhook Options.
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Button, x45 y222 w80 h25 gToggleAuraDetection vAuraDetectionBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
@@ -628,7 +620,6 @@ Gui, Font, s11 cWhite Bold, Segoe UI
 Gui, Add, Text, x365 y93 w515 h135 BackgroundTrans,Clip Type:
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, DropDownList, x440 y93 w128 vClipVersion gclipType, Nvidia: Alt + F10
-IniRead, clipType, %iniFilePath%, Macro, clipType
 GuiControl, Choose, ClipVersion, %clipType%
 
 Gui, Font, s11 cWhite Bold, Segoe UI
@@ -643,81 +634,43 @@ Gui, Add, Text, x143 y341 w70 h25 vDetectGlobalStatus BackgroundTrans, OFF
 Gui, Font, s11 cWhite Bold
 Gui, Add, GroupBox, x33 y385 w534 h100 cWhite, Clip Transcendents
 Gui, Font, s10 c0xCCCCCC Normal
-Gui, Add, Text, x45 y405 w515 h145 BackgroundTrans, Automatically clips with Nvidia's Instant Replay when detecting a Transcendent's has been equipped. Also gives a special webhook!
+Gui, Add, Text, x45 y405 w515 h145 BackgroundTrans, Automatically clips with Nvidia's Instant Replay when detecting a Transcendent has been equipped. Also gives a special webhook!
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Button, x45 y445 w80 h25 gToggleDetectTrans vDetectTransBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, Text, x143 y448 w70 h25 vDetectTransStatus BackgroundTrans, OFF
 
-Gui, Tab, Crafting
 
-Gui, Font, s10 cWhite Bold
-Gui, Add, GroupBox, x22 y85 w554 h130 cWhite, Auto Craft
-Gui, Add, GroupBox, x22 y225 w554 h200 cWhite, Manual Craft
-Gui, Add, GroupBox, x130 y445 w210 h100 cWhite, Heavenly Potion
-Gui, Add, GroupBox, x347 y445 w130 h100 cWhite, Bound Potion 
-Gui, Add, Text, x60 y167 w150 h50 BackgroundTrans, F2 = Start | F3 = Stop
+Gui, Tab, Links
+Gui, Add, Text, x35 y95 w150 h25 BackgroundTrans, Private Server Link:
+Gui, Add, Edit, x35 y120 w515 h25 vPrivateServerInput gUpdatePrivateServer Background0xD3D3D3 cBlack, %privateServerLink%
 
-Gui, Font, s10 cWhite Bold
-Gui, Add, Button, x218 y465 w80 h25 gToggleUseCelestial vUseCelestialBtn, Toggle
-Gui, Add, Button, x218 y505 w80 h25 gToggleUseExotic vUseExoticBtn, Toggle
-Gui, Add, Text, x308 y469 w60 h25 vUseCelestialStatus BackgroundTrans, OFF
-Gui, Add, Text, x308 y509 w60 h25 vUseExoticStatus BackgroundTrans, OFF
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x138 y469 w600 h100 BackgroundTrans c0xCCCCCC, Add 
-Gui, Add, Text, x138 y509 w600 h100 BackgroundTrans c0xCCCCCC, Add
-Gui, Font, s9 c9B8CFF Bold, Trajan Pro
-Gui, Add, Text, x164 y469 w600 h100 BackgroundTrans, Celestial:
-Gui, Font, s10 cWhite Normal, Trajan Pro
-Gui, Add, Text, vExoticText x164 y507 w600 h100 BackgroundTrans, Exotic:
-SetTimer, RainbowText, 50
+Gui, Font, s10 cWhite Normal Bold
+Gui, Add, Text, x35 y155 w200 h25 BackgroundTrans, Discord Webhook URL:
+Gui, Add, Edit, x35 y180 w515 h25 vWebhookInput gUpdateWebhook Background0xD3D3D3 cBlack, %webhookURL%
+Gui, Font, s8 c0xCCCCCC Normal
+Gui, Add, Text, x35 y210 w500 h15 BackgroundTrans, Paste your Discord Webhook URL here to be notified of actions happening in real time.
 
+Gui, Font, s10 cWhite Normal Bold
+Gui, Add, Text, x35 y230 w200 h25 BackgroundTrans, Discord USERID:
+Gui, Add, Edit, x35 y255 w515 h25 vUserIDInput gUpdateUserID Background0xD3D3D3 cBlack, %webhookID%
+Gui, Font, s8 c0xCCCCCC Normal
+Gui, Add, Text, x35 y285 w500 h15 BackgroundTrans, Paste your Discord USERID here to be pinged of actions happening in real time.
 
-Gui, Font, s10 cWhite Bold
-Gui, Add, Button, x358 y505 w80 h25 gToggleUseBounded vUseBoundedBtn, Toggle
-Gui, Add, Text, x446 y509 w60 h25 vUseBoundedStatus BackgroundTrans, OFF
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x358 y469 w600 h100 BackgroundTrans c0xCCCCCC, Add
-Gui, Font, s9 c1559C9 Bold, Trajan Pro
-Gui, Add, Text, x385 y469 w600 h100 BackgroundTrans, Bounded:
-
-
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x35 y105 w534 h100 BackgroundTrans c0xCCCCCC, Adds the nessecary potions and/or auras to craft potions. Please already put the desired item on auto craft. You MUST be inside of Stella's Cauldron's UI. Toggling the auras listed below means adding them to the desired potion from your inventory and turns on Add Everything.
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, DropDownList, x245 y165 w120 vAutoCraft gSelectItem, Heavenly Potion|Bound Potion|Jewelry Potion|Zombie Potion|Rage Potion|Diver Potion
-IniRead, selectedItem, %iniFilePath%, Macro, selectedItem
-GuiControl, Choose, AutoCraft, %selectedItem%
-
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x35 y245 w534 h100 BackgroundTrans c0xCCCCCC, (During Macro) Goes to Stella's cauldron and crafts the desired item before going to the fish sell shop. Please have the desired on auto craft. Toggling the auras listed below means adding them to the desired potion from your inventory and turns on Add Everything.
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, DropDownList, x195 y305 w120 vManualCraft gSelectItem2, Heavenly Potion|Bound Potion|Jewelry Potion|Zombie Potion|Rage Potion|Diver Potion
-IniRead, selectedItem2, %iniFilePath%, Macro, selectedItem2
-GuiControl, Choose, ManualCraft, %selectedItem2%
-Gui, Font, s10 cWhite Bold
-Gui, Add, Edit, x450 y305 w70 h25 vPotionCraftInput gUpdatePotionCraft Number Background0xD3D3D3 cBlack, %potionCraftCount%
-Gui, Add, Text, x335 y310 w534 h100 BackgroundTrans, Amount to Craft:
-
-Gui, Font, s10 cWhite Bold
-Gui, Add, Text, x35 y333 w534 h100 BackgroundTrans, Detect Ready Notification
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Font, s11 cWhite Bold
+Gui, Add, GroupBox, x33 y310 w534 h110 cWhite, Biome Detection
+Gui, Font, s10 c0xCCCCCC Normal
+Gui, Add, Text, x45 y330 w500 h145 BackgroundTrans, (During Macro) Detects your current biome and sends a webhook. Mentions everyone when a Glitch, Dreamspace, or Cyberspace is detected. Only detects when you are macroing.
 Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Add, Button, x55 y385 w80 h25 gToggleDetectPotion vDetectPotionBtn, Toggle
-Gui, Font, s10 cWhite Bold
-Gui, Add, Text, x153 y388 w70 h25 vDetectPotionStatus BackgroundTrans, OFF
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x35 y350 w534 h100 BackgroundTrans c0xCCCCCC, (During Macro) Detects if your potion is ready to be crafted with ready notification, and if so, stops fishing to craft it. Only recommended for Heavenly/Bound Potion.
+Gui, Add, Button, x45 y385 w80 h25 gToggleBiomeDetect vBiomeDetectBtn, Toggle
+Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Add, Text, x143 y388 w70 h25 vBiomeDetectStatus BackgroundTrans, OFF
+Gui, Font, s11 cWhite Bold, Segoe UI4
+Gui, Add, Button, x405 y385 w100 h25 gClearLogs, Clear Logs
 
-Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Add, Button, x55 y305 w80 h25 gToggleManualCraft vManualCraftBtn, Toggle
-Gui, Font, s10 cWhite Bold
-Gui, Add, Text, x153 y308 w70 h25 vManualCraftStatus BackgroundTrans, OFF
+Gui, Font, s14 cWhite Bold, Segoe UI4
+Gui, Add, Button, x205 y490 w190 h40 gOpenWebhookList, Webhook Options
 
-
-Gui, Tab, Private Server
-Gui, Add, Text, x35 y90 w150 h25 BackgroundTrans, Private Server Link:
-Gui, Add, Edit, x35 y115 w515 h25 vPrivateServerInput gUpdatePrivateServer Background0xD3D3D3 cBlack, %privateServerLink%
 /*
 Gui, Font, s11 cWhite Bold
 Gui, Add, GroupBox, x33 y185 w534 h100 cWhite, Check For Ghost Server
@@ -728,59 +681,6 @@ Gui, Add, Button, x45 y245 w80 h25 gToggleCheckGhostServer vCheckGhostServerBtn,
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, Text, x143 y248 w70 h25 vCheckGhostServerStatus BackgroundTrans, OFF
 */
-
-Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x33 y290 w534 h100 cWhite, Biome Detection
-Gui, Font, s10 c0xCCCCCC Normal
-Gui, Add, Text, x45 y310 w500 h145 BackgroundTrans, (During Macro) Sends a webhook on current biome, mentions everyone when a Glitch, Dreamspace, or Cyberspace is detected. Only detects when you are macroing.
-Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Add, Button, x45 y355 w80 h25 gToggleBiomeDetect vBiomeDetectBtn, Toggle
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x143 y358 w70 h25 vBiomeDetectStatus BackgroundTrans, OFF
-Gui, Font, s11 cWhite Bold, Segoe UI
-Gui, Add, Button, x405 y355 w100 h25 gClearLogs, Clear Logs
-
-Gui, Tab, Webhook
-
-Gui, Font, s10 cWhite Normal Bold
-Gui, Add, Text, x50 y125 w200 h25 BackgroundTrans, Discord Webhook URL:
-Gui, Add, Edit, x50 y150 w500 h25 vWebhookInput gUpdateWebhook Background0xD3D3D3 cBlack, %webhookURL%
-Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y180 w500 h15 BackgroundTrans, Paste your Discord webhook URL here to be notified of actions happening in real time.
-Gui, Font, s10 cWhite Normal Bold
-Gui, Add, Text, x50 y205 w200 h25 BackgroundTrans, Discord USERID:
-Gui, Add, Edit, x50 y230 w500 h25 vUserIDInput gUpdateUserID Background0xD3D3D3 cBlack, %webhookID%
-Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y260 w500 h15 BackgroundTrans, Paste your Discord USERID here to be pinged of actions happening in real time.
-
-Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x33 y315 w534 h65 cWhite, Macro Clip Message
-Gui, Add, Button, x60 y340 w80 h25 gToggleClipWebhook vClipWebhookBtn, Toggle
-Gui, Add, Button, x320 y340 w80 h25 gToggleDoPing2 vDoPing2Btn, Toggle
-Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x250 y344 w100 h25 BackgroundTrans c0xCCCCCC, Ping User: 
-Gui, Font, s7 cWhite Normal
-Gui, Add, Text, x465 y326 w80 h100 BackgroundTrans c0xCCCCCC, Messages and/or pings if anything has been clipped via Webhook.
-Gui, Font, s10 c0xCCCCCC Bold   
-Gui, Add, Text, x410 y344 w60 h25 vDoPing2Status BackgroundTrans, OFF
-Gui, Add, Text, x150 y344 w60 h25 vClipWebhookStatus BackgroundTrans, OFF
-
-Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x33 y385 w534 h65 cWhite, Aura Detection Ping
-Gui, Add, Button, x320 y410 w80 h25 gToggleDoPing3 vDoPing3Btn, Toggle
-Gui, Font, s10 cWhite Normal
-Gui, Add, Text, x50 y414 w300 h25 BackgroundTrans c0xCCCCCC, Ping User if global/transcendent detected: 
-Gui, Font, s10 c0xCCCCCC Bold
-Gui, Add, Text, x410 y414 w60 h25 vDoPing3Status BackgroundTrans, OFF
-
-Gui, Color, 041024
-Gui, Add, Picture, x445 y600 w27 h19 vIMAGE_HANDLE_PNG_DISCORD_%discord_counter%
-Gui, Add, Picture, x538 y601 w18 h19 vIMAGE_HANDLE_PNG_ROBLOX_%discord_counter%
-discord_counter+=1
-
-Gui, Font, s11 cWhite Bold Underline, Segoe UI
-Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
 
 Gui, Tab, Credits
 Gui, Add, Picture, x14 y80 w574 h590 vIMAGE_HANDLE_PNG_CRED_TAB
@@ -835,11 +735,12 @@ Gui, Add, Text, x50 y325 w480 h1 0x10 BackgroundTrans
 url := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
 
 Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-Http.Open("GET", url, false)
-Http.Send()
+try Http.Open("GET", url, false)
+try Http.Send()
 
 content := Http.ResponseText
 
+; change
 Gui, Font, s10 cWhite Bold
 Gui, Add, Text, x50 y345 w2000 h20 BackgroundTrans, Hope you enjoy my fishSol! Donators of Original fishSol:
 Gui, Font, s9 c0xCCCCCC Normal
@@ -849,274 +750,167 @@ Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y490 w480 h1 0x10 BackgroundTrans
 
 Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y500 w500 h15 BackgroundTrans, Aery's fishSol v1.7 (2026-07-12)
+Gui, Add, Text, x50 y500 w500 h15 BackgroundTrans, Aery's fishSol v1.8 (2026-08-12)
 Gui, Add, Text, x300 y500 w500 h15 BackgroundTrans, If you need help, message me on discord. (noaery)
 Gui, Add, Text, x50 y525 w500 h15 BackgroundTrans c0x0088FF gReleasesClick +0x200, https://github.com/knowaery/Aery-s-Fishsol
 
-Gui, Color, 041024
-Gui, Add, Picture, x445 y600 w27 h19 vIMAGE_HANDLE_PNG_DISCORD_%discord_counter%
-Gui, Add, Picture, x538 y601 w18 h19 vIMAGE_HANDLE_PNG_ROBLOX_%discord_counter%
-discord_counter+=1
-
-Gui, Font, s11 cWhite Bold Underline, Segoe UI
-Gui, Add, Text, x430 y600 w150 h38 Center BackgroundTrans c0x00FF00 gDonateClick, Donate!
-Gui, Add, Text, x330 y600 w138 h38 Center BackgroundTrans c0x00D4FF gNeedHelpClick, Need Help?
-
 Gui, Tab, Extra
-
+/*
 Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x33 y270 w534 h120 cWhite, Detect and Contract Eden (Temporary)
+Gui, Add, GroupBox, x33 y395 w534 h120 cWhite, Detect and Contract Eden (Temporary)
 Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x45 y363 w520 h145 BackgroundTrans, Not tested, not much thought into it, sorry if it dont work
+Gui, Add, Text, x45 y485 w520 h145 BackgroundTrans, Not tested, not much thought into it, sorry if it dont work
 Gui, Font, s10 c0xCCCCCC Normal
-Gui, Add, Text, x45 y290 w520 h145 BackgroundTrans, Automatically detects if Eden has spawned in and contracts with it. (You must stand where it spawns.)
+Gui, Add, Text, x45 y415 w520 h145 BackgroundTrans, Automatically detects if Eden has spawned in and contracts with it. (You must stand where it spawns.)
 Gui, Font, s10 cWhite Bold
-Gui, Add, Text, x230 y330 w400 h135 BackgroundTrans, ! This automatically starts when toggle is ON !
+Gui, Add, Text, x230 y455 w400 h135 BackgroundTrans, ! This automatically starts when toggle is ON !
 Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Add, Button, x45 y330 w80 h25 gToggleDetectEden vDetectEdenBtn, Toggle
+Gui, Add, Button, x45 y455 w80 h25 gToggleDetectEden vDetectEdenBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x143 y333 w60 h25 vDetectEdenStatus BackgroundTrans, OFF
-
+Gui, Add, Text, x143 y459 w60 h25 vDetectEdenStatus BackgroundTrans, OFF
+*/
 Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x33 y90 w270 h135 cWhite, Auto-Clicker
-Gui, Add, Button, x46 y185 w80 h25 gStartAutoClicker vAutoClickStart, Start
-Gui, Add, Button, x136 y185 w80 h25 gStopAutoClicker  vAutoClickStop Disabled, Stop
+Gui, Add, GroupBox, x22 y265 w225 h120 cWhite, Auto-Clicker
+Gui, Add, Button, x35 y345 w80 h25 gStartAutoClicker vAutoClickStart, Start
+Gui, Add, Button, x125 y345 w80 h25 gStopAutoClicker  vAutoClickStop Disabled, Stop
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x226 y189 w60 h25 vAutoClickerStatus BackgroundTrans, OFF
+Gui, Add, Text, x214 y349 w60 h25 vAutoClickerStatus BackgroundTrans, OFF
 Gui, Font, s10 cWhite Bold
-Gui, Add, Text, x46 y160 w90 h20 BackgroundTrans, Delay (sec):
+Gui, Add, Text, x35 y320 w90 h20 BackgroundTrans, Delay (sec):
 Gui, Font, s9 cBlack Bold
-Gui, Add, Edit, x131 y160 w60 h22 vAutoClickDelay, 60
+Gui, Add, Edit, x120 y320 w60 h22 vAutoClickDelay, 60
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x43 y110 w255 h135 BackgroundTrans c0xCCCCCC, Automatically clicks after the desired seconds.
+Gui, Add, Text, x32 y285 w205 h135 BackgroundTrans c0xCCCCCC, Automatically clicks after the desired seconds.
+
+Gui, Font, s10 cWhite Bold
+Gui, Add, GroupBox, x22 y85 w554 h170 cWhite, Auto Craft
+Gui, Add, Text, x60 y167 w150 h50 BackgroundTrans, F2 = Start | F3 = Stop
+
+Gui, Font, s10 cWhite Bold
+Gui, Add, GroupBox, x220 y145 w210 h100 cWhite, Heavenly Potion
+Gui, Add, Button, x308 y165 w80 h25 gToggleUseCelestial vUseCelestialBtn, Toggle
+Gui, Add, Button, x308 y205 w80 h25 gToggleUseExotic vUseExoticBtn, Toggle
+Gui, Add, Text, x398 y169 w60 h25 vUseCelestialStatus BackgroundTrans, OFF
+Gui, Add, Text, x398 y209 w60 h25 vUseExoticStatus BackgroundTrans, OFF
+Gui, Font, s9 cWhite Normal
+Gui, Add, Text, x228 y170 w600 h100 BackgroundTrans c0xCCCCCC, Add
+Gui, Add, Text, x228 y210 w600 h100 BackgroundTrans c0xCCCCCC, Add
+Gui, Font, s9 c9B8CFF Bold, Trajan Pro
+Gui, Add, Text, x254 y169 w600 h100 BackgroundTrans, Celestial:
+Gui, Font, s10 cWhite Normal, Trajan Pro
+Gui, Add, Text, vExoticText x254 y209 w600 h100 BackgroundTrans, Exotic:
+SetTimer, RainbowText, 50
+
+Gui, Font, s10 cWhite Bold
+Gui, Add, GroupBox, x437 y145 w130 h100 cWhite, Bound Potion 
+Gui, Add, Button, x448 y205 w80 h25 gToggleUseBounded vUseBoundedBtn, Toggle
+Gui, Add, Text, x536 y209 w60 h25 vUseBoundedStatus BackgroundTrans, OFF
+Gui, Font, s9 cWhite Normal
+Gui, Add, Text, x448 y169 w600 h100 BackgroundTrans c0xCCCCCC, Add
+Gui, Font, s9 c1559C9 Bold, Trajan Pro
+Gui, Add, Text, x475 y169 w600 h100 BackgroundTrans, Bounded:
+
+
+Gui, Font, s9 cWhite Normal
+Gui, Add, Text, x35 y105 w534 h100 BackgroundTrans c0xCCCCCC, Adds the nessecary potions and/or auras to craft potions. Please already put the desired item on auto craft. You MUST be inside of Stella's Cauldron's UI. Toggling the auras listed below means adding them to the desired potion from your inventory and turns on Add Everything.
+Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Add, DropDownList, x60 y205 w120 vAutoCraft gSelectItem, Heavenly Potion|Bound Potion|Jewelry Potion|Zombie Potion|Rage Potion|Diver Potion
+GuiControl, Choose, AutoCraft, %selectedItem%
 
 GuiControl, Choose, Resolution, 1
 
-Gui, Show, w600 h570,  Aery's fishSol v1.7
+Gui, Show, w600 h570,  Aery's fishSol v1.8
 
 GuiControl, Choose, Resolution, 1
-
-if (advancedFishingDetection) {
-    GuiControl,, AdvancedFishingDetectionStatus, ON
-    GuiControl, +c0x00DD00, AdvancedFishingDetectionStatus
-} else {
-    GuiControl,, AdvancedFishingDetectionStatus, OFF
-    GuiControl, +c0xFF4444, AdvancedFishingDetectionStatus
-}
-
 GuiControl, Choose, PathingMode, 1
 
-if (azertyPathing) {
-    GuiControl,, AzertyPathingStatus, ON
-    GuiControl, +c0x00DD00, AzertyPathingStatus
-} else {
-    GuiControl,, AzertyPathingStatus, OFF
-    GuiControl, +c0xFF4444, AzertyPathingStatus
+UpdateStatus(initialToggle, convert) {
+    GuiControl,, %initialToggle%, % convert ? "ON" : "OFF"
+    GuiControl, % (convert ? "+c0x00DD00" : "+c0xFF4444"), %initialToggle%
 }
-if (autoUnequip) {
-    GuiControl,, AutoUnequipStatus, ON
-    GuiControl, +c0x00DD00, AutoUnequipStatus
-    if (!auraDetection) {
-        TrayTip, Please turn on Aura Detection!, Auras Tab -> Aura Detection
-        GuiControl,, AutoUnequipStatus, OFF
-        GuiControl, +c0xFF4444, AutoUnequipStatus
-        autoUnequip := false
-    }
-} else {
-    GuiControl,, AutoUnequipStatus, OFF
-    GuiControl, +c0xFF4444, AutoUnequipStatus
+
+; fishing/macro related
+UpdateStatus("AdvancedFishingDetectionStatus", advancedFishingDetection)
+UpdateStatus("AzertyPathingStatus", azertyPathing)
+UpdateStatus("RestartMacroFailsafeStatus", restartMacroFailsafe)
+UpdateStatus("FishInLimboStatus", fishInLimbo)
+UpdateStatus("LimboFailsafeStatus", limboFailsafe)
+
+; unequip related
+if (autoUnequip && !auraDetection) {
+    TrayTip, Please turn on Aura Detection!, Auras Tab -> Aura Detection
+    autoUnequip := false
 }
-if (useNothing) {
-    GuiControl,, UseNothingStatus, ON
-    GuiControl, +c0x00DD00, UseNothingStatus
-} else {
-    GuiControl,, UseNothingStatus, OFF
-    GuiControl, +c0xFF4444, UseNothingStatus
+UpdateStatus("AutoUnequipStatus", autoUnequip)
+if (autoUnequip && !auraDetection) {
+    TrayTip, Please turn on Aura Detection!, Auras Tab -> Aura Detection
+    autoUnequip := false
+} else if (!autoUnequip) {
+    TrayTip, Please turn Auto Unequip!
+    useNothing := false
 }
-if (biomeRandomizer) {
-    GuiControl,, BiomeRandomizerStatus, ON
-    GuiControl, +c0x00DD00, BiomeRandomizerStatus
-} else {
-    GuiControl,, BiomeRandomizerStatus, OFF
-    GuiControl, +c0xFF4444, BiomeRandomizerStatus
+UpdateStatus("UseNothingStatus", useNothing)
+
+; biome devices related
+UpdateStatus("BiomeRandomizerStatus", biomeRandomizer)
+UpdateStatus("StrangeControllerStatus", strangeController)
+UpdateStatus("BiomeSelectorStatus", biomeSelector)
+
+; crafting related
+UpdateStatus("AutoCraftStatus", autoCraft)
+UpdateStatus("UseCelestialStatus", useCelestial)
+UpdateStatus("UseExoticStatus", useExotic)
+UpdateStatus("UseBoundedStatus", useBounded)
+
+
+; aura detection related
+UpdateStatus("AuraDetectionStatus", auraDetection)
+UpdateStatus("AuraFilterStatus", auraFilter)
+UpdateStatus("DetectGlobalStatus", detectGlobal)
+UpdateStatus("DetectTransStatus", detectTrans)
+UpdateStatus("ClipWebhookStatus", clipWebhook)
+UpdateStatus("ClipWebhookPingStatus", clipWebhookPing)
+UpdateStatus("GlobalTranscendentPingStatus", globalTranscendentPing)
+
+; biome detection related
+if (biomeDetect && privateServerLink = "") {
+    TrayTip, Please Enter a Private Server Link!, Private Server Tab -> Private Server Link
+    biomeDetect := false
 }
-if (strangeController) {
-    GuiControl,, StrangeControllerStatus, ON
-    GuiControl, +c0x00DD00, StrangeControllerStatus
-} else {
-    GuiControl,, StrangeControllerStatus, OFF
-    GuiControl, +c0xFF4444, StrangeControllerStatus
-}
-if (clipWebhook) {
-    GuiControl,, ClipWebhookStatus, ON
-    GuiControl, +c0x00DD00, ClipWebhookStatus
-} else {
-    GuiControl,, ClipWebhookStatus, OFF
-    GuiControl, +c0xFF4444, ClipWebhookStatus
-}
-if (doPing2) {
-    GuiControl,, DoPing2Status, ON
-    GuiControl, +c0x00DD00, DoPing2Status
-} else {
-    GuiControl,, DoPing2Status, OFF
-    GuiControl, +c0xFF4444, DoPing2Status
-}
-if (doPing3) {
-    GuiControl,, DoPing3Status, ON
-    GuiControl, +c0x00DD00, DoPing3Status
-} else {
-    GuiControl,, DoPing3Status, OFF
-    GuiControl, +c0xFF4444, DoPing3Status
-}
-if (useCelestial) {
-    GuiControl,, UseCelestialStatus, ON
-    GuiControl, +c0x00DD00, UseCelestialStatus
-} else {
-    GuiControl,, UseCelestialStatus, OFF
-    GuiControl, +c0xFF4444, UseCelestialStatus
-}
-if (useExotic) {
-    GuiControl,, UseExoticStatus, ON
-    GuiControl, +c0x00DD00, UseExoticStatus
-} else {
-    GuiControl,, UseExoticStatus, OFF
-    GuiControl, +c0xFF4444, UseExoticStatus
-}
-if (useBounded) {
-    GuiControl,, UseBoundedStatus, ON
-    GuiControl, +c0x00DD00, UseBoundedStatus
-} else {
-    GuiControl,, UseBoundedStatus, OFF
-    GuiControl, +c0xFF4444, UseBoundedStatus
-}
-if (autoClicker) {
-    GuiControl, Disable, AutoClickStart
-    GuiControl, Enable, AutoClickStop
-    GuiControl, +c0x00DD00, AutoClickerStatus, ON
-} else {
-    GuiControl, Enable, AutoClickStart
-    GuiControl, Disable, AutoClickStop
-    GuiControl, +c0xFF4444, AutoClickerStatus, OFF
-}
-if (manualCraft) {
-    GuiControl,, ManualCraftStatus, ON
-    GuiControl, +c0x00DD00, ManualCraftStatus
-} else {
-    GuiControl,, ManualCraftStatus, OFF
-    GuiControl, +c0xFF4444, ManualCraftStatus
-}
-if (auraDetection) {
-    GuiControl,, AuraDetectionStatus, ON
-    GuiControl, +c0x00DD00, AuraDetectionStatus
-} else {
-    GuiControl,, AuraDetectionStatus, OFF
-    GuiControl, +c0xFF4444, AuraDetectionStatus
-}
-if (detectGlobal) {
-    GuiControl,, DetectGlobalStatus, ON
-    GuiControl, +c0x00DD00, DetectGlobalStatus
-} else {
-    GuiControl,, DetectGlobalStatus, OFF
-    GuiControl, +c0xFF4444, DetectGlobalStatus
-}
-if (detectTrans) {
-    GuiControl,, DetectTransStatus, ON
-    GuiControl, +c0x00DD00, DetectTransStatus
-} else {
-    GuiControl,, DetectTransStatus, OFF
-    GuiControl, +c0xFF4444, DetectTransStatus
-}
-if (autoWarp) {
-    GuiControl,, AutoWarpStatus, ON
-    GuiControl, +c0x00DD00, AutoWarpStatus
-} else {
-    GuiControl,, AutoWarpStatus, OFF
-    GuiControl, +c0xFF4444, AutoWarpStatus
-}
-if (detectPotion) {
-    GuiControl,, DetectPotionStatus, ON
-    GuiControl, +c0x00DD00, DetectPotionStatus
-    SetTimer, DetectPotion, 300
-} else {
-    GuiControl,, DetectPotionStatus, OFF
-    GuiControl, +c0xFF4444, DetectPotionStatus
-    SetTimer, DetectPotion, Off
-}
-if (auraFilter) {
-    GuiControl,, AuraFilterStatus, ON
-    GuiControl, +c0x00DD00, AuraFilterStatus
-} else {
-    GuiControl,, AuraFilterStatus, OFF
-    GuiControl, +c0xFF4444, AuraFilterStatus
-}
+UpdateStatus("BiomeDetectStatus", biomeDetect)
+UpdateStatus("AutoWarpStatus", autoWarp)
+
+; misc related
+UpdateStatus("AutoWarpStatus", autoWarp)
 if (detectEden) {
-    GuiControl,, DetectEdenStatus, ON
-    GuiControl, +c0x00DD00, DetectEdenStatus
     edenDelay := 20000
     SetTimer, EdenSnatcher, 50
 } else {
-    GuiControl,, DetectEdenStatus, OFF
-    GuiControl, +c0xFF4444, DetectEdenStatus
     SetTimer, EdenSnatcher, Off
 }
-if (checkGhostServer) {
-    GuiControl,, CheckGhostServerStatus, ON
-    GuiControl, +c0x00DD00, CheckGhostServerStatus
-    if (privateServerLink = "") {
-        TrayTip, Please Enter a Private Server Link!, Private Server Tab -> Private Server Link
-        GuiControl,, CheckGhostServerStatus, OFF
-        GuiControl, +c0xFF4444, CheckGhostServerStatus
-        checkGhostServer := false
-    }
+UpdateStatus("DetectEdenStatus", detectEden)
+if (autoClicker) {
+    GuiControl, Disable, AutoClickStart
+    GuiControl, Enable, AutoClickStop
 } else {
-    GuiControl,, CheckGhostServerStatus, OFF
-    GuiControl, +c0xFF4444, CheckGhostServerStatus
+    GuiControl, Enable, AutoClickStart
+    GuiControl, Disable, AutoClickStop
 }
-if (biomeDetect) {
-    GuiControl,, BiomeDetectStatus, ON
-    GuiControl, +c0x00DD00, BiomeDetectStatus
-        if (privateServerLink = "") {
-        TrayTip, Please Enter a Private Server Link!, Private Server Tab -> Private Server Link
-        GuiControl,, BiomeDetectStatus, OFF
-        GuiControl, +c0xFF4444, BiomeDetectStatus
-        biomeDetect := false
-    }
-} else {
-    GuiControl,, BiomeDetectStatus, OFF
-    GuiControl, +c0xFF4444, BiomeDetectStatus
+UpdateStatus("AutoClickerStatus", autoClicker)
+
+/*
+if (checkGhostServer && privateServerLink = "") {
+    TrayTip, Please Enter a Private Server Link!, Private Server Tab -> Private Server Link
+    checkGhostServer := false
 }
-if (restartMacroFailsafe) {
-    GuiControl,, RestartMacroFailsafeStatus, ON
-    GuiControl, +c0x00DD00, RestartMacroFailsafeStatus
-} else {
-    GuiControl,, RestartMacroFailsafeStatus, OFF
-    GuiControl, +c0xFF4444, RestartMacroFailsafeStatus
-}
-if (biomeSelector) {
-    GuiControl,, BiomeSelectorStatus, ON
-    GuiControl, +c0x00DD00, BiomeSelectorStatus
-} else {
-    GuiControl,, BiomeSelectorStatus, OFF
-    GuiControl, +c0xFF4444, BiomeSelectorStatus
-}
-if (fishInLimbo) {
-    GuiControl,, FishInLimboStatus, ON
-    GuiControl, +c0x00DD00, FishInLimboStatus
-} else {
-    GuiControl,, FishInLimboStatus, OFF
-    GuiControl, +c0xFF4444, FishInLimboStatus
-}
-if (limboFailsafe) {
-    GuiControl,, LimboFailsafeStatus, ON
-    GuiControl, +c0x00DD00, LimboFailsafeStatus
-} else {
-    GuiControl,, LimboFailsafeStatus, OFF
-    GuiControl, +c0xFF4444, LimboFailsafeStatus
-}
+UpdateStatus("CheckGhostServerStatus", checkGhostServer)
+*/
 
 GuiControl, ChooseString, SelectedBiome, %selectedBiome%
 SetTimer, AuraBiomeDetect, 1000
 SetTimer, ServerLinkConverter, 1000
+
+
 
 
 AuraCheckChange:
@@ -1124,32 +918,36 @@ AuraCheckChange:
         return
     Gui, AuraFilter:Submit, NoHide
     for i, aura in AuraListOrder {
-        ctrlName := aura . "_chk"
-        StringReplace, ctrlName, ctrlName, -, _, All
-        EnabledAuras[aura] := %ctrlName%
-        IniWrite, % EnabledAuras[aura], %iniFilePath%, EnabledAuras, %aura%
+        auraName := aura . "_chk"
+        StringReplace, auraName, auraName, -, _, All
+        StringReplace, auraName, auraName, %A_Space%, _, All
+        EnabledAuras[aura] := %auraName%
+        IniWrite, % EnabledAuras[aura], %fishSolSettingsFilePath%, EnabledAuras, %aura%
     }
     for i, aura in AuraListTransOrder {
-        ctrlName := aura . "_chk"
-        StringReplace, ctrlName, ctrlName, -, _, All
-        EnabledAuras[aura] := %ctrlName%
-        IniWrite, % EnabledAuras[aura], %iniFilePath%, EnabledAuras, %aura%
+        auraName := aura . "_chk"
+        StringReplace, auraName, auraName, -, _, All
+        StringReplace, auraName, auraName, %A_Space%, _, All
+        EnabledAuras[aura] := %auraName%
+        IniWrite, % EnabledAuras[aura], %fishSolSettingsFilePath%, EnabledAuras, %aura%
     }
 return
 
 SaveAuraFilter:
     Gui, AuraFilter:Submit, NoHide
     for i, aura in AuraListOrder {
-        ctrlName := aura . "_chk"
-        StringReplace, ctrlName, ctrlName, -, _, All
-        EnabledAuras[aura] := %ctrlName%
-        IniWrite, % EnabledAuras[aura], %iniFilePath%, EnabledAuras, %aura%
+        auraName := aura . "_chk"
+        StringReplace, auraName, auraName, -, _, All
+        StringReplace, auraName, auraName, %A_Space%, _, All
+        EnabledAuras[aura] := %auraName%
+        IniWrite, % EnabledAuras[aura], %fishSolSettingsFilePath%, EnabledAuras, %aura%
     }
     for i, aura in AuraListTransOrder {
-        ctrlName := aura . "_chk"
-        StringReplace, ctrlName, ctrlName, -, _, All
-        EnabledAuras[aura] := %ctrlName%
-        IniWrite, % EnabledAuras[aura], %iniFilePath%, EnabledAuras, %aura%
+        auraName := aura . "_chk"
+        StringReplace, auraName, auraName, -, _, All
+        StringReplace, auraName, auraName, %A_Space%, _, All
+        EnabledAuras[aura] := %auraName%
+        IniWrite, % EnabledAuras[aura], %fishSolSettingsFilePath%, EnabledAuras, %aura%
     }
     Gui, AuraFilter:Destroy
 return
@@ -1173,11 +971,11 @@ UpdateLoopCount:
     Gui, Submit, NoHide
     if (MaxLoopInput > 0) {
         maxLoopCount := MaxLoopInput
-        IniWrite, %maxLoopCount%, %iniFilePath%, Macro, maxLoopCount
+        IniWrite, %maxLoopCount%, %fishSolSettingsFilePath%, Macro, maxLoopCount
     }
     if (FishingLoopInput > 0) {
         fishingLoopCount := FishingLoopInput
-        IniWrite, %fishingLoopCount%, %iniFilePath%, Macro, fishingLoopCount
+        IniWrite, %fishingLoopCount%, %fishSolSettingsFilePath%, Macro, fishingLoopCount
     }
 return
 
@@ -1185,379 +983,175 @@ UpdatePotionCraft:
     Gui, Submit, NoHide
     if (PotionCraftInput > 0) {
         potionCraftCount := PotionCraftInput
-        IniWrite, %potionCraftCount%, %iniFilePath%, Macro, potionCraftCount
+        IniWrite, %potionCraftCount%, %fishSolSettingsFilePath%, Macro, potionCraftCount
     }
 return
 
 UpdateSelectedBiome:
     Gui, Submit, nohide
     selectedBiome := SelectedBiome
-    IniWrite, %selectedBiome%, %iniFilePath%, Macro, selectedBiome
+    IniWrite, %selectedBiome%, %fishSolSettingsFilePath%, Macro, selectedBiome
 return
 
-ToggleAdvancedFishingDetection:
-    advancedFishingDetection := !advancedFishingDetection
-    if (advancedFishingDetection) {
-        GuiControl,, AdvancedFishingDetectionStatus, ON
-        GuiControl, +c0x00DD00, AdvancedFishingDetectionStatus
-    } else {
-        GuiControl,, AdvancedFishingDetectionStatus, OFF
-        GuiControl, +c0xFF4444, AdvancedFishingDetectionStatus
-    }
-    IniWrite, % (advancedFishingDetection ? "true" : "false"), %iniFilePath%, Macro, advancedFishingDetection
-return
+ToggleSetting(ByRef Setting, toggleName, iniKey) {
+    global fishSolSettingsFilePath
+    Setting := !Setting
+    UpdateStatus(toggleName, Setting)
+    IniWrite, % (Setting ? "true" : "false"), %fishSolSettingsFilePath%, Macro, %iniKey%
+    return Setting
+}
 
 ToggleAutoUnequip:
-    autoUnequip := !autoUnequip
-    if (autoUnequip) {
-        GuiControl,, AutoUnequipStatus, ON
-        GuiControl, +c0x00DD00, AutoUnequipStatus
-        if (!auraDetection) {
-            TrayTip, Please turn on Aura Detection!, Auras Tab -> Aura Detection
-            GuiControl,, AutoUnequipStatus, OFF
-            GuiControl, +c0xFF4444, AutoUnequipStatus
-            autoUnequip := false
-        }
-    } else {
-        GuiControl,, AutoUnequipStatus, OFF
-        GuiControl, +c0xFF4444, AutoUnequipStatus
+    if (ToggleSetting(autoUnequip, "AutoUnequipStatus", "autoUnequip") && !auraDetection) {
+        TrayTip, Please turn on Aura Detection!, Auras Tab -> Aura Detection
+        ToggleSetting(autoUnequip, "AutoUnequipStatus", "autoUnequip")
     }
-    IniWrite, % (autoUnequip ? "true" : "false"), %iniFilePath%, Macro, autoUnequip
 return
 
 ToggleUseNothing:
-    useNothing := !useNothing
-    if (useNothing) {
-        GuiControl,, UseNothingStatus, ON
-        GuiControl, +c0x00DD00, UseNothingStatus
-    } else {
-        GuiControl,, UseNothingStatus, OFF
-        GuiControl, +c0xFF4444, UseNothingStatus
+    if (ToggleSetting(useNothing, "UseNothingStatus", "useNothing") && !autoUnequip) {
+        TrayTip, Please turn on Auto Unequip!, Misc Tab -> Auto Unequip
+        ToggleSetting(useNothing, "UseNothingStatus", "useNothing")
     }
-    IniWrite, % (useNothing ? "true" : "false"), %iniFilePath%, Macro, useNothing
-return
-
-ToggleAzertyPathing:
-    azertyPathing := !azertyPathing
-    if (azertyPathing) {
-        GuiControl,, AzertyPathingStatus, ON
-        GuiControl, +c0x00DD00, AzertyPathingStatus
-    } else {
-        GuiControl,, AzertyPathingStatus, OFF
-        GuiControl, +c0xFF4444, AzertyPathingStatus
-    }
-    IniWrite, % (azertyPathing ? "true" : "false"), %iniFilePath%, Macro, azertyPathing
-return
-
-ToggleClipWebhook:
-    clipWebhook := !clipWebhook
-    if (clipWebhook) {
-        GuiControl,, ClipWebhookStatus, ON
-        GuiControl, +c0x00DD00, ClipWebhookStatus
-    } else {
-        GuiControl,, ClipWebhookStatus, OFF
-        GuiControl, +c0xFF4444, ClipWebhookStatus
-    }
-    IniWrite, % (clipWebhook ? "true" : "false"), %iniFilePath%, Macro, clipWebhook
-return
-
-ToggleDoPing2:
-    doPing2 := !doPing2
-    if (doPing2) {
-        GuiControl,, DoPing2Status, ON
-        GuiControl, +c0x00DD00, DoPing2Status
-    } else {
-        GuiControl,, DoPing2Status, OFF
-        GuiControl, +c0xFF4444, DoPing2Status
-    }
-    IniWrite, % (doPing2 ? "true" : "false"), %iniFilePath%, Macro, doPing2
-return
-
-ToggleDoPing3:
-    doPing3 := !doPing3
-    if (doPing3) {
-        GuiControl,, DoPing3Status, ON
-        GuiControl, +c0x00DD00, DoPing3Status
-    } else {
-        GuiControl,, DoPing3Status, OFF
-        GuiControl, +c0xFF4444, DoPing3Status
-    }
-    IniWrite, % (doPing3 ? "true" : "false"), %iniFilePath%, Macro, doPing3
-return
-
-ToggleStrangeController:
-    strangeController := !strangeController
-    if (strangeController) {
-        GuiControl,, StrangeControllerStatus, ON
-        GuiControl, +c0x00DD00, StrangeControllerStatus
-    } else {
-        GuiControl,, StrangeControllerStatus, OFF
-        GuiControl, +c0xFF4444, StrangeControllerStatus
-    }
-    IniWrite, % (strangeController ? "true" : "false"), %iniFilePath%, Macro, strangeController
-return
-
-ToggleBiomeRandomizer:
-    biomeRandomizer := !biomeRandomizer
-    if (biomeRandomizer) {
-        GuiControl,, BiomeRandomizerStatus, ON
-        GuiControl, +c0x00DD00, BiomeRandomizerStatus
-    } else {
-        GuiControl,, BiomeRandomizerStatus, OFF
-        GuiControl, +c0xFF4444, BiomeRandomizerStatus
-    }
-    IniWrite, % (biomeRandomizer ? "true" : "false"), %iniFilePath%, Macro, biomeRandomizer
-return
-
-ToggleUseCelestial:
-    useCelestial := !useCelestial
-    if (useCelestial) {
-        GuiControl,, UseCelestialStatus, ON
-        GuiControl, +c0x00DD00, UseCelestialStatus
-    } else {
-        GuiControl,, UseCelestialStatus, OFF
-        GuiControl, +c0xFF4444, UseCelestialStatus
-    }
-    IniWrite, % (useCelestial ? "true" : "false"), %iniFilePath%, Macro, useCelestial
-return
-
-ToggleUseExotic:
-    useExotic := !useExotic
-    if (useExotic) {
-        GuiControl,, UseExoticStatus, ON
-        GuiControl, +c0x00DD00, UseExoticStatus
-    } else {
-        GuiControl,, UseExoticStatus, OFF
-        GuiControl, +c0xFF4444, UseExoticStatus
-    }
-    IniWrite, % (useExotic ? "true" : "false"), %iniFilePath%, Macro, useExotic
-return
-
-ToggleUseBounded:
-    useBounded := !useBounded
-    if (useBounded) {
-        GuiControl,, UseBoundedStatus, ON
-        GuiControl, +c0x00DD00, UseBoundedStatus
-    } else {
-        GuiControl,, UseBoundedStatus, OFF
-        GuiControl, +c0xFF4444, UseBoundedStatus
-    }
-    IniWrite, % (useBounded ? "true" : "false"), %iniFilePath%, Macro, useBounded
 return
 
 ToggleAutoClicker:
-    autoClicker := !autoClicker
-        if (autoClicker) {
-        GuiControl, Disable, AutoClickStart
-        GuiControl, Enable, AutoClickStop
-        GuiControl,, AutoClickerStatus, ON
-    } else {
-        GuiControl, Enable, AutoClickStart
-        GuiControl, Disable, AutoClickStop
-        GuiControl,, AutoClickerStatus, OFF
-    }
-
-    IniWrite, % (autoClicker ? "true" : "false"), %iniFilePath%, Macro, autoClicker
-return
-
-ToggleManualCraft:
-    manualCraft := !manualCraft
-    if (manualCraft) {
-        GuiControl,, ManualCraftStatus, ON
-        GuiControl, +c0x00DD00, ManualCraftStatus
-    } else {
-        GuiControl,, ManualCraftStatus, OFF
-        GuiControl, +c0xFF4444, ManualCraftStatus
-    }
-    IniWrite, % (manualCraft ? "true" : "false"), %iniFilePath%, Macro, manualCraft
-return
-
-ToggleAuraDetection:
-    auraDetection := !auraDetection
-    if (auraDetection) {
-        GuiControl,, AuraDetectionStatus, ON
-        GuiControl, +c0x00DD00, AuraDetectionStatus
-    } else {
-        GuiControl,, AuraDetectionStatus, OFF
-        GuiControl, +c0xFF4444, AuraDetectionStatus
-    }
-    IniWrite, % (auraDetection ? "true" : "false"), %iniFilePath%, Macro, auraDetection
-return
-
-ToggleDetectGlobal:
-    detectGlobal := !detectGlobal
-
-    if (detectGlobal) {
-        GuiControl,, DetectGlobalStatus, ON
-        GuiControl, +c0x00DD00, DetectGlobalStatus
-    } else {
-        GuiControl,, DetectGlobalStatus, OFF
-        GuiControl, +c0xFF4444, DetectGlobalStatus
-    }
-
-    IniWrite, % (detectGlobal ? "true" : "false"), %iniFilePath%, Macro, detectGlobal
-return
-
-ToggleDetectTrans:
-    detectTrans := !detectTrans
-    if (detectTrans) {
-        GuiControl,, DetectTransStatus, ON
-        GuiControl, +c0x00DD00, DetectTransStatus
-    } else {
-        GuiControl,, DetectTransStatus, OFF
-        GuiControl, +c0xFF4444, DetectTransStatus
-    }
-    IniWrite, % (detectTrans ? "true" : "false"), %iniFilePath%, Macro, detectTrans
-return
-
-ToggleAutoWarp:
-    autoWarp := !autoWarp
-    if (autoWarp) {
-        GuiControl,, AutoWarpStatus, ON
-        GuiControl, +c0x00DD00, AutoWarpStatus
-    } else {
-        GuiControl,, AutoWarpStatus, OFF
-        GuiControl, +c0xFF4444, AutoWarpStatus
-    }
-    IniWrite, % (autoWarp ? "true" : "false"), %iniFilePath%, Macro, autoWarp
-return
-
-ToggleDetectPotion:
-    detectPotion := !detectPotion
-    if (detectPotion) {
-        GuiControl,, DetectPotionStatus, ON
-        GuiControl, +c0x00DD00, DetectPotionStatus
-        SetTimer, DetectPotion, 300
-    } else {
-        GuiControl,, DetectPotionStatus, OFF
-        GuiControl, +c0xFF4444, DetectPotionStatus
-        SetTimer, DetectPotion, Off
-    }
-    IniWrite, % (detectPotion ? "true" : "false"), %iniFilePath%, Macro, detectPotion
-return
-
-ToggleAuraFilter:
-    auraFilter := !auraFilter
-    if (auraFilter) {
-        GuiControl,, AuraFilterStatus, ON
-        GuiControl, +c0x00DD00, AuraFilterStatus
-    } else {
-        GuiControl,, AuraFilterStatus, OFF
-        GuiControl, +c0xFF4444, AuraFilterStatus
-    }
-    IniWrite, % (auraFilter ? "true" : "false"), %iniFilePath%, Macro, auraFilter
+    autoClicker := ToggleSetting(autoClicker, "AutoClickerStatus", "autoClicker")
+    GuiControl, % (autoClicker ? "Disable" : "Enable"), AutoClickStart
+    GuiControl, % (autoClicker ? "Enable" : "Disable"), AutoClickStop
 return
 
 ToggleDetectEden:
-    detectEden := !detectEden
+    detectEden := ToggleSetting(detectEden, "DetectEdenStatus", "detectEden")
     if (detectEden) {
-        GuiControl,, DetectEdenStatus, ON
-        GuiControl, +c0x00DD00, DetectEdenStatus
         edenDelay := 20000
         SetTimer, EdenSnatcher, 100
     } else {
-        GuiControl,, DetectEdenStatus, OFF
-        GuiControl, +c0xFF4444, DetectEdenStatus
         SetTimer, EdenSnatcher, Off
     }
-    IniWrite, % (detectEden ? "true" : "false"), %iniFilePath%, Macro, detectEden
 return
 
 ToggleCheckGhostServer:
-    checkGhostServer := !checkGhostServer
-    if (checkGhostServer) {
-        GuiControl,, CheckGhostServerStatus, ON
-        GuiControl, +c0x00DD00, CheckGhostServerStatus
-        if (privateServerLink = "") {
-            TrayTip, Please Enter a Private Server Link!, Private Server Tab -> Private Server Link
-            GuiControl,, CheckGhostServerStatus, OFF
-            GuiControl, +c0xFF4444, CheckGhostServerStatus
-            checkGhostServer := false
-        }
-    } else {
-        GuiControl,, CheckGhostServerStatus, OFF
-        GuiControl, +c0xFF4444, CheckGhostServerStatus
+    if (ToggleSetting(checkGhostServer, "CheckGhostServerStatus", "checkGhostServer") && privateServerLink = "") {
+        TrayTip, Please Enter a Private Server Link!, Private Server Tab -> Private Server Link
+        ToggleSetting(checkGhostServer, "CheckGhostServerStatus", "checkGhostServer")
     }
-    IniWrite, % (checkGhostServer ? "true" : "false"), %iniFilePath%, Macro, checkGhostServer
 return
 
 ToggleBiomeDetect:
-    biomeDetect := !biomeDetect
-    if (biomeDetect) {
-        GuiControl,, BiomeDetectStatus, ON
-        GuiControl, +c0x00DD00, BiomeDetectStatus
-            if (privateServerLink = "") {
-            TrayTip, Please Enter a Private Server Link!, Private Server Tab -> Private Server Link
-            GuiControl,, BiomeDetectStatus, OFF
-            GuiControl, +c0xFF4444, BiomeDetectStatus
-            biomeDetect := false
-        }
-    } else {
-        GuiControl,, BiomeDetectStatus, OFF
-        GuiControl, +c0xFF4444, BiomeDetectStatus
+    if (ToggleSetting(biomeDetect, "BiomeDetectStatus", "biomeDetect") && privateServerLink = "") {
+        TrayTip, Please Enter a Private Server Link!, Private Server Tab -> Private Server Link
+        ToggleSetting(biomeDetect, "BiomeDetectStatus", "biomeDetect")
     }
-    IniWrite, % (biomeDetect ? "true" : "false"), %iniFilePath%, Macro, biomeDetect
+return
+
+ToggleAdvancedFishingDetection:
+    ToggleSetting(advancedFishingDetection, "AdvancedFishingDetectionStatus", "advancedFishingDetection")
+return
+
+ToggleAzertyPathing:
+    ToggleSetting(azertyPathing, "AzertyPathingStatus", "azertyPathing")
+return
+
+ToggleClipWebhook:
+    ToggleSetting(clipWebhook, "ClipWebhookStatus", "clipWebhook")
+return
+
+ToggleClipWebhookPing:
+    ToggleSetting(clipWebhookPing, "ClipWebhookPingStatus", "clipWebhookPing")
+return
+
+ToggleGlobalTranscendentPing:
+    ToggleSetting(globalTranscendentPing, "GlobalTranscendentPingStatus", "globalTranscendentPing")
+return
+
+ToggleStrangeController:
+    ToggleSetting(strangeController, "StrangeControllerStatus", "strangeController")
+return
+
+ToggleBiomeRandomizer:
+    ToggleSetting(biomeRandomizer, "BiomeRandomizerStatus", "biomeRandomizer")
+return
+
+ToggleUseCelestial:
+    ToggleSetting(useCelestial, "UseCelestialStatus", "useCelestial")
+return
+
+ToggleUseExotic:
+    ToggleSetting(useExotic, "UseExoticStatus", "useExotic")
+return
+
+ToggleUseBounded:
+    ToggleSetting(useBounded, "UseBoundedStatus", "useBounded")
+return
+
+ToggleAuraDetection:
+    ToggleSetting(auraDetection, "AuraDetectionStatus", "auraDetection")
+return
+
+ToggleDetectGlobal:
+    ToggleSetting(detectGlobal, "DetectGlobalStatus", "detectGlobal")
+return
+
+ToggleDetectTrans:
+    ToggleSetting(detectTrans, "DetectTransStatus", "detectTrans")
+return
+
+ToggleAutoWarp:
+    ToggleSetting(autoWarp, "AutoWarpStatus", "autoWarp")
+return
+
+ToggleAuraFilter:
+    ToggleSetting(auraFilter, "AuraFilterStatus", "auraFilter")
 return
 
 ToggleRestartMacroFailsafe:
-    restartMacroFailsafe := !restartMacroFailsafe
-    if (restartMacroFailsafe) {
-        GuiControl,, RestartMacroFailsafeStatus, ON
-        GuiControl, +c0x00DD00, RestartMacroFailsafeStatus
-    } else {
-        GuiControl,, RestartMacroFailsafeStatus, OFF
-        GuiControl, +c0xFF4444, RestartMacroFailsafeStatus
-    }
-    IniWrite, % (restartMacroFailsafe ? "true" : "false"), %iniFilePath%, Macro, restartMacroFailsafe
+    ToggleSetting(restartMacroFailsafe, "RestartMacroFailsafeStatus", "restartMacroFailsafe")
 return
 
 ToggleBiomeSelector:
-    biomeSelector := !biomeSelector
-    if (biomeSelector) {
-        GuiControl,, BiomeSelectorStatus, ON
-        GuiControl, +c0x00DD00, BiomeSelectorStatus
-    } else {
-        GuiControl,, BiomeSelectorStatus, OFF
-        GuiControl, +c0xFF4444, BiomeSelectorStatus
-    }
-    IniWrite, % (biomeSelector ? "true" : "false"), %iniFilePath%, Macro, biomeSelector
+    ToggleSetting(biomeSelector, "BiomeSelectorStatus", "biomeSelector")
 return
 
 ToggleFishInLimbo:
-    fishInLimbo := !fishInLimbo
-    if (fishInLimbo) {
-        GuiControl,, FishInLimboStatus, ON
-        GuiControl, +c0x00DD00, FishInLimboStatus
-    } else {
-        GuiControl,, FishInLimboStatus, OFF
-        GuiControl, +c0xFF4444, FishInLimboStatus
-    }
-    IniWrite, % (fishInLimbo ? "true" : "false"), %iniFilePath%, Macro, fishInLimbo
+    ToggleSetting(fishInLimbo, "FishInLimboStatus", "fishInLimbo")
 return
 
 ToggleLimboFailsafe:
-    limboFailsafe := !limboFailsafe
-    if (limboFailsafe) {
-        GuiControl,, LimboFailsafeStatus, ON
-        GuiControl, +c0x00DD00, LimboFailsafeStatus
-    } else {
-        GuiControl,, LimboFailsafeStatus, OFF
-        GuiControl, +c0xFF4444, LimboFailsafeStatus
-    }
-    IniWrite, % (limboFailsafe ? "true" : "false"), %iniFilePath%, Macro, limboFailsafe
+    ToggleSetting(limboFailsafe, "LimboFailsafeStatus", "limboFailsafe")
+return
+
+ToggleActivationMessage:
+    ToggleSetting(activationMessage, "ActivationMessageStatus", "activationMessage")
+return
+
+ToggleBiomeItemMessage:
+    ToggleSetting(biomeItemMessage, "BiomeItemMessageStatus", "biomeItemMessage")
+return
+
+ToggleFailsafeMessage:
+    ToggleSetting(failsafeMessage, "FailsafeMessageStatus", "failsafeMessage")
+return
+
+ToggleFailsafeMessagePing:
+    ToggleSetting(failsafeMessagePing, "FailsafeMessagePingStatus", "failsafeMessagePing")
+return
+
+ToggleRestartMacroFailsafePing:
+    ToggleSetting(restartMacroFailsafePing, "RestartMacroFailsafePingStatus", "restartMacroFailsafePing")
 return
 
 UpdatePrivateServer:
     Gui, Submit, NoHide
     privateServerLink := PrivateServerInput
-    IniWrite, %privateServerLink%, %iniFilePath%, Macro, privateServerLink
+    IniWrite, %privateServerLink%, %fishSolSettingsFilePath%, Macro, privateServerLink
 return
 
 UpdateAutoRejoinFailsafe:
 Gui, Submit, nohide
 if (AutoRejoinFailsafeInput > 0) {
     autoRejoinFailsafeTime := AutoRejoinFailsafeInput
-    IniWrite, %autoRejoinFailsafeTime%, %iniFilePath%, Macro, autoRejoinFailsafeTime
+    IniWrite, %autoRejoinFailsafeTime%, %fishSolSettingsFilePath%, Macro, autoRejoinFailsafeTime
 }
 return
 
@@ -1565,14 +1159,14 @@ UpdateAdvancedThreshold:
 Gui, Submit, nohide
 if (AdvancedThresholdInput >= 0 && AdvancedThresholdInput <= 40) {
     advancedFishingThreshold := AdvancedThresholdInput
-    IniWrite, %advancedFishingThreshold%, %iniFilePath%, Macro, advancedFishingThreshold
+    IniWrite, %advancedFishingThreshold%, %fishSolSettingsFilePath%, Macro, advancedFishingThreshold
 }
 return
 
 UpdateWebhook:
     Gui, Submit, nohide
     webhookURL := WebhookInput
-    IniWrite, %webhookURL%, %iniFilePath%, Macro, webhookURL
+    IniWrite, %webhookURL%, %fishSolSettingsFilePath%, Macro, webhookURL
 return
 
 ProcessExist(Name) {
@@ -1584,59 +1178,6 @@ ProcessExist(Name) {
     return false
 }
 
-CheckBiome:
-    global ROBLOX_LOGS
-    currentBiome := "None"
-    if (!ProcessExist("RobloxPlayerBeta.exe"))
-        return
-
-    newestTime := 0
-    newestFile := ""
-
-    Loop, Files, %ROBLOX_LOGS%, F
-    {
-        if (A_LoopFileTimeModified > newestTime) {
-            newestTime := A_LoopFileTimeModified
-            newestFile := A_LoopFileFullPath
-        }
-    }
-
-
-    file := FileOpen(newestFile, "r")
-    if !IsObject(file)
-        return
-
-    size := file.Length
-    chunkSize := 10240
-    if (size > chunkSize)
-        file.Seek(-chunkSize, 2)
-    content := file.Read()
-    file.Close()
-
-    lines := StrSplit(content, "`n")
-    foundRPC := false
-
-    Loop % lines.MaxIndex()
-    {
-        line := lines[lines.MaxIndex() - A_Index + 1]
-        if InStr(line, "[BloxstrapRPC]")
-        {
-            foundRPC := true
-            if RegExMatch(line, """state"":""((?:\\.|[^""])*)"".*?""largeImage"":\{""hoverText"":""((?:\\.|[^""])*)""", m) {
-                biome := m2
-                break
-            }
-        }
-    }
-
-    if (biome and biome != "" and biome != prevBiome) {
-        currentBiome := biome
-        prevBiome    := biome
-    }
-    else if (!biome or biome = "") {
-        currentBiome := "None"
-    }
-return
 
 ; webhooks!
 SendWebhook(text, color := 16777215) {
@@ -1661,7 +1202,7 @@ SendWebhook(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.7"","
+    . """text"": ""Aery's fishSol v1.8"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1671,11 +1212,11 @@ SendWebhook(text, color := 16777215) {
     http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     http.Open("POST", webhookURL, false)
     http.SetRequestHeader("Content-Type", "application/json")
-    http.Send(json)
+    try http.Send(json)
 }
 
 SendWebhook2(text, color := 16777215, imageURL := "") {
-    global webhookURL, webhookID, doPing3, auraName
+    global webhookURL, webhookID, globalTranscendentPing, auraName
 
     if (!InStr(webhookURL, "discord"))
         return
@@ -1687,7 +1228,7 @@ SendWebhook2(text, color := 16777215, imageURL := "") {
     content := ""
     allowedMentions := ""
 
-    if (doPing3 && webhookID != "") {
+    if (globalTranscendentPing && webhookID != "") {
         content := "<@" webhookID ">"
         allowedMentions := """allowed_mentions"": {""users"": [""" webhookID """]},"
     }
@@ -1705,7 +1246,7 @@ SendWebhook2(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.7"","
+    . """text"": ""Aery's fishSol v1.8"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1715,10 +1256,10 @@ SendWebhook2(text, color := 16777215, imageURL := "") {
     http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     http.Open("POST", webhookURL, false)
     http.SetRequestHeader("Content-Type", "application/json")
-    http.Send(json)
+    try http.Send(json)
 }
 
-SendWebhook3(text, color := 16777215) {
+SendWebhookForcePing(text, color := 16777215) {
     global webhookURL, webhookID
 
     if (!InStr(webhookURL, "discord"))
@@ -1730,7 +1271,6 @@ SendWebhook3(text, color := 16777215) {
 
     allowedMentions := ""
     content := "<@" webhookID ">"
-    ;content := "<@1055676132306989076>"
 
 
     json := "{"
@@ -1740,7 +1280,7 @@ SendWebhook3(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.7"","
+    . """text"": ""Aery's fishSol v1.8"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1750,11 +1290,11 @@ SendWebhook3(text, color := 16777215) {
     http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     http.Open("POST", webhookURL, false)
     http.SetRequestHeader("Content-Type", "application/json")
-    http.Send(json)
+    try http.Send(json)
 }
 
 SendWebhook4(text, color := 16777215, imageURL := "") {
-    global webhookURL, webhookID, doPing3, auraName
+    global webhookURL, webhookID, globalTranscendentPing, auraName
 
     if (!InStr(webhookURL, "discord"))
         return
@@ -1766,7 +1306,7 @@ SendWebhook4(text, color := 16777215, imageURL := "") {
     content := ""
     allowedMentions := ""
 
-    if (doPing2 && webhookID != "") {
+    if (clipWebhookPing && webhookID != "") {
         content := "<@" webhookID ">"
         allowedMentions := """allowed_mentions"": {""users"": [""" webhookID """]},"
     }
@@ -1784,7 +1324,7 @@ SendWebhook4(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.7"","
+    . """text"": ""Aery's fishSol v1.8"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1794,11 +1334,11 @@ SendWebhook4(text, color := 16777215, imageURL := "") {
     http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     http.Open("POST", webhookURL, false)
     http.SetRequestHeader("Content-Type", "application/json")
-    http.Send(json)
+    try http.Send(json)
 }
 
 SendWebhookMonarch(text, color := 16777215, imageURL := "") {
-    global webhookURL, webhookID, doPing3, auraName
+    global webhookURL, webhookID, globalTranscendentPing, auraName
 
     if (!InStr(webhookURL, "discord"))
         return
@@ -1808,10 +1348,8 @@ SendWebhookMonarch(text, color := 16777215, imageURL := "") {
               . "T" SubStr(time,9,2) ":" SubStr(time,11,2) ":" SubStr(time,13,2) ".000Z"
 
     content := ""
-    ;allowedMentions := ""
 
     content := "# All Hail... <@" webhookID ">"
-    ;allowedMentions := """allowed_mentions"": {""users"": [""" webhookID """]},"
 
     imageBlock := ""
     if (imageURL != "") {
@@ -1820,13 +1358,12 @@ SendWebhookMonarch(text, color := 16777215, imageURL := "") {
 
     json := "{"
     . """content"": """ content ""","
-    ;. allowedMentions
     . """embeds"": [{"
     . """title"": """ text ""","
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.7"","
+    . """text"": ""Aery's fishSol v1.8"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1836,11 +1373,12 @@ SendWebhookMonarch(text, color := 16777215, imageURL := "") {
     http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
     http.Open("POST", webhookURL, false)
     http.SetRequestHeader("Content-Type", "application/json")
-    http.Send(json)
+    try http.Send(json)
 }
 
 ; Strange Controller toggle
 RunStrangeController() {
+    global biomeItemMessage
     MouseMove, 45, 521, 3
     sleep 300
     Click, Left
@@ -1850,12 +1388,18 @@ RunStrangeController() {
     MouseMove, 820, 370, 3
     sleep 300
     Click, Left
-    Send, Strange Controller
+    Clipboard := "Strange Controller"
+    sleep 150
+    Send, ^v
+    sleep 300
     MouseMove, 850, 485, 3
     sleep 300
     Click, Left            
     MouseMove, 690, 585, 3
     sleep 300
+    if (biomeItemMessage) {
+        SendWebhook(":joystick: Strange Controller Activated!", 0)
+    }
     Click, Left
     sleep 600
     MouseMove, 45, 521, 3
@@ -1869,6 +1413,7 @@ RunBiomeSelector() {
     global selectedBiome
     global currentBiome
     global res
+    global biomeItemMessage
     SetBatchLines, -1
     if (selectedBiome = "") {
         return
@@ -1977,7 +1522,9 @@ RunBiomeSelector() {
             MouseMove, 1305, 350, 3
             sleep 300
             MouseClick, Left
-            try SendWebhook(":joystick: Biome Selector couldn't be Found after retries!", "3225405")
+            if (biomeItemMessage) {
+                SendWebhook(":joystick: Biome Selector couldn't be Found after retries!", "3225405")
+            }
         }
     }
 
@@ -2022,7 +1569,7 @@ RunBiomeSelector() {
             MouseMove, %X_Close%, %Y_Close%, 3
             sleep 300
             MouseClick, Left
-            SendWebhook3(":joystick: Biome Selector is Missing a Drive!", "3225405")
+            SendWebhookForcePing(":joystick: Biome Selector is Missing a Drive!", "3225405")
         } else {
             sleep 1000
             pixelsearch, x, y, % X_Close + 50, % Y_Close + 50, % X_Close - 50, % Y_Close - 50, %Color%, 0, Fast RGB
@@ -2031,22 +1578,29 @@ RunBiomeSelector() {
                 MouseMove, %X_Close%, %Y_Close%, 3
                 sleep 300
                 MouseClick, Left
-                try SendWebhook(":joystick: Biome Selector is Recharging!", "3225405")
+                if (biomeItemMessage) {
+                    try SendWebhook(":joystick: Biome Selector is Recharging!", "3225405")
+                }
             } else {
                 MouseMove, %ConfirmX%, %ConfirmY%, 3
                 sleep 300
                 MouseClick, Left
-                try SendWebhook(":joystick: Biome Selector was used to select " . selectedBiome . ".", "3225405")
+                if (biomeItemMessage) {
+                    try SendWebhook(":joystick: Biome Selector was used to select " . selectedBiome . ".", "3225405")
+                }
             }
         }
         sleep 3000
     } else {
-        try SendWebhook(":joystick: Biome Selector couldn't be Found!.", "3225405")
+        if (biomeItemMessage) {
+            try SendWebhook(":joystick: Biome Selector couldn't be Found!.", "3225405")
+        }
     }
 }
 
 ; Biome Randomizer Toggle
 RunBiomeRandomizer() {
+    global biomeItemMessage
     MouseMove, 45, 521, 3
     sleep 300
     Click, Left
@@ -2056,12 +1610,17 @@ RunBiomeRandomizer() {
     MouseMove, 820, 370, 3
     sleep 300
     Click, Left
-    Send, Biome Randomizer
+    Clipboard := "Biome Randomizer"
+    sleep 150
+    Send, ^v
     MouseMove, 850, 485, 3
     sleep 300
     Click, Left            
     MouseMove, 690, 585, 3
     sleep 300
+    if (biomeItemMessage) {
+        SendWebhook(":joystick: Biome Randomizer Activated!", 0)
+    }
     Click, Left
     sleep 300
     MouseMove, 45, 521, 3
@@ -2163,19 +1722,37 @@ CheckGhostServer() {
         Sleep, 300
         Click, Left
         sleep, 500
-        sleep, 1000
-        MouseMove, 47, 467, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        MouseMove, 382, 126, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        Click, WheelUp 80
-        sleep 500
-        Click, WheelDown 45
-        sleep 300
+        if (closeCollectionType = "\ Key/UI Navigation") {
+            sleep, 1000
+            MouseMove, 47, 467, 3
+            sleep 220
+            Click, Left
+            sleep 320
+            Send, {\}
+            sleep, 400
+            Send, {Enter}
+            sleep 320
+            Send, {\}
+            sleep, 350
+            Click, WheelUp 80
+            sleep 500
+            Click, WheelDown 45
+            sleep 300
+        } else if (closeCollectionType = "Click") {
+            sleep, 1000
+            MouseMove, 47, 467, 3
+            sleep 220
+            Click, Left
+            sleep 220
+            MouseMove, 382, 126, 3
+            sleep 220
+            Click, Left
+            sleep 220
+            Click, WheelUp 80
+            sleep 500
+            Click, WheelDown 45
+            sleep 300
+        }
         ToolTip, Going to fishing spot.., 900, 10
         SendWebhook("Going to fishing spot... Not in Ghost Server.", 0)
         FishingSpot()
@@ -2226,277 +1803,181 @@ RunRejoin2() {
     Run, % "powershell -NoProfile -Command ""Start-Process '" . privateServerLinkDeepLink . "'"""
 }
 
+ZeusAbility() {
+    Send, {f up}
+    Send, {f down}
+}
+
+LimboFish() {
+    sleep, 1000
+    if (limboFailsafe) {
+        Send, {Esc}
+        Sleep, 650
+        Send, R
+        Sleep, 650
+        Send, {Enter}
+        sleep 3000
+    }
+    /*
+    ; stop rolling
+    sleep, 1000
+    MouseMove, 760, 1020, 3
+    sleep, 150
+    Click, Left
+    sleep, 300
+    */
+        /*
+    if (autoUnequip && !useNothing) {
+        MouseMove, 45, 412, 3
+        sleep 150
+        Click, Left
+        sleep 150
+        MouseMove, 830, 441, 3
+        sleep 150
+        Click, Left
+        sleep 150
+        MouseMove, 634, 638, 3
+        sleep 159
+        Click, Left
+        sleep 1200
+        Click, Left
+        sleep 150
+        MouseMove, 1425, 303, 3
+        sleep 150
+        Click, Left
+        sleep 500
+    }
+
+    if (autoUnequip && useNothing) {
+        MouseMove, 45, 412, 3
+        sleep 150
+        Click, Left
+        sleep 150
+        MouseMove, 820, 340, 3
+        sleep, 250
+        Click, Left
+        sleep, 250
+        MouseMove, 820, 370, 3
+        sleep 250
+        Click, Left
+        Send, Nothing
+        sleep 150
+        MouseMove, 830, 441, 3
+        sleep 500
+        Send, {WheelUp 100}
+        Sleep, 750
+        Click, Left
+        sleep 300
+        MouseMove, 634, 638, 3
+        sleep 150
+        Click, Left
+        sleep 700
+        Click, Left
+        Sleep, 250
+        MouseMove, 1425, 303, 3
+        sleep 150
+        Click, Left
+        sleep 500
+    }
+        */
+
+    ; equips zeus
+    MouseMove, 45, 412, 3
+    sleep 150
+    Click, Left
+    MouseMove, 820, 370, 3
+    sleep 400
+    Click, Left
+    Send, Zeus
+    sleep 350
+    MouseMove, 830, 441, 3
+    sleep 500
+    Send, {WheelUp 100}
+    Sleep, 750
+    Click, Left
+    sleep 500
+    MouseMove, 634, 638, 3
+    sleep 350
+    Click, Left
+    sleep 700
+    MouseMove, 1425, 303, 3
+    sleep 350
+    Click, Left
+    sleep 600
+
+    ; open inventory for protable crack
+    MouseMove, 45, 521, 3
+    sleep 500
+    Click, Left
+    MouseMove, 1280, 343, 3
+    sleep 500
+    Click, Left
+    MouseMove, 820, 370, 3
+    sleep 500
+    Click, Left
+    Send, Portable Crack
+    sleep 350
+    MouseMove, 850, 485, 3
+    sleep 500
+    Click, Left
+
+    ; uses portable crack
+    MouseMove, 690, 585, 3
+    Send, {f up}
+    ZeusAbility()
+    Click, Left
+    sleep 2000
+    MouseMove, 45, 521, 3
+    sleep 300
+    Click, Left
+    sleep, 600
+    if (limboFailsafe) {
+        PixelGetColor, ifinlimbo, 1873 , 1050, RGB
+        if (ifinlimbo = 0xFCFCFD || ifinlimbo = 0xFDFDFE) {
+            try SendWebhookForcePing("Successfully entered Limbo!", 0)
+            FishingSpot()
+        } else {
+            try SendWebhookForcePing("Failed to enter Limbo.\n Attempting Again...", 0)
+            LimboFish()
+        }
+    }
+    enteredLimbo := true
+}
+
 ; countdown functions
+
+CountdownTooltip(baseText, seconds, x, y, ByRef cancelFlag) {
+    Loop % seconds {
+        if (cancelFlag)
+            return
+        remaining := seconds - A_Index + 1
+        label := (remaining = 1) ? baseText : baseText " (" remaining ")"
+        ToolTip, %label%, %x%, %y%
+        Sleep, 1000
+    }
+    ToolTip
+}
 
 ShowClipTextGlobal() {
     global blehblehbleh
-
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (10), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (9), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (8), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (7), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (6), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (5), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (4), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (3), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (2), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol, 900, 10
-    }
-
+    CountdownTooltip("Clipped with Aery's Fishsol. F4 To Cancel", 10, 900, 10, blehblehbleh)
     blehblehbleh := ""
 }
 
 ShowClipTextTrans() {
     global blehblehbleh
-
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (20), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (19), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (18), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (17), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (16), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (15), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (14), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (13), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (12), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (11), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (10), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (9), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (8), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (7), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (6), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (5), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (4), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (3), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol. F4 To Cancel (2), 900, 10
-        sleep 1000
-    }
-    if (blehblehbleh != "hehe") {
-        ToolTip, Clipped with Aery's Fishsol, 900, 10
-    }
-
+    CountdownTooltip("Clipped with Aery's Fishsol. F4 To Cancel", 20, 900, 10, blehblehbleh)
     blehblehbleh := ""
 }
 
 ClipCountdownGlobal() {
     global webResponse
-
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook. Clipping Timer will start after... (10), 850, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook. Clipping Timer will start after... (9), 850, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook. Clipping Timer will start after... (8), 850, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook. Clipping Timer will start after... (7), 850, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook. Clipping Timer will start after... (6), 850, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook. Clipping Timer will start after... (5), 850, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook. Clipping Timer will start after... (4), 850, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook. Clipping Timer will start after... (3), 850, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook. Clipping Timer will start after... (2), 850, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook. Clipping Timer will start after... (1), 850, 10
-        Sleep, 1000
-    }
-
-    ToolTip
+    CountdownTooltip("F4 To cancel webhook. Clipping Timer will start after...", 10, 850, 10, webResponse)
 }
 
 ClipCountdown() {
     global webResponse
-
-
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook (10), 900, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook (9), 900, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook (8), 900, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook (7), 900, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook (6), 900, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook (5), 900, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook (4), 900, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook (3), 900, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook (2), 900, 10
-        Sleep, 1000
-    }
-    if (!webResponse) {
-        ToolTip, F4 To cancel webhook (1), 900, 10
-        Sleep, 1000
-    }
-    
-    ToolTip
-}
-
-ManualCraftAlert() {
-    if (offsides != true) {
-        ToolTip, Manual Craft is enabled with no item selected! Starting fishSol in: (10), 790, 10
-        sleep, 1000
-    }
-    if (offsides != true) {
-        ToolTip, Manual Craft is enabled with no item selected! Starting fishSol in: (9), 790, 10
-        sleep, 1000
-    }
-    if (offsides != true) {
-        ToolTip, Manual Craft is enabled with no item selected! Starting fishSol in: (8), 790, 10
-        sleep, 1000
-    }
-    if (offsides != true) {
-        ToolTip, Manual Craft is enabled with no item selected! Starting fishSol in: (7), 790, 10
-        sleep, 1000
-    }
-    if (offsides != true) {
-        ToolTip, Manual Craft is enabled with no item selected! Starting fishSol in: (6), 790, 10
-        sleep, 1000
-    }
-    if (offsides != true) {
-        ToolTip, Manual Craft is enabled with no item selected! Starting fishSol in: (5), 790, 10
-        sleep, 1000
-    }
-    if (offsides != true) {
-        ToolTip, Manual Craft is enabled with no item selected! Starting fishSol in: (4), 790, 10
-        sleep, 1000
-    }
-    if (offsides != true) {
-        ToolTip, Manual Craft is enabled with no item selected! Starting fishSol in: (3), 790, 10
-        sleep, 1000
-    }
-    if (offsides != true) {
-        ToolTip, Manual Craft is enabled with no item selected! Starting fishSol in: (2), 790, 10
-        sleep, 1000
-    }
-    if (offsides != true) {
-        ToolTip, Manual Craft is enabled with no item selected! Starting fishSol in: (1), 790, 10
-        sleep, 1000
-    }
-    ToolTip
+    CountdownTooltip("F4 To cancel webhook", 10, 900, 10, webResponse)
 }
 
 ; tool functions
@@ -2512,9 +1993,7 @@ EnsureFullscreen() {
 }
 
 ClipMethod:
-    if (clipType = "Nvidia: Alt + F10") {
-        Send, !{F10}
-    }
+    Send, !{F10}
     if (clipWebhook) {
             Sleep, 1500
             if (clipType = "Nvidia: Alt + F10") {
@@ -2546,6 +2025,7 @@ TurnOnNvidiaReplay() {
         sleep, 300
         Click, Left
     }
+    WinActivate, ahk_exe RobloxPlayerBeta.exe
 }
 
 ClipBiome() {
@@ -2572,19 +2052,6 @@ PopSkips() {
     Click, 1414, 300
     sleep, 600
 }
-
-DetectPotion:
-    if (!toggle) {
-        return
-    }
-    PixelGetColor, potionnotif, 1681, 835, RGB 
-    PixelGetColor, potionnotif2, 1622, 720, RGB
-    PixelGetColor, potionnotif3, 1622, 615, RGB
-    PixelGetColor, potionnotif4, 1622, 490, RGB
-    if (potionnotif = 0x6FB5FF || potionnotif2 = 0x6FB5FF || potionnotif3 = 0x6FB5FF || potionnotif4 = 0x6FB5FF) {
-        pendingCraft := true
-    }
-return
 
 EdenSnatcher:
     global edenDelay
@@ -2634,29 +2101,6 @@ CraftSelected:
         Gosub, CraftRage
     } else if (selectedItem = "Diver Potion") {
         Gosub, CraftDiver
-    }
-return
-
-CraftSelected2:
-
-    if (selectedItem2 = "Heavenly Potion") {
-        Gosub, CraftHeavenly
-        IfAdded := ""
-    } else if (selectedItem2 = "Bound Potion") {
-        Gosub, CraftBound
-        IfAdded := ""
-    } else if (selectedItem2 = "Jewelry Potion") {
-        Gosub, CraftJewerly
-        IfAdded := ""
-    } else if (selectedItem2 = "Zombie Potion") {
-        Gosub, CraftZombie
-        IfAdded := ""
-    } else if (selectedItem2 = "Rage Potion") {
-        Gosub, CraftRage
-        IfAdded := ""
-    } else if (selectedItem2 = "Diver Potion") {
-        Gosub, CraftDiver
-        IfAdded := ""
     }
 return
 
@@ -2713,10 +2157,6 @@ DoUseNothing() {
     Click, Left
     sleep 150
 }
-
-F8::
-    DoUseNothing()
-return
 
 FishingSpot() {
     global keyW, keyA, azertyPathing, res, toggle, maxLoopCount, fishingLoopCount
@@ -3224,27 +2664,28 @@ SelectItem:
     selectedItem := AutoCraft
 return
 
-SelectItem2:
-    Gui, Submit, NoHide
-    selectedItem2 := ManualCraft
-return
-
 ClipType:
     Gui, Submit, NoHide
     clipType := ClipVersion
-    IniWrite, %clipType%, %iniFilePath%, Macro, clipType
+    IniWrite, %clipType%, %fishSolSettingsFilePath%, Macro, clipType
 return
 
 SkipType:
     Gui, Submit, NoHide
     skipType := SkipPotionType
-    IniWrite, %skipType%, %iniFilePath%, Macro, skipType
+    IniWrite, %skipType%, %fishSolSettingsFilePath%, Macro, skipType
+return
+
+CloseCollectionType:
+    Gui, Submit, NoHide
+    CloseCollectionType := CloseCollectionVersion
+    IniWrite, %CloseCollectionType%, %fishSolSettingsFilePath%, Macro, closeCollectionType
 return
 
 UpdateUserID:
     Gui, Submit, NoHide
     webhookID := UserIDInput
-    IniWrite, %webhookID%, %iniFilePath%, Macro, webhookID
+    IniWrite, %webhookID%, %fishSolSettingsFilePath%, Macro, webhookID
 return
 
 OpenNvidiaNotes:
@@ -3272,7 +2713,6 @@ CloseNvidiaNotes:
 return
 
 OpenAuraFilter:
-    Gui, AuraFilter:Destroy
     Gui, AuraFilter:New, +AlwaysOnTop, Aura Filter
     Gui, AuraFilter:Color, 041024
     Gui, AuraFilter:Font, s10 cWhite Bold, Segoe UI
@@ -3287,27 +2727,120 @@ OpenAuraFilter:
         row := Mod(i - 1, itemsPerCol)
         x := 10 + col * 185
         y := 55 + row * 22
-        ctrlName := aura . "_chk"
-        StringReplace, ctrlName, ctrlName, -, _, All
-        options := "x" x " y" y " w180 h20 BackgroundTrans c0xCCCCCC v" ctrlName " gAuraCheckChange"
+        auraName := aura . "_chk"
+        StringReplace, auraName, auraName, -, _, All
+        StringReplace, auraName, auraName, %A_Space%, _, All
+        options := "x" x " y" y " w180 h20 BackgroundTrans c0xCCCCCC v" auraName " gAuraCheckChange"
         if (EnabledAuras[aura])
             options .= " Checked"
         Gui, AuraFilter:Add, CheckBox, %options%, %aura%
     }
 
-    nextY := 55 + itemsPerCol * 22 + 10
+    yColumns := 55 + itemsPerCol * 22 + 10
+    SaveButtonY := yColumns
     Gui, AuraFilter:Font, s10 cWhite Bold, Segoe UI
-    saveBtnY := nextY
-    Gui, AuraFilter:Add, Button, x190 y%saveBtnY% w180 h30 gSaveAuraFilter, Save Aura Filter
+    Gui, AuraFilter:Add, Button, x190 y%SaveButtonY% w180 h30 gSaveAuraFilter, Save Aura Filter
 
-    winH := saveBtnY + 50
-    Gui, AuraFilter:Show, w580 h%winH%, Aura Filter
-    auraFilterReady := true
+    WindowHeight := SaveButtonY + 50
+    Gui, AuraFilter:Show, w580 h%WindowHeight%, Aura Filter
 return
 
 AuraFilterClose:
-    auraFilterReady := false
     Gui, AuraFilter:Destroy
+return
+
+OpenWebhookList:
+    global ClipWebhook, GlobalTranscendentPing, WebhookURL, UserID
+    Gui, WebhookList:New, +AlwaysOnTop, Webhook List
+    Gui, WebhookList:Color, 041024
+    Gui, WebhookList:Font, s10 cWhite Bold, Segoe UI
+    Gui, WebhookList:Add, Text, x-15 y10 w600 h20 Center BackgroundTrans c0xFFAA00,Toggle Webhooks Options (Requires a Webhook URL and/or User ID)
+
+    Gui, Font, s10 cWhite Bold
+    Gui, Add, GroupBox, x23 y45 w534 h65 cWhite, Aura Detection Ping
+
+    Gui, Add, Button, x310 y70 w80 h25 gToggleGlobalTranscendentPing vGlobalTranscendentPingBtn, Toggle
+    Gui, Font, s10 cWhite Normal
+    Gui, Add, Text, x40 y74 w300 h25 BackgroundTrans c0xCCCCCC, Ping User if global/transcendent detected: 
+    Gui, Font, s9 c0xCCCCCC Bold
+    Gui, Add, Text, x400 y74 w60 h25 vGlobalTranscendentPingStatus BackgroundTrans, OFF
+
+
+
+    Gui, Font, s10 cWhite Bold
+    Gui, Add, GroupBox, x23 y115 w534 h65 cWhite, Clip Message
+
+    Gui, Add, Button, x50 y140 w80 h25 gToggleClipWebhook vClipWebhookBtn, Toggle
+    Gui, Add, Button, x310 y140 w80 h25 gToggleClipWebhookPing vClipWebhookPingBtn, Toggle
+    Gui, Font, s9 cWhite Normal
+    Gui, Add, Text, x240 y144 w100 h25 BackgroundTrans c0xCCCCCC, Ping User: 
+    Gui, Font, s7 cWhite Normal
+    Gui, Add, Text, x455 y126 w80 h100 BackgroundTrans c0xCCCCCC, Messages and/or pings if anything has been clipped via Webhook.
+    Gui, Font, s9 c0xCCCCCC Bold   
+    Gui, Add, Text, x400 y144 w60 h25 vClipWebhookPingStatus BackgroundTrans, OFF
+    Gui, Add, Text, x140 y144 w60 h25 vClipWebhookStatus BackgroundTrans, OFF
+
+
+
+    Gui, Font, s10 cWhite Bold
+    Gui, Add, GroupBox, x23 y185 w534 h65 cWhite, Macro Start/Stop Message
+
+    Gui, Add, Button, x310 y210 w80 h25 gToggleActivationMessage vActivationMessageBtn, Toggle
+    Gui, Font, s10 cWhite Normal
+    Gui, Add, Text, x40 y214 w300 h25 BackgroundTrans c0xCCCCCC, Message if macro has been started/stopped: 
+    Gui, Font, s9 c0xCCCCCC Bold   
+    Gui, Add, Text, x400 y214 w60 h25 vActivationMessageStatus BackgroundTrans, OFF
+
+
+
+    Gui, Font, s10 cWhite Bold
+    Gui, Add, GroupBox, x23 y255 w534 h65 cWhite, Biome Item Message
+
+    Gui, Add, Button, x310 y280 w80 h25 gToggleBiomeItemMessage vBiomeItemMessageBtn, Toggle
+    Gui, Font, s10 cWhite Normal
+    Gui, Add, Text, x40 y284 w300 h25 BackgroundTrans c0xCCCCCC, Message if macro uses a biome item: 
+    Gui, Font, s9 c0xCCCCCC Bold   
+    Gui, Add, Text, x400 y284 w60 h25 vBiomeItemStatus BackgroundTrans, OFF
+
+
+
+    Gui, Font, s10 cWhite Bold
+    Gui, Add, GroupBox, x23 y325 w534 h145 cWhite, Failsafe Messages
+
+    Gui, Add, Button, x310 y350 w80 h25 gToggleFailsafeMessage vFailsafeMessageBtn, Toggle
+    Gui, Font, s10 cWhite Normal
+    Gui, Add, Text, x40 y354 w300 h25 BackgroundTrans c0xCCCCCC, Message if macro triggers fishing failsafe: 
+    Gui, Font, s9 c0xCCCCCC Bold   
+    Gui, Add, Text, x400 y354 w60 h25 vFailsafeMessageStatus BackgroundTrans, OFF
+
+    Gui, Font, s10 cWhite Bold
+    Gui, Add, Button, x310 y390 w80 h25 gToggleFailsafeMessagePing vFailsafeMessagePingBtn, Toggle
+    Gui, Font, s10 cWhite Normal
+    Gui, Add, Text, x40 y394 w300 h25 BackgroundTrans c0xCCCCCC, Ping if macro triggers fishing failsafe: 
+    Gui, Font, s9 c0xCCCCCC Bold   
+    Gui, Add, Text, x400 y394 w60 h25 vFailsafeMessagePingStatus BackgroundTrans, OFF
+
+    Gui, Font, s10 cWhite Bold
+    Gui, Add, Button, x310 y430 w80 h25 gToggleRestartMacroFailsafePing vRestartMacroFailsafePingBtn, Toggle
+    Gui, Font, s10 cWhite Normal
+    Gui, Add, Text, x40 y434 w300 h25 BackgroundTrans c0xCCCCCC, Ping if macro triggers restart failsafe: 
+    Gui, Font, s9 c0xCCCCCC Bold   
+    Gui, Add, Text, x400 y434 w60 h25 vRestartMacroFailsafePingStatus BackgroundTrans, OFF
+
+    UpdateStatus("ClipWebhookStatus", clipWebhook)
+    UpdateStatus("ClipWebhookPingStatus", clipWebhookPing)
+    UpdateStatus("GlobalTranscendentPingStatus", globalTranscendentPing)
+    UpdateStatus("ActivationMessageStatus", activationMessage)
+    UpdateStatus("BiomeItemStatus", biomeItemMessage)
+    UpdateStatus("FailsafeMessageStatus", failsafeMessage)
+    UpdateStatus("FailsafeMessagePingStatus", failsafeMessagePing)
+    UpdateStatus("RestartMacroFailsafePingStatus", restartMacroFailsafePing)
+
+    Gui, WebhookList:Show, w580 h500, Webhook Options List
+return
+
+WebhookListClose:
+    Gui, WebhookList:Destroy
 return
 
 StartAutoClicker:
@@ -3342,124 +2875,8 @@ AutoClickTick:
     Click
 return
 
-; movements
-
-ManualCraftMovement() {
-    Send, {a Down}
-    Sleep, 3000
-    Send, {a Up}
-    Sleep, 50
-
-    Send, {s Down}
-    Sleep, 5000
-    Send, {s Up}
-    Sleep, 50
-
-    Send, {a Down}
-    Sleep, 1100
-    Send, {a Up}
-    Sleep, 200
-
-    Send, {w Down}
-    Sleep, 100
-    Send, {w Up}
-    Sleep, 50
-
-    Send, {Space Down}
-    Sleep, 50
-    Send, {Space Up}
-    Sleep, 50
-
-    Send, {s Down}
-    Sleep, 2250
-    Send, {s Up}
-    Sleep, 50
-
-    Send, {Shift}
-    Sleep, 250
-
-    Send, {d Down}
-    Sleep, 1800
-    Send, {d Up}
-    Sleep, 250
-
-    Send, {Shift}
-    Sleep, 250
-
-    Send, {a Down}
-    Sleep, 380
-    Send, {a Up}
-    Sleep, 250
-
-    Send, {s Down}
-    Sleep, 4400
-    Send, {s Up}
-    Sleep, 250
-
-    Send, {a Down}
-    Sleep, 1465
-    Send, {a Up}
-    Sleep, 250
-
-    Send, {s Down}
-    Sleep, 1800
-    Send, {s Up}
-    Sleep, 250
-
-    Send, {a Down}
-    Sleep, 125
-    Send, {a Up}
-    Sleep, 250
-
-    Send, {s Down}
-    Sleep, 2000
-    Send, {s Up}
-    Sleep, 250
-
-    Send, {d Down}
-    Sleep, 50
-    Send, {d Up}
-    Sleep, 250
-
-    Send, {Shift}
-    Sleep, 250
-
-    Send, {Space Down}
-    Sleep, 50
-    Send, {Space Up}
-    Sleep, 50
-
-    Send, {a Down}
-    Sleep, 800
-    Send, {a Up}
-    Sleep, 250
-
-    Send, {Shift}
-    Sleep, 250
-
-    Send, {Space Down}
-    Sleep, 50
-    Send, {Space Up}
-    Sleep, 50
-
-    Send, {a Down}
-    Sleep, 2900
-    Send, {a Up}
-    Sleep, 250
-
-    Send, {s Down}
-    Sleep, 2000
-    Send, {s Up}
-    Sleep, 2000
-
-    Send, {a Down}
-    Sleep, 1500
-    Send, {a Up}
-    Sleep, 250
-}
-
 AuraBiomeDetect:
-global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome, webResponse, biomeIndex, auraColor
+global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiome, biome, webResponse, biomeIndex, auraColor
     logDir := LocalAppData "\Roblox\logs"
 
     newestTime := 0
@@ -3516,7 +2933,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                 auraName := StrReplace(auraName, "\", "\\")
                 auraName := StrReplace(auraName, """", "\""")
 
-                if (AuraList.HasKey(auraName) && doPing3) {
+                if (AuraList.HasKey(auraName) && globalTranscendentPing) {
                     contentStr := """content"": ""<@" webhookID ">"","
                     mentionsStr := """allowed_mentions"": {""users"": [""" webhookID """]},"
                 } else {
@@ -3532,14 +2949,14 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                             . """embeds"": [{"
                             . """description"": "" ### Aura Equipped - " auraName ""","
                             . """color"": " auracolor ","
-                            . """footer"": {""text"": ""Aery's fishSol v1.7"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                            . """footer"": {""text"": ""Aery's fishSol v1.8"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                             . """timestamp"": """ timestamp """"
                             . "}]}"
 
                         http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
                         http.Open("POST", webhookURL, false)
                         http.SetRequestHeader("Content-Type", "application/json")
-                        http.Send(json)
+                        try http.Send(json)
                     } else if (auraFilter) { ; check aura filter and see if the aura is enabled
                         if (AuraList.HasKey(auraName) && EnabledAuras[auraName] && !webResponse) {
                             json := "{"
@@ -3548,25 +2965,25 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                                 . """embeds"": [{"
                                 . """description"": "" ### Aura Equipped - " auraName ""","
                                 . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.7"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                                . """footer"": {""text"": ""Aery's fishSol v1.8"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                                 . """timestamp"": """ timestamp """"
                                 . "}]}"
                             http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
                             http.Open("POST", webhookURL, false)
                             http.SetRequestHeader("Content-Type", "application/json")
-                            http.Send(json)
+                            try http.Send(json)
                         } else if (AuraList.HasKey(auraName) && !EnabledAuras[auraName] && !webResponse) { ; if aura is disabled in aura filter, it js sends webhook on the aura without pinging
                                 json := "{"
                                 . """embeds"": [{"
                                 . """description"": "" ### Aura Equipped - " auraName ""","
                                 . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.7"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                                . """footer"": {""text"": ""Aery's fishSol v1.8"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                                 . """timestamp"": """ timestamp """"
                                 . "}]}"
                             http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
                             http.Open("POST", webhookURL, false)
                             http.SetRequestHeader("Content-Type", "application/json")
-                            http.Send(json)
+                            try http.Send(json)
                         }
                     } else if (!auraFilter) { ; no aura filter, checks global list
                         if (AuraList.HasKey(auraName) && !webResponse) {
@@ -3576,13 +2993,13 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                                 . """embeds"": [{"
                                 . """description"": "" ### Aura Equipped - " auraName ""","
                                 . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.7"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+                                . """footer"": {""text"": ""Aery's fishSol v1.8"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
                                 . """timestamp"": """ timestamp """"
                                 . "}]}"
                             http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
                             http.Open("POST", webhookURL, false)
                             http.SetRequestHeader("Content-Type", "application/json")
-                            http.Send(json)
+                            try http.Send(json)
                         }
                     }
                 }
@@ -3592,52 +3009,52 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                 if (auraName = "Pixelation") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2(":tada: **Mania!** :tada: \nAura detected: " auraName, 3348986, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/PixelationCollection.webp")
+                        SendWebhook2(":tada: **Mania!** :tada: \n**[1 in 1,073,741,824!] \nAura detected: " auraName, 3348986, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/PixelationCollection.webp")
                     }
                 } else if (auraName = "Luminosity") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2( ":tada: **The Absolute Radiance** :tada: \nAura detected: " auraName , 11393254, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/ReworkedLumiCollection.webp")
+                        SendWebhook2( ":tada: **The Absolute Radiance** :tada: \n**[1 in 1,200,000,000!] \nAura detected: " auraName , 11393254, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/ReworkedLumiCollection.webp")
                     }
                 } else if (auraName = "LEVIATHAN") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2(":tada: **The Ruler of the Beneath** :tada: \nAura detected: " auraName, 5600, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/LeviathanLong.png")
+                        SendWebhook2(":tada: **The Ruler of the Beneath** :tada: \n**[1 in 1,730,000,000 from Rainy!] \nAura detected: " auraName, 5600, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/LeviathanLong.png")
                     }
                 } else if (auraName = "ASTRAIOS") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**Dragon** \nAura detected: " auraName, 3920232, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Astraios.gif")
+                        SendWebhook2("**Dragon** \n**[1 in 1,750,000,000 from Singularity!] \nAura detected: " auraName, 3920232, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Astraios.gif")
                     }
                 } else if (auraName = "BREAKTHROUGH") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**How much do you believe in this world?** \nAura detected: " auraName, 3289154, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/BreakthroughCollection.webp")
+                        SendWebhook2("**How much do you believe in this world?**\n **[1 in 1,999,999,999!] \nAura detected: " auraName, 3289154, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/BreakthroughCollection.webp")
                     }
                 } else if (auraName = "Dream Catcher") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("** I close my eyes...\n Is this a dream? ** \nAura detected: " auraName, 12476663, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/DreamcatcherCollection.webp")
+                        SendWebhook2("**I close my eyes...\nIs this a dream? ** \n**[1 in 2,222,222,222 from Nighttime!]**  \nAura detected: " auraName, 12476663, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/DreamcatcherCollection.webp")
                     }
                 } else if (auraName = "EQUINOX") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**Equilibrium Incarnate** \nAura detected: " auraName, 16777215, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/EquinoxNewCollection.webp")
+                        SendWebhook2("**Equilibrium Incarnate**\n**[1 in 2,500,000,000!] \nAura detected: " auraName, 16777215, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/EquinoxNewCollection.webp")
                     }
                 } else if (auraName = "Monarch") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhookMonarch("**Aura detected: **" auraName, 4330383, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MonarchCollection.webp")
+                        SendWebhookMonarch("**[1 in 3,000,000,0000 from Corruption!]\nAura detected: " auraName, 4330383, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MonarchCollection.webp")
                     }
                 } else if (auraName = "meta") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**Aura detected: **" auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MetaCollection.webp")
+                        SendWebhook2("**[1 in 10,000 from Cyberspace!]\n Aura detected: " auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MetaCollection.webp")
                     }
                 } else if (auraName = "illusionary") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("# The Ultimate ####'# \nP█e█r█f#█3█cT p█##UpP█3█T \n**:)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :)      :) **\n**(:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (:      (: **" auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Illusionary_curation.gif")
+                       SendWebhook2("**THE PERFECT PUPPET**\n**[1 in 10,000,000 from Cyberspace!]** \nAura detected: " auraName, 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Illusionary_curation.gif")
                     }
                 }
                 
@@ -3677,7 +3094,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                 if (biome && biome != "" && biome != prevBiome) {
                     if (biomeDetect && toggle) {
                     biomeKey := "Biome" StrReplace(biome, " ", "")
-                    IniRead, isBiomeEnabled, %iniFilePath%, "Biomes", %biomeKey%, 1
+                    IniRead, isBiomeEnabled, %fishSolSettingsFilePath%, "Biomes", %biomeKey%, 1
 
                     ; end
                     if ((prevBiome != "" && prevBiome != "Normal") || (prevBiome = "GLITCHED" || prevBiome = "DREAMSPACE" || prevBiome = "CYBERSPACE" || prevBiome = "SINGULARITY") && (biome != prevBiome)) {
@@ -3708,7 +3125,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                         endHttp := ComObjCreate("WinHttp.WinHttpRequest.5.1")
                         endHttp.Open("POST", webhookURL, false)
                         endHttp.SetRequestHeader("Content-Type", "application/json")
-                        endHttp.Send(endJson)
+                        try endHttp.Send(endJson)
                     }
 
                     
@@ -3751,7 +3168,7 @@ global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome
                         http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
                         http.Open("POST", webhookURL, false)
                         http.SetRequestHeader("Content-Type", "application/json")
-                        http.Send(json)
+                        try http.Send(json)
                     }
                 }
 
@@ -3771,10 +3188,6 @@ return
 
 
 F1::
-    if (manualCraft && selectedItem2 = "") {
-        ManualCraftAlert()
-    }
-
     if (!res) {
         res := "1080p"
     }
@@ -3801,17 +3214,16 @@ F1::
         biomeRandomizerLastRun := 0
         checkGhostServerLastRun := 0
         enteredLimbo := false
-        IniWrite, %selectedItem2%, %iniFilePath%, Macro, selectedItem2
-        IniWrite, %res%, %iniFilePath%, Macro, resolution
-        IniWrite, %maxLoopCount%, %iniFilePath%, Macro, maxLoopCount
-        IniWrite, %fishingLoopCount%, %iniFilePath%, Macro, fishingLoopCount
+        IniWrite, %selectedItem2%, %fishSolSettingsFilePath%, Macro, selectedItem2
+        IniWrite, %res%, %fishSolSettingsFilePath%, Macro, resolution
+        IniWrite, %maxLoopCount%, %fishSolSettingsFilePath%, Macro, maxLoopCount
+        IniWrite, %fishingLoopCount%, %fishSolSettingsFilePath%, Macro, fishingLoopCount
         WinActivate, ahk_exe RobloxPlayerBeta.exe
-        if (webhookID = "912451579918041118") {
-            EnsureFullscreen()
-        }
         SetTimer, UpdateGUI, 1000
         SetTimer, DoMouseMove, 100
-    try SendWebhook(":green_circle: Macro Started!", "7909721")
+        if (activationMessage) {
+            try SendWebhook(":green_circle: Macro Started!", "7909721")
+        }
     }
 return
 
@@ -3829,12 +3241,9 @@ F2::
         return
     }
 
-    IniWrite, %selectedItem%, %iniFilePath%, Macro, selectedItem
+    IniWrite, %selectedItem%, %fishSolSettingsFilePath%, Macro, selectedItem
     autocrafting := true
 
-    if (webhookID = "912451579918041118") {
-        EnsureFullscreen()
-    }
     ToolTip, Crafting will start in 5 seconds..., 900, 10
     Sleep, 1000
     ToolTip, Crafting will start in 4 seconds..., 900, 10
@@ -3846,7 +3255,9 @@ F2::
     ToolTip, Crafting will start in 1 second..., 900, 10
     Sleep, 1000
     ToolTip
-    try SendWebhook("Crafting Started on " selectedItem ":tools:", 0)
+    if (activationMessage) {
+        try SendWebhook("Crafting Started on " selectedItem ":tools:", 0)
+    }
 
     SetTimer, CraftSelected, 1000
 return
@@ -3864,9 +3275,13 @@ F3::
     send, {shift up}
     enteredlimbo := false
     if (toggle) {
-        try SendWebhook(":red_circle: Macro Stopped.", "0")
+        if (activationMessage) {
+            try SendWebhook(":red_circle: Macro Stopped.", "0")
+        }
     } else if (autocrafting) {
-        try SendWebhook(":red_circle: Auto Crafting Stopped.", "0")
+        if (activationMessage) {
+            try SendWebhook(":red_circle: Macro Stopped.", "0")
+        }
     }
     toggle := false
     Reload
@@ -3878,7 +3293,7 @@ global blehblehbleh, webResponse, auraName
     blehblehbleh := "hehe"
     webResponse := true
 
-        if (detectGlobal || detectTrans && auraDetection) {
+        if ((detectGlobal || detectTrans) && auraDetection) {
             SetTimer, ClipMethod, Off
             SetTimer, AuraBiomeDetect, Off
         if (clipWebhook && AuraList.HasKey(auraName) && decideAuraClip) {
@@ -3893,288 +3308,17 @@ global blehblehbleh, webResponse, auraName
     }
 return
 
-
-F7::
-global webhookURL, webhookID, doPing2, prevState, blehblehbleh, prevBiome, biome, webResponse, biomeIndex
-    ;RunBiomeSelector()
-    ;try SendWebhook(auraName, 0)
-    try SendWebhook("biome: " biome, 0)
-    ;try SendWebhook(privateServerLinkDeepLink, 0)
-    ;try SendWebhook3(A_TickCount - infiniteclickfailsafe , 0)
-    /*
-    ; stop rolling
-    sleep, 1000
-    MouseMove, 760, 1020, 3
-    sleep, 150
-    Click, Left
-    sleep, 300
-    
-    ; equips nothing
-    MouseMove, 45, 412, 3
-    sleep 150
-    Click, Left
-    sleep 150
-    MouseMove, 820, 340, 3
-    sleep, 250
-    Click, Left
-    sleep, 250
-    MouseMove, 820, 370, 3
-    sleep 250
-    Click, Left
-    Send, Nothing
-    sleep 150
-    MouseMove, 830, 441, 3
-    sleep 500
-    Send, {WheelUp 100}
-    Sleep, 750
-    Click, Left
-    sleep 300
-    MouseMove, 634, 638, 3
-    sleep 150
-    Click, Left
-    sleep 700
-    Click, Left
-    Sleep, 250
-
-    ; equips zeus
-    MouseMove, 820, 370, 3
-    sleep 400
-    Click, Left
-    Send, Zeus
-    sleep 350
-    MouseMove, 830, 441, 3
-    sleep 500
-    Send, {WheelUp 100}
-    Sleep, 750
-    Click, Left
-    sleep 500
-    MouseMove, 634, 638, 3
-    sleep 350
-    Click, Left
-    sleep 700
-    MouseMove, 1425, 303, 3
-    sleep 350
-    Click, Left
-    sleep 600
-
-    ; open inventory for protable crack
-    MouseMove, 45, 521, 3
-    sleep 500
-    Click, Left
-    MouseMove, 1280, 343, 3
-    sleep 500
-    Click, Left
-    MouseMove, 820, 370, 3
-    sleep 500
-    Click, Left
-    Send, Portable Crack
-    sleep 350
-    MouseMove, 850, 485, 3
-    sleep 500
-    Click, Left
-
-    ; uses portable crack
-    MouseMove, 690, 585, 3
-    Send, {f up}
-    ZeusAbility()
-    Click, Left
-    sleep 2000
-    MouseMove, 45, 521, 3
-    sleep 300
-    Click, Left
-    sleep, 600
-
-    PixelGetColor, ifinlimbo, 1870, 1070, RGB
-    if (ifinlimbo = 0x010303) {
-        try SendWebhook3("Successfully entered Limbo!", 0)
-    } else {
-        try SendWebhook3("Failed to enter Limbo.\n Attempting Again...", 0)
-        LimboFish()
-    }
-
-    sleep 100
-    MouseMove, 45, 412, 3
-    sleep 300
-    Click, Left
-    sleep 300
-    MouseMove, 830, 441, 3
-    sleep 300
-    Loop, 100
-        {
-        Click, WheelUp
-        sleep 0
-    }
-    sleep 300
-    Click, Left
-    sleep 300
-    MouseMove, 634, 638, 3
-    sleep 300
-    Click, Left
-    sleep 1200
-    Click, Left
-    sleep 300
-    MouseMove, 1425, 303, 3
-    sleep 300
-    Click, Left
-    sleep 300
-    */
-return
-
-ZeusAbility() {
-    Send, {f up}
-    Send, {f down}
-}
-
-LimboFish() {
-    sleep, 1000
-    if (limboFailsafe) {
-        Send, {Esc}
-        Sleep, 650
-        Send, R
-        Sleep, 650
-        Send, {Enter}
-        sleep 3000
-    }
-    /*
-    ; stop rolling
-    sleep, 1000
-    MouseMove, 760, 1020, 3
-    sleep, 150
-    Click, Left
-    sleep, 300
-    */
-        /*
-    if (autoUnequip && !useNothing) {
-        MouseMove, 45, 412, 3
-        sleep 150
-        Click, Left
-        sleep 150
-        MouseMove, 830, 441, 3
-        sleep 150
-        Click, Left
-        sleep 150
-        MouseMove, 634, 638, 3
-        sleep 159
-        Click, Left
-        sleep 1200
-        Click, Left
-        sleep 150
-        MouseMove, 1425, 303, 3
-        sleep 150
-        Click, Left
-        sleep 500
-    }
-
-    if (autoUnequip && useNothing) {
-        MouseMove, 45, 412, 3
-        sleep 150
-        Click, Left
-        sleep 150
-        MouseMove, 820, 340, 3
-        sleep, 250
-        Click, Left
-        sleep, 250
-        MouseMove, 820, 370, 3
-        sleep 250
-        Click, Left
-        Send, Nothing
-        sleep 150
-        MouseMove, 830, 441, 3
-        sleep 500
-        Send, {WheelUp 100}
-        Sleep, 750
-        Click, Left
-        sleep 300
-        MouseMove, 634, 638, 3
-        sleep 150
-        Click, Left
-        sleep 700
-        Click, Left
-        Sleep, 250
-        MouseMove, 1425, 303, 3
-        sleep 150
-        Click, Left
-        sleep 500
-    }
-        */
-
-    ; equips zeus
-    MouseMove, 45, 412, 3
-    sleep 150
-    Click, Left
-    MouseMove, 820, 370, 3
-    sleep 400
-    Click, Left
-    Send, Zeus
-    sleep 350
-    MouseMove, 830, 441, 3
-    sleep 500
-    Send, {WheelUp 100}
-    Sleep, 750
-    Click, Left
-    sleep 500
-    MouseMove, 634, 638, 3
-    sleep 350
-    Click, Left
-    sleep 700
-    MouseMove, 1425, 303, 3
-    sleep 350
-    Click, Left
-    sleep 600
-
-    ; open inventory for protable crack
-    MouseMove, 45, 521, 3
-    sleep 500
-    Click, Left
-    MouseMove, 1280, 343, 3
-    sleep 500
-    Click, Left
-    MouseMove, 820, 370, 3
-    sleep 500
-    Click, Left
-    Send, Portable Crack
-    sleep 350
-    MouseMove, 850, 485, 3
-    sleep 500
-    Click, Left
-
-    ; uses portable crack
-    MouseMove, 690, 585, 3
-    Send, {f up}
-    ZeusAbility()
-    Click, Left
-    sleep 2000
-    MouseMove, 45, 521, 3
-    sleep 300
-    Click, Left
-    sleep, 600
-    if (limboFailsafe) {
-        PixelGetColor, ifinlimbo, 1873 , 1050, RGB
-        if (ifinlimbo = 0xFCFCFD || ifinlimbo = 0xFDFDFE) {
-            try SendWebhook3("Successfully entered Limbo!", 0)
-            FishingSpot()
-        } else {
-            try SendWebhook3("Failed to enter Limbo.\n Attempting Again...", 0)
-            LimboFish()
-        }
-    }
-    enteredLimbo := true
-}
-
 F6::
     RunRejoin2()
 return
 
-;1080p
 DoMouseMove:
 if (toggle) {
-
     global pathingMode
     global privateServerLink
     global globalFailsafeTimer
     global azertyPathing
     global autoUnequip
-    global code
     global strangeController
     global biomeRandomizer
     global strangeControllerTime
@@ -4196,10 +3340,10 @@ if (toggle) {
         }
 
         if (autoWarp && pendingSkips) {
-            if (skipType = "Warp Potion") {
-                SendWebhook("Popping Warp Potion", 0)
+            if (skipType = "Transcendent Potion") {
+                SendWebhookForcePing("Popping Transcendent Potion", 0)
             } else {
-                try SendWebhook3("Popping Transcendent Potion", 0)
+                try SendWebhookForcePing("Popping Warp Potion", 0)
             }
             if (pendingEnterLimbo || enteredLimbo) {
                 Send, {Esc}
@@ -4267,16 +3411,36 @@ if (toggle) {
         }
         PixelGetColor, deletebutton, 1106, 919, RGB
         if (deletebutton = 0xFF5A5D && !sentstoragefull) {
-            try SendWebhook3("Max Storage Detected", 0)
+            try SendWebhookForcePing("Max Storage Detected", 0)
             sentstoragefull := true
         }
     
 
     loopCount++
     if (loopCount > maxLoopCount) {
-        pendingCraft := true
-        if (pendingCraft && manualCraft && selectedItem2 != "") {
-
+            Send, {Esc}
+            Sleep, 650
+            Send, R
+            Sleep, 650
+            Send, {Enter}
+            sleep 3000
+        if (closeCollectionType = "\ Key/UI Navigation") {
+            sleep, 1000
+            MouseMove, 47, 467, 3
+            sleep 220
+            Click, Left
+            sleep 320
+            Send, {\}
+            sleep, 400
+            Send, {Enter}
+            sleep 320
+            Send, {\}
+            sleep, 350
+            Click, WheelUp 80
+            sleep 500
+            Click, WheelDown 45
+            sleep 300
+        } else if (closeCollectionType = "Click") {
             sleep, 1000
             MouseMove, 47, 467, 3
             sleep 220
@@ -4288,52 +3452,9 @@ if (toggle) {
             sleep 220
             Click, WheelUp 80
             sleep 500
-            Click, WheelDown 25
+            Click, WheelDown 45
             sleep 300
-
-            Send, {Esc}
-            Sleep, 650
-            Send, R
-            Sleep, 650
-            Send, {Enter}
-            sleep 3000
-            
-            ManualCraftMovement()
-            Sleep, 500
-            Send, f
-            Sleep, 1500
-            Gosub, CraftSelected2
-            Sleep, 1000
-            
-            MouseMove, 850, 688, 3
-            Sleep, 500
-            Click, Left
-            Sleep, 500
-            pendingCraft := false
-
-            if (fishInLimbo) {
-                enteredLimbo := false
-            }
         }
-        sleep, 1000
-        Send, {Esc}
-        Sleep, 650
-        Send, R
-        Sleep, 650
-        Send, {Enter}
-        enteredLimbo := false
-        sleep 2600
-        MouseMove, 47, 467, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        MouseMove, 382, 126, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        Click, WheelUp 80
-        sleep 500
-        Click, WheelDown 25
 
 
      if (pathingMode = "Vip Pathing") {
@@ -4447,7 +3568,7 @@ if (toggle) {
 
         ; Fishing Failsafe
         if (A_TickCount - startWhitePixelSearch > (fishingFailsafeTime * 1000) && !fishingFailsafeRan) {
-        MouseMove, 1268, 941, 3
+        MouseMove, 1350, 941, 3
         sleep 300
         MouseClick, Left
         sleep 300
@@ -4464,11 +3585,19 @@ if (toggle) {
         MouseClick, Left
         fishingFailsafeRan := true
         failsafeTime := A_TickCount
-        SendWebhook3("Fishing Failsafe Activiated")
+        if (failsafeMessage && failsafeMessagePing) {
+            try SendWebhookForcePing("Fishing Failsafe Activated", 14495300)
+        } else if (failsafeMessage && !failsafeMessagePing) {
+            try SendWebhook("Fishing Failsafe Activated", 14495300)
+        }
         }
         
-        if (restartMacroFailsafe && failsafeTime > 0 && A_TickCount - failsafeTime > 240000) {
-        try SendWebhook3("No Activity Detected for 4 Minutes \nSelling fish, then Restarting Macro...", "14495300")
+        if (restartMacroFailsafe && failsafeTime > 0 && A_TickCount - failsafeTime > 120 * 1000) {
+        if (restartMacroFailsafePing) {
+            try SendWebhookForcePing("Fishing Failsafe Activated - Restarting Macro...", 14495300)
+        } else {
+            try SendWebhook("Fishing Failsafe Activated - Restarting Macro...", 14495300)
+        }
         toggle := false
         SetTimer, DoMouseMove, Off
         SetTimer, UpdateGUI, Off
@@ -4480,25 +3609,44 @@ if (toggle) {
         Send, {e up}
         Send, {esc up}
         Send, {r up}
+        sleep, 300
         Send, {Esc}
-        Send, {shift up}
         Sleep, 650
         Send, R
         Sleep, 650
         Send, {Enter}
         sleep 5000
-        MouseMove, 47, 467, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        MouseMove, 382, 126, 3
-        sleep 220
-        Click, Left
-        sleep 220
-        Click, WheelUp 80
-        sleep 500
-        Click, WheelDown 25
-        sleep 300
+        if (closeCollectionType = "\ Key/UI Navigation") {
+            sleep, 1000
+            MouseMove, 47, 467, 3
+            sleep 220
+            Click, Left
+            sleep 320
+            Send, {\}
+            sleep, 400
+            Send, {Enter}
+            sleep 320
+            Send, {\}
+            sleep, 350
+            Click, WheelUp 80
+            sleep 500
+            Click, WheelDown 45
+            sleep 300
+        } else if (closeCollectionType = "Click") {
+            sleep, 1000
+            MouseMove, 47, 467, 3
+            sleep 220
+            Click, Left
+            sleep 220
+            MouseMove, 382, 126, 3
+            sleep 220
+            Click, Left
+            sleep 220
+            Click, WheelUp 80
+            sleep 500
+            Click, WheelDown 45
+            sleep 300
+        }
         FishingSpotSelling()
         return
         }
@@ -4577,10 +3725,6 @@ if (toggle) {
 return
 
 StartScript:
-    if (manualCraft && selectedItem2 = "") {
-        ManualCraftAlert()
-    }
-
     if (!res) {
         res := "1080p"
     }
@@ -4606,63 +3750,19 @@ StartScript:
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
         checkGhostServerLastRun := 0
-        IniWrite, %selectedItem2%, %iniFilePath%, Macro, selectedItem2
-        IniWrite, %res%, %iniFilePath%, Macro, resolution
-        IniWrite, %maxLoopCount%, %iniFilePath%, Macro, maxLoopCount
-        IniWrite, %fishingLoopCount%, %iniFilePath%, Macro, fishingLoopCount
+        enteredLimbo := false
+        IniWrite, %selectedItem2%, %fishSolSettingsFilePath%, Macro, selectedItem2
+        IniWrite, %res%, %fishSolSettingsFilePath%, Macro, resolution
+        IniWrite, %maxLoopCount%, %fishSolSettingsFilePath%, Macro, maxLoopCount
+        IniWrite, %fishingLoopCount%, %fishSolSettingsFilePath%, Macro, fishingLoopCount
         WinActivate, ahk_exe RobloxPlayerBeta.exe
-        EnsureFullscreen()
         SetTimer, UpdateGUI, 1000
-        if (res = "1080p") {
-            SetTimer, DoMouseMove, 100
+        SetTimer, DoMouseMove, 100
+        if (activationMessage) {
+            try SendWebhook(":green_circle: Macro Started!", "7909721")
         }
     }
-    try SendWebhook(":green_circle: Macro Started!", "7909721")
 return
-
-StartScript(res) {
-        if (manualCraft && selectedItem2 = "") {
-            ManualCraftAlert()
-        }
-
-        if (!res) {
-            res := "1080p"
-        }
-        if (!toggle && offsides != true) {
-            Gui, Submit, nohide
-            if (MaxLoopInput > 0) {
-                maxLoopCount := MaxLoopInput
-            }
-            if (FishingLoopInput > 0) {
-                fishingLoopCount := FishingLoopInput
-            }
-            toggle := true
-            strangeControllerLastRun := 0
-            biomeRandomizerLastRun := 0
-            checkGhostServerLastRun := 0
-
-            if (startTick = "") {
-                startTick := A_TickCount
-            }
-            if (cycleCount = "") {
-                cycleCount := 0
-            }
-            strangeControllerLastRun := 0
-            biomeRandomizerLastRun := 0
-            checkGhostServerLastRun := 0
-            IniWrite, %selectedItem2%, %iniFilePath%, Macro, selectedItem2
-            IniWrite, %res%, %iniFilePath%, Macro, resolution
-            IniWrite, %maxLoopCount%, %iniFilePath%, Macro, maxLoopCount
-            IniWrite, %fishingLoopCount%, %iniFilePath%, Macro, fishingLoopCount
-            WinActivate, ahk_exe RobloxPlayerBeta.exe
-            EnsureFullscreen()
-            SetTimer, UpdateGUI, 1000
-            if (res = "1080p") {
-                SetTimer, DoMouseMove, 100
-        }
-        try SendWebhook(":green_circle: Macro Started!", "7909721")
-    }
-}
 
 CloseScript:
     Send, {w up}
@@ -4674,11 +3774,18 @@ CloseScript:
     Send, {esc up}
     Send, {r up}
     Send, {f up}
+    send, {shift up}
+    enteredlimbo := false
     if (toggle) {
-        try SendWebhook(":red_circle: Macro Stopped.", "0")
+        if (activationMessage) {
+            try SendWebhook(":red_circle: Macro Stopped.", "0")
+        }
     } else if (autocrafting) {
-        try SendWebhook(":red_circle: Auto Crafting Stopped.", "0")
+        if (activationMessage) {
+            try SendWebhook(":red_circle: Macro Stopped.", "0")
+        }
     }
+    toggle := false
     Reload
 return
 
@@ -4739,14 +3846,6 @@ return
 ResetBonkFunc:
     GuiControl,, IMG_Bonk , ./img/nadir.png
 Return
-
-DonateClick:
-Run, https://www.roblox.com/games/106268429577845/fishSol-Donations#!/store
-return
-
-NeedHelpClick:
-Run, https://discord.gg/nPvA54ShTm
-return
 
 /*
 Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetScriptTitle)
@@ -4846,5 +3945,5 @@ CheckItemDescription1080p(senstivity, list*) {
 }
 
 ReleasesClick:
-    Run, https://github.com/knowaery/Aery-s-fishSol/releases
+    Run, https://github.com/knowaery/Aery-s-fishSol
 return
