@@ -2300,8 +2300,6 @@ FishingSpotSelling() {
         fishingLoopCount := FishingLoopInput
     }
     toggle := true
-    strangeControllerLastRun := 0
-    biomeRandomizerLastRun := 0
     checkGhostServerLastRun := 0
 
     if (startTick = "") {
@@ -2310,11 +2308,8 @@ FishingSpotSelling() {
     if (cycleCount = "") {
         cycleCount := 0
     }
-    strangeControllerLastRun := 0
-    biomeRandomizerLastRun := 0
     checkGhostServerLastRun := 0
     WinActivate, ahk_exe RobloxPlayerBeta.exe
-    EnsureFullscreen()
     SetTimer, UpdateGUI, 1000
     SetTimer, DoMouseMove, 100
     try SendWebhook(":green_circle: Macro Started!", "7909721")
@@ -3009,27 +3004,27 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
                 if (auraName = "Pixelation") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2(":tada: **Mania!** :tada: \n**[1 in 1,073,741,824!] \nAura detected: " auraName, 3348986, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/PixelationCollection.webp")
+                        SendWebhook2(":tada: **Mania!** :tada: \n**[1 in 1,073,741,824!]** \nAura detected: " auraName, 3348986, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/PixelationCollection.webp")
                     }
                 } else if (auraName = "Luminosity") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2( ":tada: **The Absolute Radiance** :tada: \n**[1 in 1,200,000,000!] \nAura detected: " auraName , 11393254, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/ReworkedLumiCollection.webp")
+                        SendWebhook2( ":tada: **The Absolute Radiance** :tada: \n**[1 in 1,200,000,000!]** \nAura detected: " auraName , 11393254, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/ReworkedLumiCollection.webp")
                     }
                 } else if (auraName = "LEVIATHAN") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2(":tada: **The Ruler of the Beneath** :tada: \n**[1 in 1,730,000,000 from Rainy!] \nAura detected: " auraName, 5600, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/LeviathanLong.png")
+                        SendWebhook2("**The Ruler of the Beneath** \n**[1 in 1,730,000,000 from Rainy!]** \nAura detected: " auraName, 5600, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/LeviathanLong.png")
                     }
                 } else if (auraName = "ASTRAIOS") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**Dragon** \n**[1 in 1,750,000,000 from Singularity!] \nAura detected: " auraName, 3920232, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Astraios.gif")
+                        SendWebhook2("**Dragon** \n**[1 in 1,750,000,000 from Singularity!]** \nAura detected: " auraName, 3920232, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Astraios.gif")
                     }
                 } else if (auraName = "BREAKTHROUGH") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**How much do you believe in this world?**\n **[1 in 1,999,999,999!] \nAura detected: " auraName, 3289154, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/BreakthroughCollection.webp")
+                        SendWebhook2("**How much do you believe in this world?**\n**[1 in 1,999,999,999!]** \nAura detected: " auraName, 3289154, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/BreakthroughCollection.webp")
                     }
                 } else if (auraName = "Dream Catcher") {
                     ClipCountdownGlobal()
@@ -3039,17 +3034,17 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
                 } else if (auraName = "EQUINOX") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**Equilibrium Incarnate**\n**[1 in 2,500,000,000!] \nAura detected: " auraName, 16777215, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/EquinoxNewCollection.webp")
+                        SendWebhook2("**Equilibrium Incarnate**\n**[1 in 2,500,000,000!]** \nAura detected: " auraName, 16777215, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/EquinoxNewCollection.webp")
                     }
-                } else if (auraName = "Monarch") {
+                } else if (auraName = "MONARCH") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhookMonarch("**[1 in 3,000,000,0000 from Corruption!]\nAura detected: " auraName, 4330383, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MonarchCollection.webp")
+                        SendWebhookMonarch("**[1 in 3,000,000,0000 from Corruption!]**\nAura detected: " auraName, 4330383, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MonarchCollection.webp")
                     }
                 } else if (auraName = "meta") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**[1 in 10,000 from Cyberspace!]\n Aura detected: " auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MetaCollection.webp")
+                        SendWebhook2("**[1 in 10,000 from Cyberspace!]**\nAura detected: " auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MetaCollection.webp")
                     }
                 } else if (auraName = "illusionary") {
                     ClipCountdownGlobal()
@@ -3311,6 +3306,7 @@ return
 F6::
     RunRejoin2()
 return
+
 
 DoMouseMove:
 if (toggle) {
