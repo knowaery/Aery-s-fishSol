@@ -90,10 +90,10 @@ biomeRandomizer := false
 biomeSelector := false
 selectedBiome := "Windy"
 strangeControllerTime := 0
-biomeRandomizerTime := 360000
+biomeRandomizerTime := 300000
 biomeSelectorTime := 1000
 strangeControllerInterval := 1260000
-biomeRandomizerInterval := 1260000
+biomeRandomizerInterval := 2160000
 elapsed := 0
 strangeControllerLastRun := 0
 biomeRandomizerLastRun := 0
@@ -120,7 +120,6 @@ useCelestial := false
 useExotic := false
 useBounded := false
 auraFilter := false
-detectEden := false
 checkGhostServer := false
 biomeDetect := false
 restartMacroFailsafe := false
@@ -146,6 +145,8 @@ biomeItemMessage := false
 failsafeMessage := false
 failsafeMessagePing := false
 restartMacroFailsafePing := false
+restartMacroFailsafeTriggers := 0
+ping4Aura := true
 
 if (FileExist(fishSolSettingsFilePath)) {
         IniRead, tempRes, %fishSolSettingsFilePath%, Macro, resolution
@@ -267,10 +268,6 @@ if (FileExist(fishSolSettingsFilePath)) {
     IniRead, tempAuraFilter, %fishSolSettingsFilePath%, Macro, auraFilter
     if (tempAuraFilter != "ERROR")
         auraFilter := (tempAuraFilter = "true" || tempAuraFilter = "1")
-
-    IniRead, tempDetectEden, %fishSolSettingsFilePath%, Macro, detectEden
-    if (tempDetectEden != "ERROR")
-        detectEden := (tempDetectEden = "true" || tempDetectEden = "1")
 
     IniRead, tempCheckGhostServer, %fishSolSettingsFilePath%, Macro, checkGhostServer
     if (tempCheckGhostServer != "ERROR")
@@ -755,20 +752,6 @@ Gui, Add, Text, x300 y500 w500 h15 BackgroundTrans, If you need help, message me
 Gui, Add, Text, x50 y525 w500 h15 BackgroundTrans c0x0088FF gReleasesClick +0x200, https://github.com/knowaery/Aery-s-Fishsol
 
 Gui, Tab, Extra
-/*
-Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x33 y395 w534 h120 cWhite, Detect and Contract Eden (Temporary)
-Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x45 y485 w520 h145 BackgroundTrans, Not tested, not much thought into it, sorry if it dont work
-Gui, Font, s10 c0xCCCCCC Normal
-Gui, Add, Text, x45 y415 w520 h145 BackgroundTrans, Automatically detects if Eden has spawned in and contracts with it. (You must stand where it spawns.)
-Gui, Font, s10 cWhite Bold
-Gui, Add, Text, x230 y455 w400 h135 BackgroundTrans, ! This automatically starts when toggle is ON !
-Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Add, Button, x45 y455 w80 h25 gToggleDetectEden vDetectEdenBtn, Toggle
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x143 y459 w60 h25 vDetectEdenStatus BackgroundTrans, OFF
-*/
 Gui, Font, s11 cWhite Bold
 Gui, Add, GroupBox, x22 y265 w225 h120 cWhite, Auto-Clicker
 Gui, Add, Button, x35 y345 w80 h25 gStartAutoClicker vAutoClickStart, Start
@@ -881,14 +864,6 @@ UpdateStatus("BiomeDetectStatus", biomeDetect)
 UpdateStatus("AutoWarpStatus", autoWarp)
 
 ; misc related
-UpdateStatus("AutoWarpStatus", autoWarp)
-if (detectEden) {
-    edenDelay := 20000
-    SetTimer, EdenSnatcher, 50
-} else {
-    SetTimer, EdenSnatcher, Off
-}
-UpdateStatus("DetectEdenStatus", detectEden)
 if (autoClicker) {
     GuiControl, Disable, AutoClickStart
     GuiControl, Enable, AutoClickStop
@@ -1019,16 +994,6 @@ ToggleAutoClicker:
     autoClicker := ToggleSetting(autoClicker, "AutoClickerStatus", "autoClicker")
     GuiControl, % (autoClicker ? "Disable" : "Enable"), AutoClickStart
     GuiControl, % (autoClicker ? "Enable" : "Disable"), AutoClickStop
-return
-
-ToggleDetectEden:
-    detectEden := ToggleSetting(detectEden, "DetectEdenStatus", "detectEden")
-    if (detectEden) {
-        edenDelay := 20000
-        SetTimer, EdenSnatcher, 100
-    } else {
-        SetTimer, EdenSnatcher, Off
-    }
 return
 
 ToggleCheckGhostServer:
@@ -1374,6 +1339,33 @@ SendWebhookMonarch(text, color := 16777215, imageURL := "") {
     http.Open("POST", webhookURL, false)
     http.SetRequestHeader("Content-Type", "application/json")
     try http.Send(json)
+}
+
+SendWebhookAuras(text, color := 16777215) {
+    global auraName, webhookID, globalTranscendentPing, ping4Aura
+
+    if (ping4Aura) {
+        contentStr := """content"": ""<@" webhookID ">"","
+        mentionsStr := """allowed_mentions"": {""users"": [""" webhookID """]},"
+    } else {
+        contentStr := """content"": """","
+        mentionsStr := ""
+    }
+    json := "{"
+    . mentionsStr
+    . contentStr
+    . """embeds"": [{"
+    . """description"": "" ### Aura Equipped - " auraName ""","
+    . """color"": " auracolor ","
+    . """footer"": {""text"": ""Aery's fishSol v1.8"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+    . """timestamp"": """ timestamp """"
+    . "}]}"
+
+    http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
+    http.Open("POST", webhookURL, false)
+    http.SetRequestHeader("Content-Type", "application/json")
+    try http.Send(json)
+    ping4Aura := false
 }
 
 ; Strange Controller toggle
@@ -2052,40 +2044,6 @@ PopSkips() {
     Click, 1414, 300
     sleep, 600
 }
-
-EdenSnatcher:
-    global edenDelay
-
-    PixelGetColor, colorlimbo, 950, 180, RGB
-    PixelGetColor, colorlimbo2, 1200, 100, RGB
-    PixelGetColor, colorlimbo3, 676, 676, RGB
-
-    if (colorlimbo = 0xFFFFFF && colorlimbo2 = 0x000000 && colorlimbo3 = 0x000000) {
-            SetTimer, DoContract, -%edenDelay%
-        }
-return
-
-DoContract:
-    Send, e
-    sleep, 100
-    Send, e
-    sleep, 100
-    Send, e
-    sleep, 400
-    Click, 800, 800
-    sleep, 300
-    sleep, 800
-    Click, 720, 930
-    sleep, 400
-
-    if (clipWebhook) {
-        try SendWebhook2(":tada: **Eden has been Contracted!** :tada: \nWhite & Black Pixel Detected!", 0, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/yuinycto.gif")
-    }
-    if (detectGlobal || detectTrans) {
-        Sleep, 30000
-        Send, !{F10}
-    }
-return
 
 CraftSelected:
 
@@ -2927,74 +2885,25 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
 
                 auraName := StrReplace(auraName, "\", "\\")
                 auraName := StrReplace(auraName, """", "\""")
-
-                if (AuraList.HasKey(auraName) && globalTranscendentPing) {
-                    contentStr := """content"": ""<@" webhookID ">"","
-                    mentionsStr := """allowed_mentions"": {""users"": [""" webhookID """]},"
-                } else {
-                    contentStr := """content"": """","
-                    mentionsStr := ""
-                }
                 
-            if (!AuraListTrans.HasKey(auraName) && auraName != "Nothing") {
+            if (!AuraListTrans.HasKey(auraName) && auraName != "Nothing" && auraName != "Heatstroke") {
                     if (!AuraList.HasKey(auraName) && (!auraFilter || !EnabledAuras[auraName])) { ; normal auras
-                        json := "{"
-                            . mentionsStr
-                            . contentStr
-                            . """embeds"": [{"
-                            . """description"": "" ### Aura Equipped - " auraName ""","
-                            . """color"": " auracolor ","
-                            . """footer"": {""text"": ""Aery's fishSol v1.8"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
-                            . """timestamp"": """ timestamp """"
-                            . "}]}"
-
-                        http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-                        http.Open("POST", webhookURL, false)
-                        http.SetRequestHeader("Content-Type", "application/json")
-                        try http.Send(json)
+                        ping4Aura := false
+                        SendWebhookAuras("## Aura Equipped - " auraName, auracolor)
                     } else if (auraFilter) { ; check aura filter and see if the aura is enabled
                         if (AuraList.HasKey(auraName) && EnabledAuras[auraName] && !webResponse) {
-                            json := "{"
-                                . mentionsStr
-                                . contentStr
-                                . """embeds"": [{"
-                                . """description"": "" ### Aura Equipped - " auraName ""","
-                                . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.8"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
-                                . """timestamp"": """ timestamp """"
-                                . "}]}"
-                            http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-                            http.Open("POST", webhookURL, false)
-                            http.SetRequestHeader("Content-Type", "application/json")
-                            try http.Send(json)
+                            ping4Aura := true
+                            SendWebhookAuras("## Aura Equipped - " auraName, auracolor)
+                            ping4Aura := false
                         } else if (AuraList.HasKey(auraName) && !EnabledAuras[auraName] && !webResponse) { ; if aura is disabled in aura filter, it js sends webhook on the aura without pinging
-                                json := "{"
-                                . """embeds"": [{"
-                                . """description"": "" ### Aura Equipped - " auraName ""","
-                                . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.8"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
-                                . """timestamp"": """ timestamp """"
-                                . "}]}"
-                            http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-                            http.Open("POST", webhookURL, false)
-                            http.SetRequestHeader("Content-Type", "application/json")
-                            try http.Send(json)
+                            ping4Aura := false
+                            SendWebhookAuras("## Aura Equipped - " auraName, auracolor)
                         }
                     } else if (!auraFilter) { ; no aura filter, checks global list
                         if (AuraList.HasKey(auraName) && !webResponse) {
-                            json := "{"
-                                . mentionsStr
-                                . contentStr
-                                . """embeds"": [{"
-                                . """description"": "" ### Aura Equipped - " auraName ""","
-                                . """color"": " auracolor ","
-                                . """footer"": {""text"": ""Aery's fishSol v1.8"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
-                                . """timestamp"": """ timestamp """"
-                                . "}]}"
-                            http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-                            http.Open("POST", webhookURL, false)
-                            http.SetRequestHeader("Content-Type", "application/json")
-                            try http.Send(json)
+                            ping4Aura := true
+                            SendWebhookAuras("## Aura Equipped - " auraName, auracolor)
+                            ping4Aura := false
                         }
                     }
                 }
@@ -3052,6 +2961,18 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
                        SendWebhook2("**THE PERFECT PUPPET**\n**[1 in 10,000,000 from Cyberspace!]** \nAura detected: " auraName, 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Illusionary_curation.gif")
                     }
                 }
+
+                if (auraName = "TAVERNA") {
+                    ClipCountdownGlobal()
+                    if (!webResponse) {
+                        SendWebhook2("**Opened the Tavern!**\n**[1 in 1,444,444,444 from Blazing Sun!]**\nAura detected: " auraName, 16361845, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/TavernaCollection.webp" )
+                    }
+                } else if (auraName = "CENTAURUS") {
+                    ClipCountdownGlobal()
+                    if (!webReponse) {
+                        SendWebhook2("**Conqueror of the Sun!**\n**[1 in 3,000,000,000 from Blazing Sun!]**\nAura detected: " auraName, 16580586, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/CentaurusCollection.png")
+                    }
+                }
                 
                 
                 if (auraFilter) {
@@ -3085,7 +3006,7 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
             }
     
         
-    if (strangeController || biomeRandomizer || autoWarp || biomeDetect) {
+            if (autoWarp || biomeDetect) {
                 if (biome && biome != "" && biome != prevBiome) {
                     if (biomeDetect && toggle) {
                     biomeKey := "Biome" StrReplace(biome, " ", "")
@@ -3589,10 +3510,11 @@ if (toggle) {
         }
         
         if (restartMacroFailsafe && failsafeTime > 0 && A_TickCount - failsafeTime > 120 * 1000) {
+            restartMacroFailsafeTriggers++
         if (restartMacroFailsafePing) {
-            try SendWebhookForcePing("Fishing Failsafe Activated - Restarting Macro...", 14495300)
+            try SendWebhookForcePing("Restart Macro Failsafe Activated - Restarting Macro...", 14495300)
         } else {
-            try SendWebhook("Fishing Failsafe Activated - Restarting Macro...", 14495300)
+            try SendWebhook("Fishing Failsafe Activated - Restarting Macro...", 0)
         }
         toggle := false
         SetTimer, DoMouseMove, Off
@@ -3646,6 +3568,8 @@ if (toggle) {
         FishingSpotSelling()
         return
         }
+
+        if (restartMacroFailsafeTriggers > 3)
         
 
         if (!toggle) {
