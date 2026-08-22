@@ -1,14 +1,8 @@
-April 20th, 2026                                                                                                 (Commit 267)
-                                                                                                                             1.8 - 1
-• placeholder
-
-placeholder
+April 22nd, 2026                                                                                                 (Commit 269)
+                                                                                                                             1.8 - 2
+• Removed Limbo Fish
+• Moved Restart Macro Failsafe to Main Tab
+• Added missing Developers
 
 All Commits are listed on the GitHub
 https://github.com/knowaery/Aery-s-fishSol
-
-
-placeholder:
-• placeholder
-
-placeholder

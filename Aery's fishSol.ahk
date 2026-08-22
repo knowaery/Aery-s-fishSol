@@ -82,7 +82,6 @@ res := "1080p"
 maxLoopCount := 30
 fishingLoopCount := 15
 advancedFishingDetection := false
-pathingMode := "Vip Pathing"
 azertyPathing := false
 autoUnequip := false
 strangeController := false
@@ -149,11 +148,6 @@ restartMacroFailsafeTriggers := 0
 ping4Aura := true
 
 if (FileExist(fishSolSettingsFilePath)) {
-        IniRead, tempRes, %fishSolSettingsFilePath%, Macro, resolution
-    if (tempRes != "ERROR")
-    {
-        res := tempRes
-    }
     IniRead, tempMaxLoop, %fishSolSettingsFilePath%, Macro, maxLoopCount
     if (tempMaxLoop != "ERROR" && tempMaxLoop > 0)
     {
@@ -163,11 +157,6 @@ if (FileExist(fishSolSettingsFilePath)) {
     if (tempFishingLoop != "ERROR" && tempFishingLoop > 0)
     {
         fishingLoopCount := tempFishingLoop
-    }
-    IniRead, tempPathing, %fishSolSettingsFilePath%, Macro, pathingMode
-    if (tempPathing != "ERROR")
-    {
-        pathingMode := tempPathing
     }
     IniRead, tempAzerty, %fishSolSettingsFilePath%, Macro, azertyPathing
     if (tempAzerty != "ERROR")
@@ -386,9 +375,21 @@ Devs := [{dev_name:"mongoosee"
          , dev_discord:"General Programmer"
          , dev_img: A_ScriptDir . "\img\nadir.png"
          , dev_link:"https://www.twitch.tv/nadirrift"
-         , dev_egg:"Bonk"}]
+         , dev_egg:"Bonk"}
+       ,{dev_name:"Maxstellar"
+        , dev_role:"Twitch"
+        , dev_discord:"Lead Developer"
+        , dev_img: A_ScriptDir . "\img\maxstellar.png"
+        , dev_link:""
+        , dev_website:""}
+       ,{dev_name:"aery"
+        , dev_role:""
+        , dev_discord:"Editor"
+        , dev_img: A_ScriptDir . "\img\aery.png"
+        , dev_link:""
+        , dev_website:""}]
 
-Randomised_DevOrder := "1|2|3|4"
+Randomised_DevOrder := "1|2|3|4|5|6"
 Sort, Randomised_DevOrder, Random D|
 
 Randomised_DevOrder := StrSplit(Randomised_DevOrder, "|")
@@ -447,6 +448,16 @@ Gui, Font, s11 cWhite Bold
 Gui, Add, Text, x120 y178 w80 h25 BackgroundTrans, 1080p
 
 Gui, Font, s11 cWhite Bold
+Gui, Add, GroupBox, x235 y85 w330 h120 cWhite, Restart Macro Failsafe
+Gui, Font, s9 cWhite Normal
+Gui, Add, Text, x247 y105 h45 w295 BackgroundTrans c0xCCCCCC, (During Macro) Toggle if you want the macro to automatically restart if it detects that nothing has happened in 4 minutes.
+Gui, Font, s10 cWhite Bold
+Gui, Add, Button, x250 y160 w80 h25 gToggleRestartMacroFailsafe vRestartMacroFailsafeBtn, Toggle
+Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
+Gui, Add, Text, x340 y163 w60 h25 vRestartMacroFailsafeStatus BackgroundTrans, OFF
+
+/*
+Gui, Font, s11 cWhite Bold
 Gui, Add, GroupBox, x235 y85 w330 h120 cWhite, Limbo Fish
 Gui, Font, s9 cWhite Normal
 Gui, Add, Text, x247 y105 h45 w295 BackgroundTrans c0xCCCCCC, (During Macro) Automatically uses Zeus to glitch into limbo then fish in overworld. Requires Zeus and a consistent frame rate (~60fps). (In development)
@@ -458,7 +469,7 @@ Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Font, s9 c0xCCCCCC Bold, Segoe UI
 ;Gui, Add, Button, x385 y159 w124 h25 gTogglelimboFailsafe vlimboFailsafeBtn, Toggle Limbo Failsafe
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-;Gui, Add, Text, x521 y162 w60 h25 vlimboFailsafeStatus BackgroundTrans, OFF
+*/
 
 Gui, Add, GroupBox, x30 y215 w535 h120 cWhite, Loop Count Settings
 Gui, Font, s10 cWhite Bold
@@ -579,14 +590,6 @@ Gui, Add, Text, x415 y173 w60 h25 vAutoWarpStatus BackgroundTrans, OFF
 Gui, Add, DropDownList, x410 y207 w148 vSkipPotionType gskipType, Warp Potion|Transcendent Potion
 GuiControl, Choose, SkipPotionType, %skipType%
 
-Gui, Add, GroupBox, x307 y290 w260 h120 cWhite, Restart Macro Failsafe
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x318 y310 h45 w240 BackgroundTrans c0xCCCCCC, (During Macro) Toggle if you want the macro to automatically restart if it detects that nothing has happened in 5 minutes.
-Gui, Font, s10 cWhite Bold
-Gui, Add, Button, x318 y370 w80 h25 gToggleRestartMacroFailsafe vRestartMacroFailsafeBtn, Toggle
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x405 y373 w60 h25 vRestartMacroFailsafeStatus BackgroundTrans, OFF
-
 Gui, Tab, Auras
 
 Gui, Font, s13 cWhite Bold, Segoe UI
@@ -680,76 +683,104 @@ Gui, Add, Text, x143 y248 w70 h25 vCheckGhostServerStatus BackgroundTrans, OFF
 */
 
 Gui, Tab, Credits
-Gui, Add, Picture, x14 y80 w574 h590 vIMAGE_HANDLE_PNG_CRED_TAB
+Gui, Add, Picture, x14 y50 w574 h590 vIMAGE_HANDLE_PNG_CRED_TAB
 Gui, Font, s10 cWhite Normal
-Gui, Add, Picture, x50 y130 w50 h50 %dev1_egg_label% %dev1_egg_variable%, %dev1_img%
+Gui, Add, Picture, x50 y100 w50 h50 %dev1_egg_label% %dev1_egg_variable%, %dev1_img%
 Gui, Font, s11 cWhite Normal Bold
 if (dev1_website != "") {
-    Gui, Add, Text, x110 y135 w200 h20 BackgroundTrans c0x0088FF gDev1NameClick, %dev1_name%
+    Gui, Add, Text, x110 y105 w200 h20 BackgroundTrans c0x0088FF gDev1NameClick, %dev1_name%
 } else {
-    Gui, Add, Text, x110 y135 w200 h20 BackgroundTrans c0x00DD00, %dev1_name%
+    Gui, Add, Text, x110 y105 w200 h20 BackgroundTrans c0x00DD00, %dev1_name%
 }
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x110 y155 w200 h15 BackgroundTrans, %dev1_role%
+Gui, Add, Text, x110 y125 w200 h15 BackgroundTrans, %dev1_role%
 Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x110 y170 w200 h15 BackgroundTrans c0x0088FF gDev1LinkClick, %dev1_discord%
+Gui, Add, Text, x110 y140 w200 h15 BackgroundTrans c0x0088FF gDev1LinkClick, %dev1_discord%
 Gui, Font, s11 cWhite Normal Bold
-Gui, Add, Picture, x50 y195 w50 h50 %dev2_egg_label% %dev2_egg_variable%, %dev2_img%
+Gui, Add, Picture, x50 y165 w50 h50 %dev2_egg_label% %dev2_egg_variable%, %dev2_img%
 if (dev2_website != "") {
-    Gui, Add, Text, x110 y200 w200 h20 BackgroundTrans c0x0088FF gDev2NameClick, %dev2_name%
+    Gui, Add, Text, x110 y170 w200 h20 BackgroundTrans c0x0088FF gDev2NameClick, %dev2_name%
 } else {
-    Gui, Add, Text, x110 y200 w200 h20 BackgroundTrans c0x00DD00, %dev2_name%
+    Gui, Add, Text, x110 y170 w200 h20 BackgroundTrans c0x00DD00, %dev2_name%
 }
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x110 y220 w200 h15 BackgroundTrans, %dev2_role%
+Gui, Add, Text, x110 y190 w200 h15 BackgroundTrans, %dev2_role%
 Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x110 y235 w200 h15 BackgroundTrans c0x0088FF gDev2LinkClick, %dev2_discord%
-Gui, Add, Picture, x50 y260 w50 h50 %dev3_egg_label% %dev3_egg_variable%, %dev3_img%
+Gui, Add, Text, x110 y205 w200 h15 BackgroundTrans c0x0088FF gDev2LinkClick, %dev2_discord%
+Gui, Add, Picture, x50 y230 w50 h50 %dev3_egg_label% %dev3_egg_variable%, %dev3_img%
 Gui, Font, s11 cWhite Normal Bold
 if (dev3_website != "") {
-    Gui, Add, Text, x110 y265 w200 h20 BackgroundTrans c0x0088FF gDev3NameClick, %dev3_name%
+    Gui, Add, Text, x110 y235 w200 h20 BackgroundTrans c0x0088FF gDev3NameClick, %dev3_name%
 } else {
-    Gui, Add, Text, x110 y265 w200 h20 BackgroundTrans c0x00DD00, %dev3_name%
+    Gui, Add, Text, x110 y235 w200 h20 BackgroundTrans c0x00DD00, %dev3_name%
 }
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x110 y285 w200 h15 BackgroundTrans, %dev3_role%
+Gui, Add, Text, x110 y255 w200 h15 BackgroundTrans, %dev3_role%
 Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x110 y300 w200 h15 BackgroundTrans c0x0088FF gDev3LinkClick, %dev3_discord%
-Gui, Add, Picture, x490 y260 w50 h50 %dev4_egg_label% %dev4_egg_variable%, %dev4_img%
+Gui, Add, Text, x110 y270 w200 h15 BackgroundTrans c0x0088FF gDev3LinkClick, %dev3_discord%
+Gui, Add, Picture, x490 y230 w50 h50 %dev4_egg_label% %dev4_egg_variable%, %dev4_img%
 Gui, Font, s11 cWhite Normal Bold
 if (dev4_website != "") {
-    Gui, Add, Text, x280 y265 w200 h20 BackgroundTrans c0x0088FF 0x202 gDev4NameClick, %dev4_name%
+    Gui, Add, Text, x280 y235 w200 h20 BackgroundTrans c0x0088FF 0x202 gDev4NameClick, %dev4_name%
 } else {
-    Gui, Add, Text, x280 y265 w200 h20 BackgroundTrans c0x00DD00 0x202, %dev4_name%
+    Gui, Add, Text, x280 y235 w200 h20 BackgroundTrans c0x00DD00 0x202, %dev4_name%
 }
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x280 y285 w200 h15 BackgroundTrans 0x202, %dev4_role%
+Gui, Add, Text, x280 y255 w200 h15 BackgroundTrans 0x202, %dev4_role%
 Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x280 y300 w200 h15 BackgroundTrans c0x0088FF gDev4NameClick 0x202, %dev4_discord%
+Gui, Add, Text, x280 y270 w200 h15 BackgroundTrans c0x0088FF gDev4NameClick 0x202, %dev4_discord%
 Gui, Font, s8 c0x888888
-Gui, Add, Text, x50 y325 w480 h1 0x10 BackgroundTrans
+Gui, Add, Text, x50 y295 w480 h1 0x10 BackgroundTrans
+Gui, Font, s8 c0x888888
+Gui, Add, Text, x50 y295 w480 h1 0x10 BackgroundTrans
+Gui, Font, s11 cWhite Normal Bold
+if (dev5_website != "") {
+    Gui, Add, Text, x280 y105 w200 h20 BackgroundTrans c0x0088FF 0x202 gDev5NameClick, %dev5_name%
+} else {
+    Gui, Add, Text, x280 y105 w200 h20 BackgroundTrans c0x00DD00 0x202, %dev5_name%
+}
+Gui, Font, s9 c0xCCCCCC Normal
+Gui, Add, Text, x280 y125 w200 h15 BackgroundTrans 0x202, %dev5_role%
+Gui, Font, s9 c0xCCCCCC Normal Underline
+Gui, Add, Text, x280 y140 w200 h15 BackgroundTrans c0x0088FF gDev5NameClick 0x202, %dev5_discord%
+Gui, Add, Picture, x490 y100 w50 h50 %dev5_egg_label% %dev5_egg_variable%, %dev5_img%
+Gui, Font, s8 c0x888888
+;Gui, Add, Text, x50 y165 w492 h1 0x10 BackgroundTrans
+Gui, Font, s11 cWhite Normal Bold
+if (dev6_website != "") {
+    Gui, Add, Text, x280 y170 w200 h20 BackgroundTrans c0x0088FF 0x202 gDev6NameClick, %dev6_name%
+} else {
+    Gui, Add, Text, x280 y170 w200 h20 BackgroundTrans c0x00DD00 0x202, %dev6_name%
+}
+Gui, Font, s9 c0xCCCCCC Normal
+Gui, Add, Text, x280 y190 w200 h15 BackgroundTrans 0x202, %dev6_role%
+Gui, Font, s9 c0xCCCCCC Normal Underline
+Gui, Add, Text, x280 y205 w200 h15 BackgroundTrans c0x0088FF gDev6NameClick 0x202, %dev6_discord%
+Gui, Add, Picture, x490 y170 w50 h50 %dev6_egg_label% %dev6_egg_variable%, %dev6_img%
+Gui, Font, s8 c0x888888
+Gui, Add, Text, x50 y295 w492 h1 0x10 BackgroundTrans
 
-url := "https://raw.githubusercontent.com/ivelchampion249/FishSol-Macro/refs/heads/main/DONATORS.txt"
+ChangelogURL := "https://raw.githubusercontent.com/knowaery/Aery-s-fishSol/main/Changelog.txt"
 
 Http := ComObjCreate("WinHttp.WinHttpRequest.5.1")
-try Http.Open("GET", url, false)
+try Http.Open("GET", ChangelogURL, false)
 try Http.Send()
 
-content := Http.ResponseText
+changelogContent := Http.ResponseText
 
 ; change
-Gui, Font, s10 cWhite Bold
-Gui, Add, Text, x50 y345 w2000 h20 BackgroundTrans, Hope you enjoy my fishSol! Donators of Original fishSol:
+Gui, Font, s13 cWhite Bold
+Gui, Add, Text, x50 y305 w2000 h25 BackgroundTrans, Changelog:
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Edit, x50 y370 w480 h95 vDonatorsList -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background0x2D2D2D c0xCCCCCC, %content%
+Gui, Add, Edit, x50 y340 w480 h135 vChangelogt -Wrap +ReadOnly +VScroll -WantReturn -E0x200 Background0x2D2D2D c0xCCCCCC, %changelogContent%
 
 Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y490 w480 h1 0x10 BackgroundTrans
 
 Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y500 w500 h15 BackgroundTrans, Aery's fishSol v1.8 (2026-08-12)
-Gui, Add, Text, x300 y500 w500 h15 BackgroundTrans, If you need help, message me on discord. (noaery)
-Gui, Add, Text, x50 y525 w500 h15 BackgroundTrans c0x0088FF gReleasesClick +0x200, https://github.com/knowaery/Aery-s-Fishsol
+Gui, Add, Text, x50 y495 w500 h15 BackgroundTrans, Aery's fishSol v1.8
+Gui, Add, Text, x300 y495 w500 h15 BackgroundTrans, If you need help, message me on discord. (noaery)
+Gui, Add, Text, x50 y505 w505 h15 BackgroundTrans c0x0088FF gReleasesClick +0x200, https://github.com/knowaery/Aery-s-Fishsol
 
 Gui, Tab, Extra
 Gui, Font, s11 cWhite Bold
@@ -800,12 +831,7 @@ Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, DropDownList, x60 y205 w120 vAutoCraft gSelectItem, Heavenly Potion|Bound Potion|Jewelry Potion|Zombie Potion|Rage Potion|Diver Potion
 GuiControl, Choose, AutoCraft, %selectedItem%
 
-GuiControl, Choose, Resolution, 1
-
 Gui, Show, w600 h570,  Aery's fishSol v1.8
-
-GuiControl, Choose, Resolution, 1
-GuiControl, Choose, PathingMode, 1
 
 UpdateStatus(initialToggle, convert) {
     GuiControl,, %initialToggle%, % convert ? "ON" : "OFF"
@@ -1452,7 +1478,6 @@ RunBiomeSelector() {
             COLOR := Heaven
     }
 
-    if (res = "1080p") {
         MouseMove, 36, 513, 3
         sleep 200
         MouseClick, Left
@@ -1518,7 +1543,6 @@ RunBiomeSelector() {
                 SendWebhook(":joystick: Biome Selector couldn't be Found after retries!", "3225405")
             }
         }
-    }
 
     if (inController){
         MouseMove, %X_Button_Center%, 100, 0
@@ -3104,9 +3128,7 @@ return
 
 
 F1::
-    if (!res) {
-        res := "1080p"
-    }
+    res := "1080p"
     if (!toggle && offsides != true) {
         Gui, Submit, nohide
         if (MaxLoopInput > 0) {
@@ -3131,7 +3153,6 @@ F1::
         checkGhostServerLastRun := 0
         enteredLimbo := false
         IniWrite, %selectedItem2%, %fishSolSettingsFilePath%, Macro, selectedItem2
-        IniWrite, %res%, %fishSolSettingsFilePath%, Macro, resolution
         IniWrite, %maxLoopCount%, %fishSolSettingsFilePath%, Macro, maxLoopCount
         IniWrite, %fishingLoopCount%, %fishSolSettingsFilePath%, Macro, fishingLoopCount
         WinActivate, ahk_exe RobloxPlayerBeta.exe
@@ -3373,8 +3394,6 @@ if (toggle) {
             sleep 300
         }
 
-
-     if (pathingMode = "Vip Pathing") {
             ; VIP Pathing
             Send, {%keyW% Down}
             Send, {%keyA% Down}
@@ -3454,7 +3473,6 @@ if (toggle) {
             sleep 2670
             Send, {%keyW% Up}
             loopCount := 0
-            }
         }
 
         MouseMove, 862, 843, 3
@@ -3645,9 +3663,7 @@ if (toggle) {
 return
 
 StartScript:
-    if (!res) {
-        res := "1080p"
-    }
+    res := "1080p"
     if (!toggle && offsides != true) {
         Gui, Submit, nohide
         if (MaxLoopInput > 0) {
@@ -3672,7 +3688,6 @@ StartScript:
         checkGhostServerLastRun := 0
         enteredLimbo := false
         IniWrite, %selectedItem2%, %fishSolSettingsFilePath%, Macro, selectedItem2
-        IniWrite, %res%, %fishSolSettingsFilePath%, Macro, resolution
         IniWrite, %maxLoopCount%, %fishSolSettingsFilePath%, Macro, maxLoopCount
         IniWrite, %fishingLoopCount%, %fishSolSettingsFilePath%, Macro, fishingLoopCount
         WinActivate, ahk_exe RobloxPlayerBeta.exe
@@ -3747,6 +3762,26 @@ Return
 
 Dev4LinkClick:
     Run, %dev4_link%
+return
+
+Dev5NameClick:
+if (dev5_website) {
+    Run, %dev5_website%
+}
+Return
+
+Dev5LinkClick:
+    Run, %dev5_link%
+return
+
+Dev6NameClick:
+if (dev6_website) {
+    Run, %dev6_website%
+}
+Return
+
+Dev6LinkClick:
+    Run, %dev6_link%
 return
 
 Bonk:
