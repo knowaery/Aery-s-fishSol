@@ -360,31 +360,31 @@ Devs := [{dev_name:"mongoosee"
          , dev_link:"https://mongoosee.com/"
          , dev_website:"https://mongoosee.com/"}
         ,{dev_name:"ivelchampion249"
-         , dev_role:"YouTube"
-         , dev_discord:"Original Creator"
+         , dev_role:"Original Creator"
+         , dev_discord:"Youtube"
          , dev_img: A_ScriptDir . "\img\Ivel.png"
          , dev_link:"https://www.youtube.com/@ivelchampion"}
        ,{dev_name:"cresqnt"
-         , dev_role:"Scope Development (other macros)"
-         , dev_discord:"Frontend Developer"
+         , dev_role:"Frontend Developer"
+         , dev_discord:"Website"
          , dev_img: A_ScriptDir . "\img\cresqnt.png"
-         , dev_link:"https://scopedevelopment.tech"
+         , dev_link:"https://cresqnt.com"
          , dev_website:"https://cresqnt.com"}
        ,{dev_name:"Nadir Rift"
-         , dev_role:"Twitch"
-         , dev_discord:"General Programmer"
+         , dev_role:"General Programmer"
+         , dev_discord:"Twitch"
          , dev_img: A_ScriptDir . "\img\nadir.png"
          , dev_link:"https://www.twitch.tv/nadirrift"
          , dev_egg:"Bonk"}
-       ,{dev_name:"Maxstellar"
-        , dev_role:"Twitch"
-        , dev_discord:"Lead Developer"
+       ,{dev_name:"Maxstellar/purestellenium"
+        , dev_role:"Lead Developer"
+        , dev_discord:"Github"
         , dev_img: A_ScriptDir . "\img\maxstellar.png"
-        , dev_link:""
+        , dev_link:"https://github.com/purestellenium"
         , dev_website:""}
        ,{dev_name:"aery"
-        , dev_role:""
-        , dev_discord:"Editor"
+        , dev_role:"Editor"
+        , dev_discord:""
         , dev_img: A_ScriptDir . "\img\aery.png"
         , dev_link:""
         , dev_website:""}]
@@ -574,7 +574,7 @@ Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, Text, x257 y455 w60 h25 vBiomeSelectorStatus BackgroundTrans, OFF
 Gui, Font, s9 cWhite Normal
 Gui, Add, Text, x30 y468 w500 h40 BackgroundTrans c0xCCCCCC,Uses every 61 minutes.
-Gui, Font, s9 cWhite Bold
+Gui, Font, s10 cWhite Bold
 Gui, Add, DropDownList, x30 y487 w100 h200 vSelectedBiome gUpdateSelectedBiome, Windy|Snowy|Rainy|Heaven|Hell|Starfall|Corruption|SandStorm|Null
 
 Gui, Font, s11 cWhite Bold
@@ -728,7 +728,7 @@ if (dev4_website != "") {
 Gui, Font, s9 c0xCCCCCC Normal
 Gui, Add, Text, x280 y255 w200 h15 BackgroundTrans 0x202, %dev4_role%
 Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x280 y270 w200 h15 BackgroundTrans c0x0088FF gDev4NameClick 0x202, %dev4_discord%
+Gui, Add, Text, x280 y270 w200 h15 BackgroundTrans c0x0088FF gDev4LinkClick 0x202, %dev4_discord%
 Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y295 w480 h1 0x10 BackgroundTrans
 Gui, Font, s8 c0x888888
@@ -742,10 +742,9 @@ if (dev5_website != "") {
 Gui, Font, s9 c0xCCCCCC Normal
 Gui, Add, Text, x280 y125 w200 h15 BackgroundTrans 0x202, %dev5_role%
 Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x280 y140 w200 h15 BackgroundTrans c0x0088FF gDev5NameClick 0x202, %dev5_discord%
+Gui, Add, Text, x280 y140 w200 h15 BackgroundTrans c0x0088FF gDev5LinkClick 0x202, %dev5_discord%
 Gui, Add, Picture, x490 y100 w50 h50 %dev5_egg_label% %dev5_egg_variable%, %dev5_img%
 Gui, Font, s8 c0x888888
-;Gui, Add, Text, x50 y165 w492 h1 0x10 BackgroundTrans
 Gui, Font, s11 cWhite Normal Bold
 if (dev6_website != "") {
     Gui, Add, Text, x280 y170 w200 h20 BackgroundTrans c0x0088FF 0x202 gDev6NameClick, %dev6_name%
@@ -755,7 +754,7 @@ if (dev6_website != "") {
 Gui, Font, s9 c0xCCCCCC Normal
 Gui, Add, Text, x280 y190 w200 h15 BackgroundTrans 0x202, %dev6_role%
 Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x280 y205 w200 h15 BackgroundTrans c0x0088FF gDev6NameClick 0x202, %dev6_discord%
+Gui, Add, Text, x280 y270 w200 h15 BackgroundTrans c0x0088FF gDev6LinkClick 0x202, %dev4_discord%
 Gui, Add, Picture, x490 y170 w50 h50 %dev6_egg_label% %dev6_egg_variable%, %dev6_img%
 Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y295 w492 h1 0x10 BackgroundTrans
@@ -3801,65 +3800,6 @@ return
 ResetBonkFunc:
     GuiControl,, IMG_Bonk , ./img/nadir.png
 Return
-
-/*
-Send_WM_COPYDATA(ByRef StringToSend, ByRef TargetScriptTitle)
-{
-    VarSetCapacity(CopyDataStruct, 3 * A_PtrSize, 0)
-    SizeInBytes := (StrLen(StringToSend) + 1) * (A_IsUnicode ? 2 : 1)
-    NumPut(SizeInBytes, CopyDataStruct, A_PtrSize)
-    NumPut(&StringToSend, CopyDataStruct, 2 * A_PtrSize)
-    Prev_DetectHiddenWindows := A_DetectHiddenWindows
-    Prev_TitleMatchMode := A_TitleMatchMode
-    DetectHiddenWindows On
-    SetTitleMatchMode 2
-    SendMessage, 0x4a, 0, &CopyDataStruct,, %TargetScriptTitle%
-    DetectHiddenWindows %Prev_DetectHiddenWindows%
-    SetTitleMatchMode %Prev_TitleMatchMode%
-    return ErrorLevel
-}
-*/
-/*
-    Receive_WM_COPYDATA(wParam, lParam)
-    {
-        SetBatchLines, -1
-        StringAddress := NumGet(lParam + 2*A_PtrSize)
-        CopyOfData := StrGet(StringAddress)
-        List := StrSplit(CopyOfData, "`n")
-        if CanProcessMessage(Data[1])
-        {
-            LastMessageData = SubStr(CopyOfData, 1, strlen(Data[1]))
-            CanProcessMessage(LastMessageData)
-            return true
-        }
-        return false
-    }
-
-    CanProcessMessage(Header)
-    {
-        ListOfFunctions := [ "biome", "aura"]
-        SetBatchLines, -1
-        for function in ListOfFunctions
-            if function == Header
-                return true
-    }
-
-    CanProcessMessage(Data)
-    {
-    }
-
-*/
-
-DoChatWait:
-    sleep 3000
-    PixelGetColor, ChatCheck, 132, 35, RGB
-    while (ChatCheck ~= "0xF[4-9A-F]F[4-9A-F]F8")
-    {
-        PixelGetColor, ChatCheck, 132, 35, RGB
-    }
-return
-
-
 
 LazyCheckItemDescription(senstivity, list*) {
     global res
