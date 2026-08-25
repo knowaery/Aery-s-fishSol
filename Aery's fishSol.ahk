@@ -119,7 +119,6 @@ useCelestial := false
 useExotic := false
 useBounded := false
 auraFilter := false
-checkGhostServer := false
 biomeDetect := false
 restartMacroFailsafe := false
 useNothing := false
@@ -257,10 +256,6 @@ if (FileExist(fishSolSettingsFilePath)) {
     IniRead, tempAuraFilter, %fishSolSettingsFilePath%, Macro, auraFilter
     if (tempAuraFilter != "ERROR")
         auraFilter := (tempAuraFilter = "true" || tempAuraFilter = "1")
-
-    IniRead, tempCheckGhostServer, %fishSolSettingsFilePath%, Macro, checkGhostServer
-    if (tempCheckGhostServer != "ERROR")
-        checkGhostServer := (tempCheckGhostServer = "true" || tempCheckGhostServer = "1")
 
     IniRead, tempBiomeDetect, %fishSolSettingsFilePath%, Macro, biomeDetect
     if (tempBiomeDetect != "ERROR")
@@ -671,17 +666,6 @@ Gui, Add, Button, x405 y385 w100 h25 gClearLogs, Clear Logs
 Gui, Font, s14 cWhite Bold, Segoe UI4
 Gui, Add, Button, x205 y490 w190 h40 gOpenWebhookList, Webhook Options
 
-/*
-Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x33 y185 w534 h100 cWhite, Check For Ghost Server
-Gui, Font, s10 c0xCCCCCC Normal
-Gui, Add, Text, x45 y205 w500 h145 BackgroundTrans, (During Macro) Checks for Ghost Server at the start of script, then hourly by seeing if you have access to Command Panel. If detected joins the server in private server link.
-Gui, Font, s10 cWhite Bold, Segoe UI
-Gui, Add, Button, x45 y245 w80 h25 gToggleCheckGhostServer vCheckGhostServerBtn, Toggle
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x143 y248 w70 h25 vCheckGhostServerStatus BackgroundTrans, OFF
-*/
-
 Gui, Tab, Credits
 Gui, Add, Picture, x14 y50 w574 h590 vIMAGE_HANDLE_PNG_CRED_TAB
 Gui, Font, s10 cWhite Normal
@@ -754,7 +738,7 @@ if (dev6_website != "") {
 Gui, Font, s9 c0xCCCCCC Normal
 Gui, Add, Text, x280 y190 w200 h15 BackgroundTrans 0x202, %dev6_role%
 Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x280 y270 w200 h15 BackgroundTrans c0x0088FF gDev6LinkClick 0x202, %dev4_discord%
+Gui, Add, Text, x280 y205 w200 h15 BackgroundTrans c0x0088FF gDev6LinkClick 0x202, %dev6_discord%
 Gui, Add, Picture, x490 y170 w50 h50 %dev6_egg_label% %dev6_egg_variable%, %dev6_img%
 Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y295 w492 h1 0x10 BackgroundTrans
@@ -783,51 +767,53 @@ Gui, Add, Text, x50 y505 w505 h15 BackgroundTrans c0x0088FF gReleasesClick +0x20
 
 Gui, Tab, Extra
 Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x22 y265 w225 h120 cWhite, Auto-Clicker
-Gui, Add, Button, x35 y345 w80 h25 gStartAutoClicker vAutoClickStart, Start
-Gui, Add, Button, x125 y345 w80 h25 gStopAutoClicker  vAutoClickStop Disabled, Stop
+Gui, Add, GroupBox, x22 y315 w225 h120 cWhite, Auto-Clicker
+Gui, Add, Button, x35 y395 w80 h25 gStartAutoClicker vAutoClickStart, Start
+Gui, Add, Button, x125 y395 w80 h25 gStopAutoClicker  vAutoClickStop Disabled, Stop
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, Text, x214 y349 w60 h25 vAutoClickerStatus BackgroundTrans, OFF
+Gui, Add, Text, x214 y399 w60 h25 vAutoClickerStatus BackgroundTrans, OFF
 Gui, Font, s10 cWhite Bold
-Gui, Add, Text, x35 y320 w90 h20 BackgroundTrans, Delay (sec):
+Gui, Add, Text, x35 y370 w90 h20 BackgroundTrans, Delay (sec):
 Gui, Font, s9 cBlack Bold
-Gui, Add, Edit, x120 y320 w60 h22 vAutoClickDelay, 60
+Gui, Add, Edit, x120 y370 w60 h22 vAutoClickDelay, 60
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x32 y285 w205 h135 BackgroundTrans c0xCCCCCC, Automatically clicks after the desired seconds.
+Gui, Add, Text, x32 y335 w205 h135 BackgroundTrans c0xCCCCCC, Automatically clicks after the desired seconds.
 
 Gui, Font, s10 cWhite Bold
-Gui, Add, GroupBox, x22 y85 w554 h170 cWhite, Auto Craft
-Gui, Add, Text, x60 y167 w150 h50 BackgroundTrans, F2 = Start | F3 = Stop
+Gui, Add, GroupBox, x22 y85 w554 h200 cWhite, Auto Craft
+Gui, Add, Text, x55 y205 w150 h50 BackgroundTrans, F2 = Start | F3 = Stop
+Gui, Font, s10 cWhite Bold, Segoe UI
+Gui, Add, Button, x45 y230 w70 h35 gStartAutoCraft vStartAutoCraftBtn c0x00AA00 +0x8000, Start
+Gui, Add, Button, x125 y230 w70 h35 gCloseScript vStopAutoCraftBtn c0xFF4444 +0x8000, Stop
 
 Gui, Font, s10 cWhite Bold
-Gui, Add, GroupBox, x220 y145 w210 h100 cWhite, Heavenly Potion
-Gui, Add, Button, x308 y165 w80 h25 gToggleUseCelestial vUseCelestialBtn, Toggle
-Gui, Add, Button, x308 y205 w80 h25 gToggleUseExotic vUseExoticBtn, Toggle
-Gui, Add, Text, x398 y169 w60 h25 vUseCelestialStatus BackgroundTrans, OFF
-Gui, Add, Text, x398 y209 w60 h25 vUseExoticStatus BackgroundTrans, OFF
+Gui, Add, GroupBox, x220 y165 w210 h100 cWhite, Heavenly Potion
+Gui, Add, Button, x308 y185 w80 h25 gToggleUseCelestial vUseCelestialBtn, Toggle
+Gui, Add, Button, x308 y225 w80 h25 gToggleUseExotic vUseExoticBtn, Toggle
+Gui, Add, Text, x398 y189 w60 h25 vUseCelestialStatus BackgroundTrans, OFF
+Gui, Add, Text, x398 y229 w60 h25 vUseExoticStatus BackgroundTrans, OFF
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x228 y170 w600 h100 BackgroundTrans c0xCCCCCC, Add
-Gui, Add, Text, x228 y210 w600 h100 BackgroundTrans c0xCCCCCC, Add
+Gui, Add, Text, x228 y190 w600 h100 BackgroundTrans c0xCCCCCC, Add
+Gui, Add, Text, x228 y230 w600 h100 BackgroundTrans c0xCCCCCC, Add
 Gui, Font, s9 c9B8CFF Bold, Trajan Pro
-Gui, Add, Text, x254 y169 w600 h100 BackgroundTrans, Celestial:
+Gui, Add, Text, x254 y189 w600 h100 BackgroundTrans, Celestial:
 Gui, Font, s10 cWhite Normal, Trajan Pro
-Gui, Add, Text, vExoticText x254 y209 w600 h100 BackgroundTrans, Exotic:
+Gui, Add, Text, vExoticText x254 y229 w600 h100 BackgroundTrans, Exotic:
 SetTimer, RainbowText, 50
 
 Gui, Font, s10 cWhite Bold
-Gui, Add, GroupBox, x437 y145 w130 h100 cWhite, Bound Potion 
-Gui, Add, Button, x448 y205 w80 h25 gToggleUseBounded vUseBoundedBtn, Toggle
-Gui, Add, Text, x536 y209 w60 h25 vUseBoundedStatus BackgroundTrans, OFF
+Gui, Add, GroupBox, x437 y165 w130 h100 cWhite, Bound Potion 
+Gui, Add, Button, x448 y225 w80 h25 gToggleUseBounded vUseBoundedBtn, Toggle
+Gui, Add, Text, x536 y229 w60 h25 vUseBoundedStatus BackgroundTrans, OFF
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x448 y169 w600 h100 BackgroundTrans c0xCCCCCC, Add
+Gui, Add, Text, x448 y189 w600 h100 BackgroundTrans c0xCCCCCC, Add
 Gui, Font, s9 c1559C9 Bold, Trajan Pro
-Gui, Add, Text, x475 y169 w600 h100 BackgroundTrans, Bounded:
-
+Gui, Add, Text, x475 y189 w600 h100 BackgroundTrans, Bounded:
 
 Gui, Font, s9 cWhite Normal
 Gui, Add, Text, x35 y105 w534 h100 BackgroundTrans c0xCCCCCC, Adds the nessecary potions and/or auras to craft potions. Please already put the desired item on auto craft. You MUST be inside of Stella's Cauldron's UI. Toggling the auras listed below means adding them to the desired potion from your inventory and turns on Add Everything.
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-Gui, Add, DropDownList, x60 y205 w120 vAutoCraft gSelectItem, Heavenly Potion|Bound Potion|Jewelry Potion|Zombie Potion|Rage Potion|Diver Potion
+Gui, Add, DropDownList, x60 y167 w120 vAutoCraft gSelectItem, Heavenly Potion|Bound Potion|Jewelry Potion|Zombie Potion|Rage Potion|Diver Potion
 GuiControl, Choose, AutoCraft, %selectedItem%
 
 Gui, Show, w600 h570,  Aery's fishSol v1.8
@@ -897,14 +883,6 @@ if (autoClicker) {
     GuiControl, Disable, AutoClickStop
 }
 UpdateStatus("AutoClickerStatus", autoClicker)
-
-/*
-if (checkGhostServer && privateServerLink = "") {
-    TrayTip, Please Enter a Private Server Link!, Private Server Tab -> Private Server Link
-    checkGhostServer := false
-}
-UpdateStatus("CheckGhostServerStatus", checkGhostServer)
-*/
 
 GuiControl, ChooseString, SelectedBiome, %selectedBiome%
 SetTimer, AuraBiomeDetect, 1000
@@ -1019,13 +997,6 @@ ToggleAutoClicker:
     autoClicker := ToggleSetting(autoClicker, "AutoClickerStatus", "autoClicker")
     GuiControl, % (autoClicker ? "Disable" : "Enable"), AutoClickStart
     GuiControl, % (autoClicker ? "Enable" : "Disable"), AutoClickStop
-return
-
-ToggleCheckGhostServer:
-    if (ToggleSetting(checkGhostServer, "CheckGhostServerStatus", "checkGhostServer") && privateServerLink = "") {
-        TrayTip, Please Enter a Private Server Link!, Private Server Tab -> Private Server Link
-        ToggleSetting(checkGhostServer, "CheckGhostServerStatus", "checkGhostServer")
-    }
 return
 
 ToggleBiomeDetect:
@@ -1419,7 +1390,7 @@ RunStrangeController() {
     }
     Click, Left
     sleep 600
-    MouseMove, 45, 521, 3
+    MouseMove, 1414, 300, 3
     sleep 300
     Click, Left
     sleep, 600
@@ -1638,7 +1609,7 @@ RunBiomeRandomizer() {
     }
     Click, Left
     sleep 300
-    MouseMove, 45, 521, 3
+    MouseMove, 1414, 300, 3
     sleep 300
     Click, Left
     sleep, 600
@@ -1710,69 +1681,6 @@ ServerLinkConverter() {
     RegExMatch(privateServerLink, "code=([^&]+)", codeMatch)
     code := codeMatch1
     privateServerLinkDeepLink := "roblox://navigation/share_links?code=" . code . "&type=Server"
-}
-
-CheckGhostServer() {
-
-    SendWebhook("Checking for ghost server...", 0)
-    ToolTip, Checking for ghost server... , 900, 10
-    Send, {Esc}
-    Sleep, 650
-    Send, R
-    Sleep, 650
-    Send, {Enter}
-    sleep 10000
-    EnsureFullscreen()
-    sleep, 5000
-    MouseMove, 34, 678, 3
-    Sleep, 300
-    Click, Left
-    sleep, 2000
-    PixelGetColor, ghostColor, 980, 735, RGB
-    PixelGetColor, ghostColor2, 994, 440, RGB
-    if (ghostColor != 0xFFFFFF && ghostColor2 != 0xFFF49D) {
-        RunRejoin()
-    } else {
-        MouseMove, 34, 678, 3
-        Sleep, 300
-        Click, Left
-        sleep, 500
-        if (closeCollectionType = "\ Key/UI Navigation") {
-            sleep, 1000
-            MouseMove, 47, 467, 3
-            sleep 220
-            Click, Left
-            sleep 320
-            Send, {\}
-            sleep, 400
-            Send, {Enter}
-            sleep 320
-            Send, {\}
-            sleep, 350
-            Click, WheelUp 80
-            sleep 500
-            Click, WheelDown 45
-            sleep 300
-        } else if (closeCollectionType = "Click") {
-            sleep, 1000
-            MouseMove, 47, 467, 3
-            sleep 220
-            Click, Left
-            sleep 220
-            MouseMove, 382, 126, 3
-            sleep 220
-            Click, Left
-            sleep 220
-            Click, WheelUp 80
-            sleep 500
-            Click, WheelDown 45
-            sleep 300
-        }
-        ToolTip, Going to fishing spot.., 900, 10
-        SendWebhook("Going to fishing spot... Not in Ghost Server.", 0)
-        FishingSpot()
-    }
-    ToolTip
 }
 
 RunRejoin() {
@@ -2141,7 +2049,7 @@ DoUseNothing() {
 
 FishingSpot() {
     global keyW, keyA, azertyPathing, res, toggle, maxLoopCount, fishingLoopCount
-    global strangeControllerLastRun, biomeRandomizerLastRun, checkGhostServerLastRun
+    global strangeControllerLastRun, biomeRandomizerLastRun
     global startTick, cycleCount, restartingMacro, MaxLoopInput, FishingLoopInput
     keyW := azertyPathing ? "z" : "w"
     keyA := azertyPathing ? "q" : "a"
@@ -2192,7 +2100,7 @@ FishingSpot() {
 
 FishingSpotSelling() {
     global keyW, keyA, azertyPathing, res, toggle, maxLoopCount, fishingLoopCount
-    global strangeControllerLastRun, biomeRandomizerLastRun, checkGhostServerLastRun
+    global strangeControllerLastRun, biomeRandomizerLastRun
     global startTick, cycleCount, restartingMacro, MaxLoopInput, FishingLoopInput
     keyW := azertyPathing ? "z" : "w"
     keyA := azertyPathing ? "q" : "a"
@@ -2281,7 +2189,6 @@ FishingSpotSelling() {
         fishingLoopCount := FishingLoopInput
     }
     toggle := true
-    checkGhostServerLastRun := 0
 
     if (startTick = "") {
         startTick := A_TickCount
@@ -2289,7 +2196,6 @@ FishingSpotSelling() {
     if (cycleCount = "") {
         cycleCount := 0
     }
-    checkGhostServerLastRun := 0
     WinActivate, ahk_exe RobloxPlayerBeta.exe
     SetTimer, UpdateGUI, 1000
     SetTimer, DoMouseMove, 100
@@ -3139,7 +3045,6 @@ F1::
         toggle := true
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
-        checkGhostServerLastRun := 0
 
         if (startTick = "") {
             startTick := A_TickCount
@@ -3149,7 +3054,6 @@ F1::
         }
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
-        checkGhostServerLastRun := 0
         enteredLimbo := false
         IniWrite, %selectedItem2%, %fishSolSettingsFilePath%, Macro, selectedItem2
         IniWrite, %maxLoopCount%, %fishSolSettingsFilePath%, Macro, maxLoopCount
@@ -3179,6 +3083,7 @@ F2::
 
     IniWrite, %selectedItem%, %fishSolSettingsFilePath%, Macro, selectedItem
     autocrafting := true
+    WinActivate, ahk_exe RobloxPlayerBeta.exe
 
     ToolTip, Crafting will start in 5 seconds..., 900, 10
     Sleep, 1000
@@ -3586,7 +3491,9 @@ if (toggle) {
         return
         }
 
-        if (restartMacroFailsafeTriggers > 3)
+        if (restartMacroFailsafeTriggers > 3) {
+            pendingRejoinFailsafe := true
+        }
         
 
         if (!toggle) {
@@ -3674,7 +3581,6 @@ StartScript:
         toggle := true
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
-        checkGhostServerLastRun := 0
 
         if (startTick = "") {
             startTick := A_TickCount
@@ -3684,7 +3590,6 @@ StartScript:
         }
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
-        checkGhostServerLastRun := 0
         enteredLimbo := false
         IniWrite, %selectedItem2%, %fishSolSettingsFilePath%, Macro, selectedItem2
         IniWrite, %maxLoopCount%, %fishSolSettingsFilePath%, Macro, maxLoopCount
@@ -3721,6 +3626,41 @@ CloseScript:
     }
     toggle := false
     Reload
+return
+
+StartAutoCraft:
+    Gui, Submit, NoHide
+
+    if (autocrafting || toggle)
+        return
+
+    if (selectedItem = "") {
+        ToolTip, Please Select Item To Craft!, 900, 10
+        Sleep, 2500
+        ToolTip
+        return
+    }
+
+    IniWrite, %selectedItem%, %fishSolSettingsFilePath%, Macro, selectedItem
+    autocrafting := true
+    WinActivate, ahk_exe RobloxPlayerBeta.exe
+
+    ToolTip, Crafting will start in 5 seconds..., 900, 10
+    Sleep, 1000
+    ToolTip, Crafting will start in 4 seconds..., 900, 10
+    Sleep, 1000
+    ToolTip, Crafting will start in 3 seconds..., 900, 10
+    Sleep, 1000
+    ToolTip, Crafting will start in 2 seconds..., 900, 10
+    Sleep, 1000
+    ToolTip, Crafting will start in 1 second..., 900, 10
+    Sleep, 1000
+    ToolTip
+    if (activationMessage) {
+        try SendWebhook("Crafting Started on " selectedItem ":tools:", 0)
+    }
+
+    SetTimer, CraftSelected, 1000
 return
 
 Dev1NameClick:
