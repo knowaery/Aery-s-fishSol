@@ -1,4 +1,4 @@
-April 24th, 2026                                                                                                 (Commit 271)
+August 24th, 2026                                                                                                 (Commit 271)
                                                                                                                              1.8 - 4
 • Changed how Strange Controller/Biome Randomizer exit the inventory                                                                                                                            
 • Fixed the last of several Frontend/Backend issues on the Credits tab
@@ -9,13 +9,13 @@ https://github.com/knowaery/Aery-s-fishSol
 
 --
 
-April 23rd, 2026                                                                                                 (Commit 270)
+August 23rd, 2026                                                                                                 (Commit 270)
                                                                                                                              1.8 - 3
 • Fixed several Frontend/Backend issues on the Credits tab
 
 --
 
-April 22nd, 2026                                                                                                 (Commit 269)
+August 22nd, 2026                                                                                                 (Commit 269)
                                                                                                                              1.8 - 2
 • Removed Limbo Fish
 • Moved Restart Macro Failsafe to Main Tab
