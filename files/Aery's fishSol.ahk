@@ -1,5 +1,3 @@
-;#Requires AutoHotkey v1.1
-
 #NoEnv
 #SingleInstance Force
 BatchLine_Default := A_BatchLines
@@ -8,17 +6,17 @@ EnvGet, LocalAppData, LOCALAPPDATA
 SetWorkingDir %A_ScriptDir%
 CoordMode, Mouse, Screen
 CoordMode, Pixel, Screen
-iconFilePath := A_ScriptDir "\img\icon.ico"
+iconFilePath := A_ScriptDir "\files\img\icon.ico"
+fishSolSettingsFilePath := A_ScriptDir "\files\settings.ini"
+fishSolAuraFilePath := A_ScriptDir "\files\AuraList.ini"
 
+; Abandoned function
 /* Put settings & AuraList into LocalAppData
 fishSolFilePath := LocalAppData . "\Aery's fishSol"
 FileCreateDir, %fishSolFilePath%
 fishSolSettingsFilePath := fishSolFilePath . "\settings.ini"
 fishSolAuraFilePath := fishSolFilePath . "\AuraList.ini"
 */
-
-fishSolSettingsFilePath := A_ScriptDir "\settings.ini"
-fishSolAuraFilePath := A_ScriptDir "\AuraList.ini"
 
 if (FileExist(iconFilePath)) {
     Menu, Tray, Icon, %iconFilePath%
@@ -30,7 +28,7 @@ try {
 } catch {
     if !FileExist(fishSolAuraFilePath) {
         MsgBox, 16, Error, Failed to download Auras and no local backup exists. Please download the Aura List from https://github.com/knowaery/Aery-s-fishSol/releases and place it into the backup folder.
-        BackupAurasURL := "\backup\AuraList.ini"
+        BackupAurasURL := "\files\backup\AuraList.ini"
         if FileExist(BackupAurasURL) {
             FileCopy, %BackupAurasURL%, %fishSolAuraFilePath%
         }
@@ -351,36 +349,36 @@ if (FileExist(fishSolSettingsFilePath)) {
 Devs := [{dev_name:"mongoosee"
          , dev_role:"Biome Image Credits"
          , dev_discord:"Website"
-         , dev_img: A_ScriptDir . "\img\mongoosee.png"
+         , dev_img: A_ScriptDir . "\files\img\mongoosee.png"
          , dev_link:"https://mongoosee.com/"
          , dev_website:"https://mongoosee.com/"}
         ,{dev_name:"ivelchampion249"
          , dev_role:"Original Creator"
          , dev_discord:"Youtube"
-         , dev_img: A_ScriptDir . "\img\Ivel.png"
+         , dev_img: A_ScriptDir . "\files\img\Ivel.png"
          , dev_link:"https://www.youtube.com/@ivelchampion"}
        ,{dev_name:"cresqnt"
          , dev_role:"Frontend Developer"
          , dev_discord:"Website"
-         , dev_img: A_ScriptDir . "\img\cresqnt.png"
+         , dev_img: A_ScriptDir . "\files\img\cresqnt.png"
          , dev_link:"https://cresqnt.com"
          , dev_website:"https://cresqnt.com"}
        ,{dev_name:"Nadir Rift"
          , dev_role:"General Programmer"
          , dev_discord:"Twitch"
-         , dev_img: A_ScriptDir . "\img\nadir.png"
+         , dev_img: A_ScriptDir . "\files\img\nadir.png"
          , dev_link:"https://www.twitch.tv/nadirrift"
          , dev_egg:"Bonk"}
        ,{dev_name:"Maxstellar/purestellenium"
         , dev_role:"Lead Developer"
         , dev_discord:"Github"
-        , dev_img: A_ScriptDir . "\img\maxstellar.png"
+        , dev_img: A_ScriptDir . "\files\img\maxstellar.png"
         , dev_link:"https://github.com/purestellenium"
         , dev_website:""}
        ,{dev_name:"aery"
         , dev_role:"Editor"
         , dev_discord:""
-        , dev_img: A_ScriptDir . "\img\aery.png"
+        , dev_img: A_ScriptDir . "\files\img\aery.png"
         , dev_link:""
         , dev_website:""}]
 
@@ -411,7 +409,7 @@ Gui, Color, 041024
 
 Gui, Font, s30 cWhite Bold, Segoe UI
 Gui, Font, s17 cWhite Bold, Segoe UI
-Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.8
+Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.8-1
 
 Gui, Font, s9 cWhite Normal, Segoe UI
 
@@ -543,7 +541,7 @@ Gui, Add, Text, x130 y248 w60 h25 vUseNothingStatus BackgroundTrans, OFF
 Gui, Font, s11 cWhite Bold
 Gui, Add, GroupBox, x22 y291 w270 h230 cWhite, Biome Devices:
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x37 y313 w250 h50 BackgroundTrans, Togge which biome devices you want to be automatically used during fishing. (Strange Controller, Biome Randomizer, Biome Selector)
+Gui, Add, Text, x37 y313 w250 h50 BackgroundTrans, (During Macro) Toggle which biome devices you want the macro to use (Strange Controller, Biome Randomizer, Biome Selector)
 
 Gui, Font, s10 cWhite Bold, Segoe UI
 Gui, Add, Text, x30 y370 w120 h25 BackgroundTrans, Strange Controller:
@@ -761,7 +759,7 @@ Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y490 w480 h1 0x10 BackgroundTrans
 
 Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y495 w500 h15 BackgroundTrans, Aery's fishSol v1.8
+Gui, Add, Text, x50 y495 w500 h15 BackgroundTrans, Aery's fishSol v1.8-1
 Gui, Add, Text, x300 y495 w500 h15 BackgroundTrans, If you need help, message me on discord. (noaery)
 Gui, Add, Text, x50 y505 w505 h15 BackgroundTrans c0x0088FF gReleasesClick +0x200, https://github.com/knowaery/Aery-s-Fishsol
 
@@ -811,12 +809,12 @@ Gui, Font, s9 c1559C9 Bold, Trajan Pro
 Gui, Add, Text, x475 y189 w600 h100 BackgroundTrans, Bounded:
 
 Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x35 y105 w534 h100 BackgroundTrans c0xCCCCCC, Adds the nessecary potions and/or auras to craft potions. Please already put the desired item on auto craft. You MUST be inside of Stella's Cauldron's UI. Toggling the auras listed below means adding them to the desired potion from your inventory and turns on Add Everything.
+Gui, Add, Text, x35 y105 w534 h100 BackgroundTrans c0xCCCCCC, Auto Craft, in Stella's Cauldron's UI, automatically adds the nessecary potions/auras to the potion you want to craft. Toggling the auras below enables the macro to use Add Everything.
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, DropDownList, x60 y167 w120 vAutoCraft gSelectItem, Heavenly Potion|Bound Potion|Jewelry Potion|Zombie Potion|Rage Potion|Diver Potion
 GuiControl, Choose, AutoCraft, %selectedItem%
 
-Gui, Show, w600 h570,  Aery's fishSol v1.8
+Gui, Show, w600 h570,  Aery's fishSol v1.8-1
 
 UpdateStatus(initialToggle, convert) {
     GuiControl,, %initialToggle%, % convert ? "ON" : "OFF"
@@ -1163,7 +1161,7 @@ SendWebhook(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8"","
+    . """text"": ""Aery's fishSol v1.8-1"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1207,7 +1205,7 @@ SendWebhook2(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8"","
+    . """text"": ""Aery's fishSol v1.8-1"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1241,7 +1239,7 @@ SendWebhookForcePing(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8"","
+    . """text"": ""Aery's fishSol v1.8-1"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1285,7 +1283,7 @@ SendWebhook4(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8"","
+    . """text"": ""Aery's fishSol v1.8-1"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1324,7 +1322,7 @@ SendWebhookMonarch(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8"","
+    . """text"": ""Aery's fishSol v1.8-1"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1353,7 +1351,7 @@ SendWebhookAuras(text, color := 16777215) {
     . """embeds"": [{"
     . """description"": "" ### Aura Equipped - " auraName ""","
     . """color"": " auracolor ","
-    . """footer"": {""text"": ""Aery's fishSol v1.8"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+    . """footer"": {""text"": ""Aery's fishSol v1.8-1"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
     . """timestamp"": """ timestamp """"
     . "}]}"
 
@@ -1721,9 +1719,13 @@ RunRejoin() {
 }
 
 RunRejoin2() {
-    global privateServerLinkDeepLink
-    SendWebhook("Rejoining Server link...", 0)
-    Run, % "powershell -NoProfile -Command ""Start-Process '" . privateServerLinkDeepLink . "'"""
+    global privateServerLinkDeepLink, privateServerLink
+    if (privateServerLink != "") {
+        SendWebhook("Rejoining Server link...", 0)
+        Run, % "powershell -NoProfile -Command ""Start-Process '" . privateServerLinkDeepLink . "'"""
+    } else {
+        MsgBox, 16, Error, No private server link.
+    }
 }
 
 ZeusAbility() {
@@ -2669,7 +2671,7 @@ OpenWebhookList:
 
     Gui, Add, Button, x310 y210 w80 h25 gToggleActivationMessage vActivationMessageBtn, Toggle
     Gui, Font, s10 cWhite Normal
-    Gui, Add, Text, x40 y214 w300 h25 BackgroundTrans c0xCCCCCC, Message if macro has been started/stopped: 
+    Gui, Add, Text, x40 y214 w300 h25 BackgroundTrans c0xCCCCCC, Message if macro has started/stopped: 
     Gui, Font, s9 c0xCCCCCC Bold   
     Gui, Add, Text, x400 y214 w60 h25 vActivationMessageStatus BackgroundTrans, OFF
 
@@ -3725,20 +3727,16 @@ return
 
 Bonk:
     SetTimer, ResetBonkFunc, Off
-    GuiControl,, IMG_Bonk , ./img/nadir_bonk.png
-    SoundPlay, ./img/bonk.mp3
+    GuiControl,, IMG_Bonk , ./files/img/nadir_bonk.png
+    SoundPlay, ./files/img/bonk.mp3
     while GetKeyState("LButton", "P")
         sleep 1
-    GuiControl,, IMG_Bonk , ./img/nadir_unbonk.png
+    GuiControl,, IMG_Bonk , ./files/img/nadir_unbonk.png
     SetTimer, ResetBonkFunc, -3000
 return
 
-RemoveToolTip:
-    ToolTip
-return
-
 ResetBonkFunc:
-    GuiControl,, IMG_Bonk , ./img/nadir.png
+    GuiControl,, IMG_Bonk , ./files/img/nadir.png
 Return
 
 LazyCheckItemDescription(senstivity, list*) {

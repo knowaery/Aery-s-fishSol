@@ -1,21 +1,25 @@
-August 24th, 2026                                                                                                 (Commit 271)
-                                                                                                                             1.8 - 4
-• Changed how Strange Controller/Biome Randomizer exit the inventory                                                                                                                            
-• Fixed the last of several Frontend/Backend issues on the Credits tab
-• Added a Start/Stop Button to Auto Craft
+August 30th, 2026                                                                                               (Commit 273)
+                                                                                                                    1.8-1 (Release)
+• Changed the format how the script loads (Loader.ahk wil automatically update to the latest version)
 
 All Commits are listed on the GitHub
 https://github.com/knowaery/Aery-s-fishSol
 
 --
 
-August 23rd, 2026                                                                                                 (Commit 270)
+August 24th, 2026                                                                                               (Commit 271)
+                                                                                                                             1.8 - 4
+• Changed how Strange Controller/Biome Randomizer exit the inventory                                                                                                                            
+• Fixed the last of several Frontend/Backend issues on the Credits tab
+• Added a Start/Stop Button to Auto Craft
+
+August 23rd, 2026                                                                                               (Commit 270)
                                                                                                                              1.8 - 3
 • Fixed several Frontend/Backend issues on the Credits tab
 
 --
 
-August 22nd, 2026                                                                                                 (Commit 269)
+August 22nd, 2026                                                                                               (Commit 269)
                                                                                                                              1.8 - 2
 • Removed Limbo Fish
 • Moved Restart Macro Failsafe to Main Tab
