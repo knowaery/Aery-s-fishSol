@@ -22,7 +22,7 @@ if (FileExist(iconFilePath)) {
     Menu, Tray, Icon, %iconFilePath%
 }
 
-AurasURL := "https://raw.githubusercontent.com/knowaery/Aery-s-fishSol/main/AuraList.ini"
+AurasURL := "https://raw.githubusercontent.com/knowaery/Aery-s-fishSol/main/files/AuraList.ini"
 try {
     UrlDownloadToFile, %AurasURL%, %fishSolAuraFilePath%
 } catch {

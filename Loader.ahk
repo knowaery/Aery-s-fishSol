@@ -3,7 +3,7 @@
 #NoEnv
 #SingleInstance Force
 SetWorkingDir %A_ScriptDir%
-fishSolScriptPath := A_ScriptDir "\Aery's fishSol.ahk"
+fishSolScriptPath := A_ScriptDir "\files\Aery's fishSol.ahk"
 fishSolURL := "https://raw.githubusercontent.com/knowaery/Aery-s-fishSol/main/files/Aery's%20fishSol.ahk"
 
 try {
