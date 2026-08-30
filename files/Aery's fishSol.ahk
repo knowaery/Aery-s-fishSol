@@ -6,9 +6,9 @@ EnvGet, LocalAppData, LOCALAPPDATA
 SetWorkingDir %A_ScriptDir%
 CoordMode, Mouse, Screen
 CoordMode, Pixel, Screen
-iconFilePath := A_ScriptDir "\files\img\icon.ico"
-fishSolSettingsFilePath := A_ScriptDir "\files\settings.ini"
-fishSolAuraFilePath := A_ScriptDir "\files\AuraList.ini"
+iconFilePath := A_ScriptDir "img\icon.ico"
+fishSolSettingsFilePath := A_ScriptDir "\settings.ini"
+fishSolAuraFilePath := A_ScriptDir "\AuraList.ini"
 
 ; Abandoned function
 /* Put settings & AuraList into LocalAppData
@@ -27,11 +27,7 @@ try {
     UrlDownloadToFile, %AurasURL%, %fishSolAuraFilePath%
 } catch {
     if !FileExist(fishSolAuraFilePath) {
-        MsgBox, 16, Error, Failed to download Auras and no local backup exists. Please download the Aura List from https://github.com/knowaery/Aery-s-fishSol/releases and place it into the backup folder.
-        BackupAurasURL := "\files\backup\AuraList.ini"
-        if FileExist(BackupAurasURL) {
-            FileCopy, %BackupAurasURL%, %fishSolAuraFilePath%
-        }
+        MsgBox, 16, Error, Failed to download Auras and no local backup exists. Please download the Aura List from https://github.com/knowaery/Aery-s-fishSol/releases and place it into the this folder.
     }
 }
 
@@ -349,36 +345,36 @@ if (FileExist(fishSolSettingsFilePath)) {
 Devs := [{dev_name:"mongoosee"
          , dev_role:"Biome Image Credits"
          , dev_discord:"Website"
-         , dev_img: A_ScriptDir . "\files\img\mongoosee.png"
+         , dev_img: A_ScriptDir . "\img\mongoosee.png"
          , dev_link:"https://mongoosee.com/"
          , dev_website:"https://mongoosee.com/"}
         ,{dev_name:"ivelchampion249"
          , dev_role:"Original Creator"
          , dev_discord:"Youtube"
-         , dev_img: A_ScriptDir . "\files\img\Ivel.png"
+         , dev_img: A_ScriptDir . "\img\Ivel.png"
          , dev_link:"https://www.youtube.com/@ivelchampion"}
        ,{dev_name:"cresqnt"
          , dev_role:"Frontend Developer"
          , dev_discord:"Website"
-         , dev_img: A_ScriptDir . "\files\img\cresqnt.png"
+         , dev_img: A_ScriptDir . "\img\cresqnt.png"
          , dev_link:"https://cresqnt.com"
          , dev_website:"https://cresqnt.com"}
        ,{dev_name:"Nadir Rift"
          , dev_role:"General Programmer"
          , dev_discord:"Twitch"
-         , dev_img: A_ScriptDir . "\files\img\nadir.png"
+         , dev_img: A_ScriptDir . "\img\nadir.png"
          , dev_link:"https://www.twitch.tv/nadirrift"
          , dev_egg:"Bonk"}
        ,{dev_name:"Maxstellar/purestellenium"
         , dev_role:"Lead Developer"
         , dev_discord:"Github"
-        , dev_img: A_ScriptDir . "\files\img\maxstellar.png"
+        , dev_img: A_ScriptDir . "\img\maxstellar.png"
         , dev_link:"https://github.com/purestellenium"
         , dev_website:""}
        ,{dev_name:"aery"
         , dev_role:"Editor"
         , dev_discord:""
-        , dev_img: A_ScriptDir . "\files\img\aery.png"
+        , dev_img: A_ScriptDir . "\img\aery.png"
         , dev_link:""
         , dev_website:""}]
 
@@ -3727,16 +3723,16 @@ return
 
 Bonk:
     SetTimer, ResetBonkFunc, Off
-    GuiControl,, IMG_Bonk , ./files/img/nadir_bonk.png
-    SoundPlay, ./files/img/bonk.mp3
+    GuiControl,, IMG_Bonk , ./img/nadir_bonk.png
+    SoundPlay, ./img/bonk.mp3
     while GetKeyState("LButton", "P")
         sleep 1
-    GuiControl,, IMG_Bonk , ./files/img/nadir_unbonk.png
+    GuiControl,, IMG_Bonk , ./img/nadir_unbonk.png
     SetTimer, ResetBonkFunc, -3000
 return
 
 ResetBonkFunc:
-    GuiControl,, IMG_Bonk , ./files/img/nadir.png
+    GuiControl,, IMG_Bonk , .img/nadir.png
 Return
 
 LazyCheckItemDescription(senstivity, list*) {
