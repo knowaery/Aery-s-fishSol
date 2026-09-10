@@ -1,11 +1,23 @@
+September 10, 2026                                                                                              (Commit 279)
+                                                                                                                1.8-2 (Release)
+• Change the script's webhook asset's URLS; Any version 
+before 1.8-1's webhook assets will not work.
+• Added Incinerator Biome Detection
+• Added Crabtropica aura webhook
+• Added Daily Rewards Failsafe
+• Removed Dev6
+
+All Commits are listed on the GitHub
+https://github.com/knowaery/Aery-s-fishSol
+
+--
+
 August 30th, 2026                                                                                               (Commit 273)
                                                                                                                     1.8-1 (Release)
 • Changed the format how the script loads (Loader.ahk wil automatically update to the latest version)
 
 All Commits are listed on the GitHub
 https://github.com/knowaery/Aery-s-fishSol
-
---
 
 August 24th, 2026                                                                                               (Commit 271)
                                                                                                                              1.8 - 4

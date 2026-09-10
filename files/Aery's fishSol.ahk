@@ -10,14 +10,6 @@ iconFilePath := A_ScriptDir "img\icon.ico"
 fishSolSettingsFilePath := A_ScriptDir "\settings.ini"
 fishSolAuraFilePath := A_ScriptDir "\AuraList.ini"
 
-; Abandoned function
-/* Put settings & AuraList into LocalAppData
-fishSolFilePath := LocalAppData . "\Aery's fishSol"
-FileCreateDir, %fishSolFilePath%
-fishSolSettingsFilePath := fishSolFilePath . "\settings.ini"
-fishSolAuraFilePath := fishSolFilePath . "\AuraList.ini"
-*/
-
 if (FileExist(iconFilePath)) {
     Menu, Tray, Icon, %iconFilePath%
 }
@@ -27,7 +19,7 @@ try {
     UrlDownloadToFile, %AurasURL%, %fishSolAuraFilePath%
 } catch {
     if !FileExist(fishSolAuraFilePath) {
-        MsgBox, 16, Error, Failed to download Auras and no local backup exists. Please download the Aura List from https://github.com/knowaery/Aery-s-fishSol/releases and place it into the this folder.
+        MsgBox, 16, Error, Failed to get Aura List. Please download the Aura List from https://github.com/knowaery/Aery-s-fishSol/releases and place it into the files folder.
     }
 }
 
@@ -37,108 +29,117 @@ AuraListOrder := StrSplit(AuraListOrderRaw, ",")
 AuraListTransOrder := StrSplit(AuraListTransOrderRaw, ",")
 AuraList := {}
 for i, aura in AuraListOrder
-    AuraList[aura] := 1
+AuraList[aura] := 1
+
+EnabledAuras := {}
+for i, aura in AuraListOrder
+EnabledAuras[aura] := 1
 
 AuraListTrans := {}
 for i, aura in AuraListTransOrder
     AuraListTrans[aura] := 1
 
-EnabledAuras := {}
-for i, aura in AuraListOrder
-    EnabledAuras[aura] := 1
-
 auracolor := 0
 if (biomeData = "") {
     biomeData := {}
-    biomeData["NORMAL"]       := {color: 0,         thumbnail: "https://cdn.mongoosee.com/assets/biomes/NORMAL.png"}
-    biomeData["WINDY"]        := {color: 10150399,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/WINDY.png"}
-    biomeData["RAINY"]        := {color: 163773,    thumbnail: "https://cdn.mongoosee.com/assets/biomes/RAINY.png"}
-    biomeData["SNOWY"]        := {color: 14479353,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/SNOWY.png"}
-    biomeData["SAND STORM"]   := {color: 9401431,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/SAND%20STORM.png"}
-    biomeData["HELL"]         := {color: 16730905,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/HELL.png"}
-    biomeData["STARFALL"]     := {color: 72375,     thumbnail: "https://cdn.mongoosee.com/assets/biomes/STARFALL.png"}
-    biomeData["CORRUPTION"]   := {color: 7155368,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/CORRUPTION.png"}
-    biomeData["NULL"]         := {color: 8618883,   thumbnail: "https://cdn.mongoosee.com/assets/biomes/NULL.png"}
-    biomeData["GLITCHED"]     := {color: 12582656,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/GLITCHED.png"}
-    biomeData["DREAMSPACE"]   := {color: 15376858,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/DREAMSPACE.png"}
-    biomeData["HEAVEN"]       := {color: 16769184,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/HEAVEN.png"}
-    biomeData["CYBERSPACE"]   := {color: 663101,    thumbnail: "https://cdn.mongoosee.com/assets/biomes/CYBERSPACE.png"}
-    biomeData["SINGULARITY"]  := {color: 13582371,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/SINGULARITY.png"}
-    biomeData["BLAZING SUN"]  := {color: 16106050,  thumbnail: "https://cdn.mongoosee.com/assets/biomes/BLAZING%20SUN.png"}
-    biomeData["AURORA"]       := {color: 9065205, thumbnail: "https://cdn.mongoosee.com/assets/biomes/AURORA.png"}
-    biomeData["GRAVEYARD"]    := {color: 0, thumbnail: "https://cdn.mongoosee.com/assets/biomes/GRAVEYARD.png"}
-    biomeData["PUMPKIN MOON"] := {color: 0, thumbnail: "https://cdn.mongoosee.com/assets/biomes/PUMPKIN%20MOON.png"}
-    biomeData["BLOOD RAIN"]   := {color: 0, thumbnail: "https://cdn.mongoosee.com/assets/biomes/BLOOD%20RAIN.png"}
+    biomeData["NORMAL"]       := {color: 0,         thumbnail: "https://knowaery.github.io/assets/biomes/NORMAL.png"}
+    biomeData["WINDY"]        := {color: 10150399,  thumbnail: "https://knowaery.github.io/assets/biomes/WINDY.png"}
+    biomeData["RAINY"]        := {color: 163773,    thumbnail: "https://knowaery.github.io/assets/biomes/RAINY.png"}
+    biomeData["SNOWY"]        := {color: 14479353,  thumbnail: "https://knowaery.github.io/assets/biomes/SNOWY.png"}
+    biomeData["SAND STORM"]   := {color: 9401431,   thumbnail: "https://knowaery.github.io/assets/biomes/SAND%20STORM.png"}
+    biomeData["HELL"]         := {color: 16730905,  thumbnail: "https://knowaery.github.io/assets/biomes/HELL.png"}
+    biomeData["STARFALL"]     := {color: 72375,     thumbnail: "https://knowaery.github.io/assets/biomes/STARFALL.png"}
+    biomeData["CORRUPTION"]   := {color: 7155368,   thumbnail: "https://knowaery.github.io/assets/biomes/CORRUPTION.png"}
+    biomeData["NULL"]         := {color: 8618883,   thumbnail: "https://knowaery.github.io/assets/biomes/NULL.png"}
+    biomeData["GLITCHED"]     := {color: 12582656,  thumbnail: "https://knowaery.github.io/assets/biomes/GLITCHED.png"}
+    biomeData["DREAMSPACE"]   := {color: 15376858,  thumbnail: "https://knowaery.github.io/assets/biomes/DREAMSPACE.png"}
+    biomeData["HEAVEN"]       := {color: 16769184,  thumbnail: "https://knowaery.github.io/assets/biomes/HEAVEN.png"}
+    biomeData["CYBERSPACE"]   := {color: 663101,    thumbnail: "https://knowaery.github.io/assets/biomes/CYBERSPACE.png"}
+    biomeData["SINGULARITY"]  := {color: 13582371,  thumbnail: "https://knowaery.github.io/assets/biomes/SINGULARITY.png"}
+    biomeData["BLAZING SUN"]  := {color: 16106050,  thumbnail: "https://knowaery.github.io/assets/biomes/BLAZING%20SUN.png"}
+    biomeData["AURORA"]       := {color: 9065205, thumbnail: "https://knowaery.github.io/assets/biomes/AURORA.png"}
+    biomeData["GRAVEYARD"]    := {color: 0, thumbnail: "https://knowaery.github.io/assets/biomes/GRAVEYARD.png"}
+    biomeData["PUMPKIN MOON"] := {color: 0, thumbnail: "https://knowaery.github.io/assets/biomes/PUMPKIN%20MOON.png"}
+    biomeData["BLOOD RAIN"]   := {color: 0, thumbnail: "https://knowaery.github.io/assets/biomes/BLOOD%20RAIN.png"}
+    biomeData["INCINERATOR"]   := {color: 10373176, thumbnail: "https://knowaery.github.io/assets/biomes/INCINERATOR.png"}
 }
 
 ROBLOX_LOGS := LocalAppData "\Roblox\logs\*.log"
+
+; Main
 res := "1080p"
 maxLoopCount := 30
 fishingLoopCount := 15
 advancedFishingDetection := false
+advancedFishingThreshold := 25
+fishingFailsafeTime := 31
 azertyPathing := false
-autoUnequip := false
+privateServerLink := ""
+
+; Biome/biome item stuff
+biomeDetect := false
+prevBiome := "None"
+currentBiome := "None"
 strangeController := false
+strangeControllerTime := 0
+strangeControllerInterval := 1260000
+strangeControllerLastRun := 0
 biomeRandomizer := false
+biomeRandomizerTime := 300000
+biomeRandomizerInterval := 2160000
+biomeRandomizerLastRun := 0
 biomeSelector := false
 selectedBiome := "Windy"
-strangeControllerTime := 0
-biomeRandomizerTime := 300000
 biomeSelectorTime := 1000
-strangeControllerInterval := 1260000
-biomeRandomizerInterval := 2160000
-elapsed := 0
-strangeControllerLastRun := 0
-biomeRandomizerLastRun := 0
+biomeSelectorInterval := 3660000
 biomeSelectorLastRun := 0
-privateServerLink := ""
+autoWarp := false
+
+; Failsafes & timers
+elapsed := 0
 globalFailsafeTimer := 0
-fishingFailsafeTime := 31
+failsafeTime := 0
 autoRejoinFailsafeTime := 320
-advancedFishingThreshold := 25
-webhookURL := ""
-prevBiome := "None"
-prevState := "None"
-currentBiome := "None"
-sentstoragefull := false
+restartMacroFailsafe := false
+restartMacroFailsafeTriggers := 0
 triggerDelayGlobal := 10000
 triggerDelayTrans := 20000
+
+; Auras
+prevState := "None"
 auraDetection := false
 detectGlobal := false
 detectTrans := false
+autoUnequip := false
+auraFilter := false
+decideAuraClip := false
+ping4Aura := true
+
+; Webhook stuff
+webhookURL := ""
+webhookID := ""
 clipWebhook := false
 clipWebhookPing := false
-globalTranscendentPing := false
-useCelestial := false
-useExotic := false
-useBounded := false
-auraFilter := false
-biomeDetect := false
-restartMacroFailsafe := false
-useNothing := false
-autoWarp := false
-webhookID := ""
-biomeIndex := 0
-potionCraftCount := 1
-selectedItem := "Heavenly Potion"
-selectedItem2 := "Heavenly Potion"
-autoClicker := false
-biomeSelectorInterval := 3660000
-failsafeTime := 0
-fishInLimbo := false
-decideAuraClip := false
-limboFailsafe := false
-pscode := ""
-ClipType := "Nvidia: Alt + F10"
-SkipType := "Warp Potion"
-CloseCollectionType := "Click"
 activationMessage := false
 biomeItemMessage := false
 failsafeMessage := false
 failsafeMessagePing := false
 restartMacroFailsafePing := false
-restartMacroFailsafeTriggers := 0
-ping4Aura := true
+sentstoragefull := false
+globalTranscendentPing  := false
+
+; Auto craft
+selectedItem := "Heavenly Potion"
+useCelestial := false
+useExotic := false
+useBounded := false
+useNothing := false
+
+; Misc
+ClipType := "Nvidia: Alt + F10"
+SkipType := "Warp Potion"
+CloseCollectionType := "Click"
+autoClicker := false
 
 if (FileExist(fishSolSettingsFilePath)) {
     IniRead, tempMaxLoop, %fishSolSettingsFilePath%, Macro, maxLoopCount
@@ -165,11 +166,6 @@ if (FileExist(fishSolSettingsFilePath)) {
     if (tempAdvancedDetection != "ERROR")
     {
         advancedFishingDetection := (tempAdvancedDetection = "true" || tempAdvancedDetection = "1")
-    }
-    IniRead, tempAutoRejoinFailsafe, %fishSolSettingsFilePath%, Macro, autoRejoinFailsafeTime
-    if (tempAutoRejoinFailsafe != "ERROR" && tempAutoRejoinFailsafe > 0)
-    {
-        autoRejoinFailsafeTime := tempAutoRejoinFailsafe
     }
     IniRead, tempAutoUnequip, %fishSolSettingsFilePath%, Macro, autoUnequip
     if (tempAutoUnequip != "ERROR")
@@ -271,33 +267,13 @@ if (FileExist(fishSolSettingsFilePath)) {
     if (tempWebhookID != "ERROR")
         webhookID := tempWebhookID
 
-    IniRead, tempBiomeIndex, %fishSolSettingsFilePath%, Macro, biomeIndex
-    if (tempBiomeIndex != "ERROR" && tempBiomeIndex > 0)
-        biomeIndex := tempBiomeIndex
-
-    IniRead, tempPotionCraftCount, %fishSolSettingsFilePath%, Macro, potionCraftCount
-    if (tempPotionCraftCount != "ERROR" && tempPotionCraftCount > 0)
-        potionCraftCount := tempPotionCraftCount
-
     IniRead, tempSelectedItem, %fishSolSettingsFilePath%, Macro, selectedItem
     if (tempSelectedItem != "ERROR")
         selectedItem := tempSelectedItem
 
-    IniRead, tempSelectedItem2, %fishSolSettingsFilePath%, Macro, selectedItem2
-    if (tempSelectedItem2 != "ERROR")
-        selectedItem2 := tempSelectedItem2
-
     IniRead, tempAutoClicker, %fishSolSettingsFilePath%, Macro, autoClicker
     if (tempAutoClicker != "ERROR")
         autoClicker := (tempAutoClicker = "true" || tempAutoClicker = "1")
-
-    IniRead, tempFishInLimbo, %fishSolSettingsFilePath%, Macro, fishInLimbo
-    if (tempFishInLimbo != "ERROR")
-        fishInLimbo := (tempFishInLimbo = "true" || tempFishInLimbo = "1")
-
-    IniRead, tempLimboFailsafe, %fishSolSettingsFilePath%, Macro, limboFailsafe
-    if (tempLimboFailsafe != "ERROR")
-        limboFailsafe := (tempLimboFailsafe = "true" || tempLimboFailsafe = "1")
 
     IniRead, tempActivationMessage, %fishSolSettingsFilePath%, Macro, activationMessage
     if (tempActivationMessage != "ERROR")
@@ -342,13 +318,7 @@ if (FileExist(fishSolSettingsFilePath)) {
 }
 
 
-Devs := [{dev_name:"mongoosee"
-         , dev_role:"Biome Image Credits"
-         , dev_discord:"Website"
-         , dev_img: A_ScriptDir . "\img\mongoosee.png"
-         , dev_link:"https://mongoosee.com/"
-         , dev_website:"https://mongoosee.com/"}
-        ,{dev_name:"ivelchampion249"
+Devs := [{dev_name:"ivelchampion249"
          , dev_role:"Original Creator"
          , dev_discord:"Youtube"
          , dev_img: A_ScriptDir . "\img\Ivel.png"
@@ -378,7 +348,7 @@ Devs := [{dev_name:"mongoosee"
         , dev_link:""
         , dev_website:""}]
 
-Randomised_DevOrder := "1|2|3|4|5|6"
+Randomised_DevOrder := "1|2|3|4|5"
 Sort, Randomised_DevOrder, Random D|
 
 Randomised_DevOrder := StrSplit(Randomised_DevOrder, "|")
@@ -405,7 +375,7 @@ Gui, Color, 041024
 
 Gui, Font, s30 cWhite Bold, Segoe UI
 Gui, Font, s17 cWhite Bold, Segoe UI
-Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.8-1
+Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.8-2
 
 Gui, Font, s9 cWhite Normal, Segoe UI
 
@@ -444,21 +414,6 @@ Gui, Font, s10 cWhite Bold
 Gui, Add, Button, x250 y160 w80 h25 gToggleRestartMacroFailsafe vRestartMacroFailsafeBtn, Toggle
 Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, Text, x340 y163 w60 h25 vRestartMacroFailsafeStatus BackgroundTrans, OFF
-
-/*
-Gui, Font, s11 cWhite Bold
-Gui, Add, GroupBox, x235 y85 w330 h120 cWhite, Limbo Fish
-Gui, Font, s9 cWhite Normal
-Gui, Add, Text, x247 y105 h45 w295 BackgroundTrans c0xCCCCCC, (During Macro) Automatically uses Zeus to glitch into limbo then fish in overworld. Requires Zeus and a consistent frame rate (~60fps). (In development)
-Gui, Font, s10 cWhite Bold
-;Gui, Add, Button, x250 y160 w80 h25 gTogglefishInLimbo vfishInLimboBtn, Toggle
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-;Gui, Add, Text, x340 y163 w60 h25 vfishInLimboStatus BackgroundTrans, OFF
-
-Gui, Font, s9 c0xCCCCCC Bold, Segoe UI
-;Gui, Add, Button, x385 y159 w124 h25 gTogglelimboFailsafe vlimboFailsafeBtn, Toggle Limbo Failsafe
-Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
-*/
 
 Gui, Add, GroupBox, x30 y215 w535 h120 cWhite, Loop Count Settings
 Gui, Font, s10 cWhite Bold
@@ -713,29 +668,17 @@ Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y295 w480 h1 0x10 BackgroundTrans
 Gui, Font, s11 cWhite Normal Bold
 if (dev5_website != "") {
-    Gui, Add, Text, x280 y105 w200 h20 BackgroundTrans c0x0088FF 0x202 gDev5NameClick, %dev5_name%
+    Gui, Add, Text, x280 y170 w200 h20 BackgroundTrans c0x0088FF 0x202 gDev5NameClick, %dev5_name%
 } else {
-    Gui, Add, Text, x280 y105 w200 h20 BackgroundTrans c0x00DD00 0x202, %dev5_name%
+    Gui, Add, Text, x280 y170 w200 h20 BackgroundTrans c0x00DD00 0x202, %dev5_name%
 }
 Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x280 y125 w200 h15 BackgroundTrans 0x202, %dev5_role%
+Gui, Add, Text, x280 y190 w200 h15 BackgroundTrans 0x202, %dev5_role%
 Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x280 y140 w200 h15 BackgroundTrans c0x0088FF gDev5LinkClick 0x202, %dev5_discord%
-Gui, Add, Picture, x490 y100 w50 h50 %dev5_egg_label% %dev5_egg_variable%, %dev5_img%
+Gui, Add, Text, x280 y205 w200 h15 BackgroundTrans c0x0088FF gDev5LinkClick 0x202, %dev5_discord%
+Gui, Add, Picture, x490 y170 w50 h50 %dev5_egg_label% %dev5_egg_variable%, %dev5_img%
 Gui, Font, s8 c0x888888
 Gui, Font, s11 cWhite Normal Bold
-if (dev6_website != "") {
-    Gui, Add, Text, x280 y170 w200 h20 BackgroundTrans c0x0088FF 0x202 gDev6NameClick, %dev6_name%
-} else {
-    Gui, Add, Text, x280 y170 w200 h20 BackgroundTrans c0x00DD00 0x202, %dev6_name%
-}
-Gui, Font, s9 c0xCCCCCC Normal
-Gui, Add, Text, x280 y190 w200 h15 BackgroundTrans 0x202, %dev6_role%
-Gui, Font, s9 c0xCCCCCC Normal Underline
-Gui, Add, Text, x280 y205 w200 h15 BackgroundTrans c0x0088FF gDev6LinkClick 0x202, %dev6_discord%
-Gui, Add, Picture, x490 y170 w50 h50 %dev6_egg_label% %dev6_egg_variable%, %dev6_img%
-Gui, Font, s8 c0x888888
-Gui, Add, Text, x50 y295 w492 h1 0x10 BackgroundTrans
 
 ChangelogURL := "https://raw.githubusercontent.com/knowaery/Aery-s-fishSol/main/Changelog.txt"
 
@@ -755,7 +698,7 @@ Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y490 w480 h1 0x10 BackgroundTrans
 
 Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y495 w500 h15 BackgroundTrans, Aery's fishSol v1.8-1
+Gui, Add, Text, x50 y495 w500 h15 BackgroundTrans, Aery's fishSol v1.8-2
 Gui, Add, Text, x300 y495 w500 h15 BackgroundTrans, If you need help, message me on discord. (noaery)
 Gui, Add, Text, x50 y505 w505 h15 BackgroundTrans c0x0088FF gReleasesClick +0x200, https://github.com/knowaery/Aery-s-Fishsol
 
@@ -810,7 +753,7 @@ Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, DropDownList, x60 y167 w120 vAutoCraft gSelectItem, Heavenly Potion|Bound Potion|Jewelry Potion|Zombie Potion|Rage Potion|Diver Potion
 GuiControl, Choose, AutoCraft, %selectedItem%
 
-Gui, Show, w600 h570,  Aery's fishSol v1.8-1
+Gui, Show, w600 h570,  Aery's fishSol v1.8-2
 
 UpdateStatus(initialToggle, convert) {
     GuiControl,, %initialToggle%, % convert ? "ON" : "OFF"
@@ -821,8 +764,6 @@ UpdateStatus(initialToggle, convert) {
 UpdateStatus("AdvancedFishingDetectionStatus", advancedFishingDetection)
 UpdateStatus("AzertyPathingStatus", azertyPathing)
 UpdateStatus("RestartMacroFailsafeStatus", restartMacroFailsafe)
-UpdateStatus("FishInLimboStatus", fishInLimbo)
-UpdateStatus("LimboFailsafeStatus", limboFailsafe)
 
 ; unequip related
 if (autoUnequip && !auraDetection) {
@@ -880,8 +821,7 @@ UpdateStatus("AutoClickerStatus", autoClicker)
 
 GuiControl, ChooseString, SelectedBiome, %selectedBiome%
 SetTimer, AuraBiomeDetect, 1000
-SetTimer, ServerLinkConverter, 1000
-
+ServerLinkConverter()
 
 
 
@@ -925,6 +865,27 @@ SaveAuraFilter:
 return
 
 GuiClose:
+    Send, {w up}
+    Send, {a up}
+    Send, {s up}
+    Send, {d up}
+    Send, {space up}
+    Send, {e up}
+    Send, {esc up}
+    Send, {r up}
+    Send, {f up}
+    send, {shift up}
+    if (toggle) {
+        if (activationMessage) {
+            try SendWebhook(":red_circle: Macro Stopped.", "0")
+        }
+    } else if (autocrafting) {
+        if (activationMessage) {
+            try SendWebhook(":red_circle: Macro Stopped.", "0")
+        }
+    }
+    toggle := false
+    autocrafting := false
 ExitApp
 
 toggle := false
@@ -948,14 +909,6 @@ UpdateLoopCount:
     if (FishingLoopInput > 0) {
         fishingLoopCount := FishingLoopInput
         IniWrite, %fishingLoopCount%, %fishSolSettingsFilePath%, Macro, fishingLoopCount
-    }
-return
-
-UpdatePotionCraft:
-    Gui, Submit, NoHide
-    if (PotionCraftInput > 0) {
-        potionCraftCount := PotionCraftInput
-        IniWrite, %potionCraftCount%, %fishSolSettingsFilePath%, Macro, potionCraftCount
     }
 return
 
@@ -1068,14 +1021,6 @@ ToggleBiomeSelector:
     ToggleSetting(biomeSelector, "BiomeSelectorStatus", "biomeSelector")
 return
 
-ToggleFishInLimbo:
-    ToggleSetting(fishInLimbo, "FishInLimboStatus", "fishInLimbo")
-return
-
-ToggleLimboFailsafe:
-    ToggleSetting(limboFailsafe, "LimboFailsafeStatus", "limboFailsafe")
-return
-
 ToggleActivationMessage:
     ToggleSetting(activationMessage, "ActivationMessageStatus", "activationMessage")
 return
@@ -1100,6 +1045,7 @@ UpdatePrivateServer:
     Gui, Submit, NoHide
     privateServerLink := PrivateServerInput
     IniWrite, %privateServerLink%, %fishSolSettingsFilePath%, Macro, privateServerLink
+    ServerLinkConverter()
 return
 
 UpdateAutoRejoinFailsafe:
@@ -1157,7 +1103,7 @@ SendWebhook(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8-1"","
+    . """text"": ""Aery's fishSol v1.8-2"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1201,7 +1147,7 @@ SendWebhook2(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8-1"","
+    . """text"": ""Aery's fishSol v1.8-2"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1235,7 +1181,7 @@ SendWebhookForcePing(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8-1"","
+    . """text"": ""Aery's fishSol v1.8-2"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1279,7 +1225,7 @@ SendWebhook4(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8-1"","
+    . """text"": ""Aery's fishSol v1.8-2"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1318,7 +1264,7 @@ SendWebhookMonarch(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8-1"","
+    . """text"": ""Aery's fishSol v1.8-2"","
     . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
     . "},"
     . """timestamp"": """ timestamp """"
@@ -1347,7 +1293,7 @@ SendWebhookAuras(text, color := 16777215) {
     . """embeds"": [{"
     . """description"": "" ### Aura Equipped - " auraName ""","
     . """color"": " auracolor ","
-    . """footer"": {""text"": ""Aery's fishSol v1.8-1"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+    . """footer"": {""text"": ""Aery's fishSol v1.8-2"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
     . """timestamp"": """ timestamp """"
     . "}]}"
 
@@ -1722,147 +1668,6 @@ RunRejoin2() {
     } else {
         MsgBox, 16, Error, No private server link.
     }
-}
-
-ZeusAbility() {
-    Send, {f up}
-    Send, {f down}
-}
-
-LimboFish() {
-    sleep, 1000
-    if (limboFailsafe) {
-        Send, {Esc}
-        Sleep, 650
-        Send, R
-        Sleep, 650
-        Send, {Enter}
-        sleep 3000
-    }
-    /*
-    ; stop rolling
-    sleep, 1000
-    MouseMove, 760, 1020, 3
-    sleep, 150
-    Click, Left
-    sleep, 300
-    */
-        /*
-    if (autoUnequip && !useNothing) {
-        MouseMove, 45, 412, 3
-        sleep 150
-        Click, Left
-        sleep 150
-        MouseMove, 830, 441, 3
-        sleep 150
-        Click, Left
-        sleep 150
-        MouseMove, 634, 638, 3
-        sleep 159
-        Click, Left
-        sleep 1200
-        Click, Left
-        sleep 150
-        MouseMove, 1425, 303, 3
-        sleep 150
-        Click, Left
-        sleep 500
-    }
-
-    if (autoUnequip && useNothing) {
-        MouseMove, 45, 412, 3
-        sleep 150
-        Click, Left
-        sleep 150
-        MouseMove, 820, 340, 3
-        sleep, 250
-        Click, Left
-        sleep, 250
-        MouseMove, 820, 370, 3
-        sleep 250
-        Click, Left
-        Send, Nothing
-        sleep 150
-        MouseMove, 830, 441, 3
-        sleep 500
-        Send, {WheelUp 100}
-        Sleep, 750
-        Click, Left
-        sleep 300
-        MouseMove, 634, 638, 3
-        sleep 150
-        Click, Left
-        sleep 700
-        Click, Left
-        Sleep, 250
-        MouseMove, 1425, 303, 3
-        sleep 150
-        Click, Left
-        sleep 500
-    }
-        */
-
-    ; equips zeus
-    MouseMove, 45, 412, 3
-    sleep 150
-    Click, Left
-    MouseMove, 820, 370, 3
-    sleep 400
-    Click, Left
-    Send, Zeus
-    sleep 350
-    MouseMove, 830, 441, 3
-    sleep 500
-    Send, {WheelUp 100}
-    Sleep, 750
-    Click, Left
-    sleep 500
-    MouseMove, 634, 638, 3
-    sleep 350
-    Click, Left
-    sleep 700
-    MouseMove, 1425, 303, 3
-    sleep 350
-    Click, Left
-    sleep 600
-
-    ; open inventory for protable crack
-    MouseMove, 45, 521, 3
-    sleep 500
-    Click, Left
-    MouseMove, 1280, 343, 3
-    sleep 500
-    Click, Left
-    MouseMove, 820, 370, 3
-    sleep 500
-    Click, Left
-    Send, Portable Crack
-    sleep 350
-    MouseMove, 850, 485, 3
-    sleep 500
-    Click, Left
-
-    ; uses portable crack
-    MouseMove, 690, 585, 3
-    Send, {f up}
-    ZeusAbility()
-    Click, Left
-    sleep 2000
-    MouseMove, 45, 521, 3
-    sleep 300
-    Click, Left
-    sleep, 600
-    if (limboFailsafe) {
-        PixelGetColor, ifinlimbo, 1873 , 1050, RGB
-        if (ifinlimbo = 0xFCFCFD || ifinlimbo = 0xFDFDFE) {
-            try SendWebhookForcePing("Successfully entered Limbo!", 0)
-            FishingSpot()
-        } else {
-            try SendWebhookForcePing("Failed to enter Limbo.\n Attempting Again...", 0)
-            LimboFish()
-        }
-    }
-    enteredLimbo := true
 }
 
 ; countdown functions
@@ -2756,7 +2561,7 @@ AutoClickTick:
 return
 
 AuraBiomeDetect:
-global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiome, biome, webResponse, biomeIndex, auraColor
+global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiome, biome, webResponse, auraColor
     logDir := LocalAppData "\Roblox\logs"
 
     newestTime := 0
@@ -2840,64 +2645,69 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
                 if (auraName = "Pixelation") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2(":tada: **Mania!** :tada: \n**[1 in 1,073,741,824!]** \nAura detected: " auraName, 3348986, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/PixelationCollection.webp")
+                        SendWebhook2(":tada: **Mania!** :tada: \n**[1 in 1,073,741,824!]** \nAura detected: " auraName, 3348986, "https://knowaery.github.io/assets/auras/PixelationCollection.webp")
                     }
                 } else if (auraName = "Luminosity") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2( ":tada: **The Absolute Radiance** :tada: \n**[1 in 1,200,000,000!]** \nAura detected: " auraName , 11393254, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/ReworkedLumiCollection.webp")
+                        SendWebhook2( ":tada: **The Absolute Radiance** :tada: \n**[1 in 1,200,000,000!]** \nAura detected: " auraName , 11393254, "https://knowaery.github.io/assets/auras/ReworkedLumiCollection.webp")
                     }
                 } else if (auraName = "LEVIATHAN") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**The Ruler of the Beneath** \n**[1 in 1,730,000,000 from Rainy!]** \nAura detected: " auraName, 5600, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/LeviathanLong.png")
+                        SendWebhook2("**The Ruler of the Beneath** \n**[1 in 1,730,000,000 from Rainy!]** \nAura detected: " auraName, 5600, "https://knowaery.github.io/assets/auras/LeviathanLong.png")
                     }
                 } else if (auraName = "ASTRAIOS") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**Dragon** \n**[1 in 1,750,000,000 from Singularity!]** \nAura detected: " auraName, 3920232, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Astraios.gif")
+                        SendWebhook2("**Dragon** \n**[1 in 1,750,000,000 from Singularity!]** \nAura detected: " auraName, 3920232, "https://knowaery.github.io/assets/auras/Astraios.gif")
                     }
                 } else if (auraName = "BREAKTHROUGH") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**How much do you believe in this world?**\n**[1 in 1,999,999,999!]** \nAura detected: " auraName, 3289154, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/BreakthroughCollection.webp")
+                        SendWebhook2("**How much do you believe in this world?**\n**[1 in 1,999,999,999!]** \nAura detected: " auraName, 3289154, "https://knowaery.github.io/assets/auras/BreakthroughCollection.webp")
                     }
                 } else if (auraName = "Dream Catcher") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**I close my eyes...\nIs this a dream? ** \n**[1 in 2,222,222,222 from Nighttime!]**  \nAura detected: " auraName, 12476663, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/DreamcatcherCollection.webp")
+                        SendWebhook2("**I close my eyes...\nIs this a dream? ** \n**[1 in 2,222,222,222 from Nighttime!]**  \nAura detected: " auraName, 12476663, "https://knowaery.github.io/assets/auras/DreamcatcherCollection.webp")
                     }
                 } else if (auraName = "EQUINOX") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**Equilibrium Incarnate**\n**[1 in 2,500,000,000!]** \nAura detected: " auraName, 16777215, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/EquinoxNewCollection.webp")
+                        SendWebhook2("**Equilibrium Incarnate**\n**[1 in 2,500,000,000!]** \nAura detected: " auraName, 16777215, "https://knowaery.github.io/assets/auras/EquinoxNewCollection.webp")
                     }
                 } else if (auraName = "MONARCH") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhookMonarch("**[1 in 3,000,000,0000 from Corruption!]**\nAura detected: " auraName, 4330383, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MonarchCollection.webp")
+                        SendWebhookMonarch("**[1 in 3,000,000,0000 from Corruption!]**\nAura detected: " auraName, 4330383, "https://knowaery.github.io/assets/auras/MonarchCollection.webp")
                     }
                 } else if (auraName = "meta") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**[1 in 10,000 from Cyberspace!]**\nAura detected: " auraName , 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/MetaCollection.webp")
+                        SendWebhook2("**[1 in 10,000 from Cyberspace!]**\nAura detected: " auraName , 736657, "https://knowaery.github.io/assets/auras//MetaCollection.webp")
                     }
                 } else if (auraName = "illusionary") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                       SendWebhook2("**THE PERFECT PUPPET**\n**[1 in 10,000,000 from Cyberspace!]** \nAura detected: " auraName, 736657, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/Illusionary_curation.gif")
+                       SendWebhook2("**THE PERFECT PUPPET**\n**[1 in 10,000,000 from Cyberspace!]** \nAura detected: " auraName, 736657, "https://knowaery.github.io/assets/auras/Illusionary_curation.gif")
                     }
                 }
 
                 if (auraName = "TAVERNA") {
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2("**Opened the Tavern!**\n**[1 in 1,444,444,444 from Blazing Sun!]**\nAura detected: " auraName, 16361845, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/TavernaCollection.webp" )
+                        SendWebhook2("**Opened the Tavern!**\n**[1 in 1,444,444,444 from Blazing Sun!]**\nAura detected: " auraName, 16361845, "https://knowaery.github.io/assets/auras/TavernaCollection.webp" )
                     }
                 } else if (auraName = "CENTAURUS") {
                     ClipCountdownGlobal()
-                    if (!webReponse) {
-                        SendWebhook2("**Conqueror of the Sun!**\n**[1 in 3,000,000,000 from Blazing Sun!]**\nAura detected: " auraName, 16580586, "https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/auraimages/CentaurusCollection.png")
+                    if (!webResponse) {
+                        SendWebhook2("**Conqueror of the Sun!**\n**[1 in 3,000,000,000 from Blazing Sun!]**\nAura detected: " auraName, 16580586, "https://knowaery.github.io/assets/auras/CentaurusCollection.png")
+                    }
+                } else if (auraName = "Crabtropica") {
+                    ClipCountdownGlobal()
+                    if (!webResponse) {
+                        SendWebhook2("**:crab:**\n**[1,334,221,000 from Blazing Sun!]**\nAura detected: " auraName, 10373176, "https://knowaery.github.io/assets/auras/Crabtropica.webp")
                     }
                 }
                 
@@ -3052,7 +2862,6 @@ F1::
         }
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
-        enteredLimbo := false
         IniWrite, %selectedItem2%, %fishSolSettingsFilePath%, Macro, selectedItem2
         IniWrite, %maxLoopCount%, %fishSolSettingsFilePath%, Macro, maxLoopCount
         IniWrite, %fishingLoopCount%, %fishSolSettingsFilePath%, Macro, fishingLoopCount
@@ -3112,7 +2921,6 @@ F3::
     Send, {r up}
     Send, {f up}
     send, {shift up}
-    enteredlimbo := false
     if (toggle) {
         if (activationMessage) {
             try SendWebhook(":red_circle: Macro Stopped.", "0")
@@ -3123,6 +2931,7 @@ F3::
         }
     }
     toggle := false
+    autocrafting := false
     Reload
 return
 
@@ -3150,7 +2959,6 @@ return
 F6::
     RunRejoin2()
 return
-
 
 DoMouseMove:
 if (toggle) {
@@ -3185,16 +2993,6 @@ if (toggle) {
             } else {
                 try SendWebhookForcePing("Popping Warp Potion", 0)
             }
-            if (pendingEnterLimbo || enteredLimbo) {
-                Send, {Esc}
-                Sleep, 650
-                Send, R
-                Sleep, 650
-                Send, {Enter}
-                sleep 3000
-                pendingEnterLimbo := false
-                enteredLimbo := false
-            }
             PopSkips()
             pendingSkips := false
         }
@@ -3207,12 +3005,6 @@ if (toggle) {
                 DoAutoUnequip()
             }
             pendingUnequip := false
-        }
-        ; limbo stuff
-        if (fishInLimbo && !enteredLimbo) {
-            LimboFish()
-            enteredLimbo := true
-            SendWebhook("Mini Version")
         }
         ; SC Toggle
         if (strangeController) {
@@ -3328,6 +3120,21 @@ if (toggle) {
             sleep 200
             Send {%keyW% Up}
             sleep 300
+            Loop 3 {
+            PixelSearch, px, py, 920, 658, 999, 679, 0x7bff8e, 3, Fast RGB
+            if (ErrorLevel != 1) {
+                MouseMove, 960, 670, 3
+                sleep 200
+                MouseClick, Left
+                sleep 200
+                MouseMove, 1417, 395, 3
+                sleep 200
+                MouseClick, Left
+                sleep 200
+            } else {
+                    break
+                }
+            }
             Send {e Down}
             sleep 300
             Send {e Up}
@@ -3588,7 +3395,6 @@ StartScript:
         }
         strangeControllerLastRun := 0
         biomeRandomizerLastRun := 0
-        enteredLimbo := false
         IniWrite, %selectedItem2%, %fishSolSettingsFilePath%, Macro, selectedItem2
         IniWrite, %maxLoopCount%, %fishSolSettingsFilePath%, Macro, maxLoopCount
         IniWrite, %fishingLoopCount%, %fishSolSettingsFilePath%, Macro, fishingLoopCount
@@ -3612,7 +3418,6 @@ CloseScript:
     Send, {r up}
     Send, {f up}
     send, {shift up}
-    enteredlimbo := false
     if (toggle) {
         if (activationMessage) {
             try SendWebhook(":red_circle: Macro Stopped.", "0")
@@ -3623,6 +3428,7 @@ CloseScript:
         }
     }
     toggle := false
+    autocrafting := false
     Reload
 return
 
@@ -3709,16 +3515,6 @@ Return
 
 Dev5LinkClick:
     Run, %dev5_link%
-return
-
-Dev6NameClick:
-if (dev6_website) {
-    Run, %dev6_website%
-}
-Return
-
-Dev6LinkClick:
-    Run, %dev6_link%
 return
 
 Bonk:
