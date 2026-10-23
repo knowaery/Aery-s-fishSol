@@ -6,7 +6,7 @@ EnvGet, LocalAppData, LOCALAPPDATA
 SetWorkingDir %A_ScriptDir%
 CoordMode, Mouse, Screen
 CoordMode, Pixel, Screen
-iconFilePath := A_ScriptDir "img\icon.ico"
+iconFilePath := A_ScriptDir "\img\icon.ico"
 fishSolSettingsFilePath := A_ScriptDir "\settings.ini"
 fishSolAuraFilePath := A_ScriptDir "\AuraList.ini"
 
@@ -40,28 +40,47 @@ for i, aura in AuraListTransOrder
     AuraListTrans[aura] := 1
 
 auracolor := 0
+
 if (biomeData = "") {
     biomeData := {}
-    biomeData["NORMAL"]       := {color: 0,         thumbnail: "https://knowaery.github.io/assets/biomes/NORMAL.png"}
-    biomeData["WINDY"]        := {color: 10150399,  thumbnail: "https://knowaery.github.io/assets/biomes/WINDY.png"}
-    biomeData["RAINY"]        := {color: 163773,    thumbnail: "https://knowaery.github.io/assets/biomes/RAINY.png"}
-    biomeData["SNOWY"]        := {color: 14479353,  thumbnail: "https://knowaery.github.io/assets/biomes/SNOWY.png"}
-    biomeData["SAND STORM"]   := {color: 9401431,   thumbnail: "https://knowaery.github.io/assets/biomes/SAND%20STORM.png"}
-    biomeData["HELL"]         := {color: 16730905,  thumbnail: "https://knowaery.github.io/assets/biomes/HELL.png"}
-    biomeData["STARFALL"]     := {color: 72375,     thumbnail: "https://knowaery.github.io/assets/biomes/STARFALL.png"}
-    biomeData["CORRUPTION"]   := {color: 7155368,   thumbnail: "https://knowaery.github.io/assets/biomes/CORRUPTION.png"}
-    biomeData["NULL"]         := {color: 8618883,   thumbnail: "https://knowaery.github.io/assets/biomes/NULL.png"}
-    biomeData["GLITCHED"]     := {color: 12582656,  thumbnail: "https://knowaery.github.io/assets/biomes/GLITCHED.png"}
-    biomeData["DREAMSPACE"]   := {color: 15376858,  thumbnail: "https://knowaery.github.io/assets/biomes/DREAMSPACE.png"}
-    biomeData["HEAVEN"]       := {color: 16769184,  thumbnail: "https://knowaery.github.io/assets/biomes/HEAVEN.png"}
-    biomeData["CYBERSPACE"]   := {color: 663101,    thumbnail: "https://knowaery.github.io/assets/biomes/CYBERSPACE.png"}
-    biomeData["SINGULARITY"]  := {color: 13582371,  thumbnail: "https://knowaery.github.io/assets/biomes/SINGULARITY.png"}
-    biomeData["BLAZING SUN"]  := {color: 16106050,  thumbnail: "https://knowaery.github.io/assets/biomes/BLAZING%20SUN.png"}
-    biomeData["AURORA"]       := {color: 9065205, thumbnail: "https://knowaery.github.io/assets/biomes/AURORA.png"}
-    biomeData["GRAVEYARD"]    := {color: 0, thumbnail: "https://knowaery.github.io/assets/biomes/GRAVEYARD.png"}
-    biomeData["PUMPKIN MOON"] := {color: 0, thumbnail: "https://knowaery.github.io/assets/biomes/PUMPKIN%20MOON.png"}
-    biomeData["BLOOD RAIN"]   := {color: 0, thumbnail: "https://knowaery.github.io/assets/biomes/BLOOD%20RAIN.png"}
-    biomeData["INCINERATOR"]   := {color: 10373176, thumbnail: "https://knowaery.github.io/assets/biomes/INCINERATOR.png"}
+    biomeData["NORMAL"]       := {color: 0,         thumbnail: "https://cdn.solsstattracker.com/biomes/NORMAL.png"}
+    biomeData["WINDY"]        := {color: 10150399,  thumbnail: "https://cdn.solsstattracker.com/biomes/WINDY.png"}
+    biomeData["RAINY"]        := {color: 163773,    thumbnail: "https://cdn.solsstattracker.com/biomes/RAINY.png"}
+    biomeData["SNOWY"]        := {color: 14479353,  thumbnail: "https://cdn.solsstattracker.com/biomes/SNOWY.png"}
+    biomeData["SAND STORM"]   := {color: 9401431,   thumbnail: "https://cdn.solsstattracker.com/biomes/SAND%20STORM.png"}
+    biomeData["HELL"]         := {color: 16730905,  thumbnail: "https://cdn.solsstattracker.com/biomes/HELL.png"}
+    biomeData["STARFALL"]     := {color: 72375,     thumbnail: "https://cdn.solsstattracker.com/biomes/STARFALL.png"}
+    biomeData["CORRUPTION"]   := {color: 7155368,   thumbnail: "https://cdn.solsstattracker.com/biomes/CORRUPTION.png"}
+    biomeData["NULL"]         := {color: 8618883,   thumbnail: "https://cdn.solsstattracker.com/biomes/NULL.png"}
+    biomeData["GLITCHED"]     := {color: 12582656,  thumbnail: "https://cdn.solsstattracker.com/biomes/GLITCHED.png"}
+    biomeData["DREAMSPACE"]   := {color: 15376858,  thumbnail: "https://cdn.solsstattracker.com/biomes/DREAMSPACE.png"}
+    biomeData["HEAVEN"]       := {color: 16769184,  thumbnail: "https://cdn.solsstattracker.com/biomes/HEAVEN.png"}
+    biomeData["CYBERSPACE"]   := {color: 663101,    thumbnail: "https://cdn.solsstattracker.com/biomes/CYBERSPACE.png"}
+    biomeData["SINGULARITY"]  := {color: 13582371,  thumbnail: "https://cdn.solsstattracker.com/biomes/SINGULARITY.png"}
+    biomeData["BLAZING SUN"]  := {color: 16106050,  thumbnail: "https://cdn.solsstattracker.com/biomes/BLAZING%20SUN.png"}
+    biomeData["AURORA"]       := {color: 9065205,   thumbnail: "https://cdn.solsstattracker.com/biomes/AURORA.png"}
+    biomeData["GRAVEYARD"]    := {color: 8421504,   thumbnail: "https://cdn.solsstattracker.com/biomes/GRAVEYARD.png"}
+    biomeData["PUMPKIN MOON"] := {color: 14912571,  thumbnail: "https://cdn.solsstattracker.com/biomes/PUMPKIN%20MOON.png"}
+    biomeData["BLOOD RAIN"]   := {color: 12847366,  thumbnail: "https://cdn.solsstattracker.com/biomes/BLOOD%20RAIN.png"}
+    biomeData["INCINERATOR"]  := {color: 10373176,  thumbnail: "https://cdn.solsstattracker.com/biomes/INCINERATOR.png"}
+    biomeData["LOST FOREST"]  := {color : 671781,   thumbnail: "https://cdn.solsstattracker.com/biomes/LOST%20FOREST.png"}
+    biomeData["THE RADIANT FOREST"] := {color: 9122490, thumbnail: "https://cdn.solsstattracker.com/biomes/THE%20RADIANT%20FOREST.png"}
+}
+
+if (auraData = "") {
+    auraData := {}
+    auraData["Pixelation"]    := {color: 3348986,  msg: "**[1 in 1,073,741,824!]** \nAura detected: "}
+    auraData["Luminosity"]    := {color: 11393254, msg: "**[1 in 1,200,000,000!]** \nAura detected: "}
+    auraData["LEVIATHAN"]     := {color: 5600,     msg: "****[1 in 1,730,000,000 from Rainy!]** \nAura detected: "}
+    auraData["ASTRAIOS"]      := {color: 3920232,  msg: "**[1 in 1,750,000,000 from Singularity!]** \nAura detected: "}
+    auraData["BREAKTHROUGH"]  := {color: 3289154,  msg: "**[1 in 1,999,999,999!]** \nAura detected: "}
+    auraData["Dream Catcher"] := {color: 12476663, msg: "**[1 in 2,222,222,222 from Nighttime!]**  \nAura detected: "}
+    auraData["EQUINOX"]       := {color: 16777215, msg: "**[1 in 2,500,000,000!]** \nAura detected: "}
+    auraData["HELLBORN"]      := {color: 10373176, msg: "**[1 in 2,644,600,640]** \nAura detected: "}
+    auraData["TREE HOUSE"]    := {color: 671781,   msg: "**[3,800,000,000]** \nAura detected: "}
+    auraData["meta"]          := {color: 736657,   msg: "**[1 in 10,000 from Cyberspace!]**\nAura detected: "}
+    auraData["illusionary"]   := {color: 736657,   msg: "**THE PERFECT PUPPET**\n**[1 in 10,000,000 from Cyberspace!]** \nAura detected: "}
+    auraData["MONARCH"] := {color: 4330383, msg: "**[1 in 3,000,000,000 from Corruption!]**\nAura detected: ", monarch: true}
 }
 
 ROBLOX_LOGS := LocalAppData "\Roblox\logs\*.log"
@@ -375,7 +394,7 @@ Gui, Color, 041024
 
 Gui, Font, s30 cWhite Bold, Segoe UI
 Gui, Font, s17 cWhite Bold, Segoe UI
-Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.8-2
+Gui, Add, Text, x0 y8 w600 h45 Center BackgroundTrans c0xFFAA00, Aery's fishSol v1.9
 
 Gui, Font, s9 cWhite Normal, Segoe UI
 
@@ -698,8 +717,8 @@ Gui, Font, s8 c0x888888
 Gui, Add, Text, x50 y490 w480 h1 0x10 BackgroundTrans
 
 Gui, Font, s8 c0xCCCCCC Normal
-Gui, Add, Text, x50 y495 w500 h15 BackgroundTrans, Aery's fishSol v1.8-2
-Gui, Add, Text, x300 y495 w500 h15 BackgroundTrans, If you need help, message me on discord. (noaery)
+Gui, Add, Text, x50 y495 w500 h15 BackgroundTrans, Aery's fishSol v1.9
+Gui, Add, Text, x300 y495 w500 h15 BackgroundTrans, If you need help, message me on discord. (knowaery)
 Gui, Add, Text, x50 y505 w505 h15 BackgroundTrans c0x0088FF gReleasesClick +0x200, https://github.com/knowaery/Aery-s-Fishsol
 
 Gui, Tab, Extra
@@ -753,7 +772,7 @@ Gui, Font, s10 c0xCCCCCC Bold, Segoe UI
 Gui, Add, DropDownList, x60 y167 w120 vAutoCraft gSelectItem, Heavenly Potion|Bound Potion|Jewelry Potion|Zombie Potion|Rage Potion|Diver Potion
 GuiControl, Choose, AutoCraft, %selectedItem%
 
-Gui, Show, w600 h570,  Aery's fishSol v1.8-2
+Gui, Show, w600 h570,  Aery's fishSol v1.9
 
 UpdateStatus(initialToggle, convert) {
     GuiControl,, %initialToggle%, % convert ? "ON" : "OFF"
@@ -1103,8 +1122,8 @@ SendWebhook(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8-2"","
-    . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
+    . """text"": ""Aery's fishSol v1.9"","
+    . """icon_url"": ""https://github.com/knowaery/Aery-s-fishSol/raw/main/files/img/aery.png"""
     . "},"
     . """timestamp"": """ timestamp """"
     . "}]"
@@ -1147,8 +1166,8 @@ SendWebhook2(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8-2"","
-    . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
+    . """text"": ""Aery's fishSol v1.9"","
+    . """icon_url"": ""https://github.com/knowaery/Aery-s-fishSol/raw/main/files/img/aery.png"""
     . "},"
     . """timestamp"": """ timestamp """"
     . "}]"
@@ -1181,8 +1200,8 @@ SendWebhookForcePing(text, color := 16777215) {
     . """title"": """ text ""","
     . """color"": " color ","
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8-2"","
-    . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
+    . """text"": ""Aery's fishSol v1.9"","
+    . """icon_url"": ""https://github.com/knowaery/Aery-s-fishSol/raw/main/files/img/aery.png"""
     . "},"
     . """timestamp"": """ timestamp """"
     . "}]"
@@ -1225,8 +1244,8 @@ SendWebhook4(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8-2"","
-    . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
+    . """text"": ""Aery's fishSol v1.9"","
+    . """icon_url"": ""https://github.com/knowaery/Aery-s-fishSol/raw/main/files/img/aery.png"""
     . "},"
     . """timestamp"": """ timestamp """"
     . "}]"
@@ -1264,8 +1283,8 @@ SendWebhookMonarch(text, color := 16777215, imageURL := "") {
     . """color"": " color ","
     . imageBlock
     . """footer"": {"
-    . """text"": ""Aery's fishSol v1.8-2"","
-    . """icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png"""
+    . """text"": ""Aery's fishSol v1.9"","
+    . """icon_url"": ""https://github.com/knowaery/Aery-s-fishSol/raw/main/files/img/aery.png"""
     . "},"
     . """timestamp"": """ timestamp """"
     . "}]"
@@ -1293,7 +1312,7 @@ SendWebhookAuras(text, color := 16777215) {
     . """embeds"": [{"
     . """description"": "" ### Aura Equipped - " auraName ""","
     . """color"": " auracolor ","
-    . """footer"": {""text"": ""Aery's fishSol v1.8-2"", ""icon_url"": ""https://raw.githubusercontent.com/knowaery/Aery-s-Fishsol/main/img/yui2.png""},"
+    . """footer"": {""text"": ""Aery's fishSol v1.9"", ""icon_url"": ""https://github.com/knowaery/Aery-s-fishSol/raw/main/files/img/aery.png""},"
     . """timestamp"": """ timestamp """"
     . "}]}"
 
@@ -2414,7 +2433,7 @@ OpenAuraFilter:
         y := 55 + row * 22
         auraName := aura . "_chk"
         StringReplace, auraName, auraName, -, _, All
-        StringReplace, auraName, auraName, %A_Space%, _, All
+        StringReplace, auraNauraNameame, auraName, %A_Space%, _, All
         options := "x" x " y" y " w180 h20 BackgroundTrans c0xCCCCCC v" auraName " gAuraCheckChange"
         if (EnabledAuras[aura])
             options .= " Checked"
@@ -2642,72 +2661,15 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
 
                 
 
-                if (auraName = "Pixelation") {
+                if (auraData.HasKey(auraName)) {
+                    data := auraData[auraName]
                     ClipCountdownGlobal()
                     if (!webResponse) {
-                        SendWebhook2(":tada: **Mania!** :tada: \n**[1 in 1,073,741,824!]** \nAura detected: " auraName, 3348986, "https://knowaery.github.io/assets/auras/PixelationCollection.webp")
-                    }
-                } else if (auraName = "Luminosity") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhook2( ":tada: **The Absolute Radiance** :tada: \n**[1 in 1,200,000,000!]** \nAura detected: " auraName , 11393254, "https://knowaery.github.io/assets/auras/ReworkedLumiCollection.webp")
-                    }
-                } else if (auraName = "LEVIATHAN") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhook2("**The Ruler of the Beneath** \n**[1 in 1,730,000,000 from Rainy!]** \nAura detected: " auraName, 5600, "https://knowaery.github.io/assets/auras/LeviathanLong.png")
-                    }
-                } else if (auraName = "ASTRAIOS") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhook2("**Dragon** \n**[1 in 1,750,000,000 from Singularity!]** \nAura detected: " auraName, 3920232, "https://knowaery.github.io/assets/auras/Astraios.gif")
-                    }
-                } else if (auraName = "BREAKTHROUGH") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhook2("**How much do you believe in this world?**\n**[1 in 1,999,999,999!]** \nAura detected: " auraName, 3289154, "https://knowaery.github.io/assets/auras/BreakthroughCollection.webp")
-                    }
-                } else if (auraName = "Dream Catcher") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhook2("**I close my eyes...\nIs this a dream? ** \n**[1 in 2,222,222,222 from Nighttime!]**  \nAura detected: " auraName, 12476663, "https://knowaery.github.io/assets/auras/DreamcatcherCollection.webp")
-                    }
-                } else if (auraName = "EQUINOX") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhook2("**Equilibrium Incarnate**\n**[1 in 2,500,000,000!]** \nAura detected: " auraName, 16777215, "https://knowaery.github.io/assets/auras/EquinoxNewCollection.webp")
-                    }
-                } else if (auraName = "MONARCH") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhookMonarch("**[1 in 3,000,000,0000 from Corruption!]**\nAura detected: " auraName, 4330383, "https://knowaery.github.io/assets/auras/MonarchCollection.webp")
-                    }
-                } else if (auraName = "meta") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhook2("**[1 in 10,000 from Cyberspace!]**\nAura detected: " auraName , 736657, "https://knowaery.github.io/assets/auras//MetaCollection.webp")
-                    }
-                } else if (auraName = "illusionary") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                       SendWebhook2("**THE PERFECT PUPPET**\n**[1 in 10,000,000 from Cyberspace!]** \nAura detected: " auraName, 736657, "https://knowaery.github.io/assets/auras/Illusionary_curation.gif")
-                    }
-                }
-
-                if (auraName = "TAVERNA") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhook2("**Opened the Tavern!**\n**[1 in 1,444,444,444 from Blazing Sun!]**\nAura detected: " auraName, 16361845, "https://knowaery.github.io/assets/auras/TavernaCollection.webp" )
-                    }
-                } else if (auraName = "CENTAURUS") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhook2("**Conqueror of the Sun!**\n**[1 in 3,000,000,000 from Blazing Sun!]**\nAura detected: " auraName, 16580586, "https://knowaery.github.io/assets/auras/CentaurusCollection.png")
-                    }
-                } else if (auraName = "Crabtropica") {
-                    ClipCountdownGlobal()
-                    if (!webResponse) {
-                        SendWebhook2("**:crab:**\n**[1,334,221,000 from Blazing Sun!]**\nAura detected: " auraName, 10373176, "https://knowaery.github.io/assets/auras/Crabtropica.webp")
+                        msg := data.msg auraName
+                        if (data.monarch)
+                            SendWebhookMonarch(msg, data.color, "")
+                        else
+                            SendWebhook2(msg, data.color, "")
                     }
                 }
                 
@@ -2741,6 +2703,8 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
                 decideAuraClip := false
                 }
             }
+
+            
     
         
             if (autoWarp || biomeDetect) {
@@ -2768,7 +2732,7 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
                         . "    ""title"": ""<t:" endwebhookUnix ":F> (<t:" endwebhookUnix ":R>)"","
                         . "    ""description"": """ enddescription ""","
                         . "    ""color"": " biomeColor ","
-                        . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://purestellenium.github.io/fishSol%20icon.png""},"
+                        . "    ""footer"": {""text"": ""aery's fishSol v1.9"", ""icon_url"": ""https://github.com/knowaery/Aery-s-fishSol/raw/main/files/img/aery.png""},"
                         . "    ""timestamp"": """ endTimestamp """"
                         . "  }"
                         . "],"
@@ -2783,7 +2747,7 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
 
                     
                     ; start
-                    if ((isBiomeEnabled = 1 || biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE" || biome = "SINGULARITY") && biome != "Normal") {
+                    if ((isBiomeEnabled = 1 || biome = "GLITCHED" || biome = "DREAMSPACE" || biome = "CYBERSPACE" || biome = "SINGULARITY") && biome != "") {
 
                         if (biomeData.HasKey(biome)) {
                             biomeColor    := biomeData[biome].color
@@ -2811,7 +2775,7 @@ global webhookURL, webhookID, clipWebhookPing, prevState, blehblehbleh, prevBiom
                         . "    ""description"": """ description ""","
                         . "    ""color"": " biomeColor ","
                         . "    ""thumbnail"": {""url"": """ thumbnail_url """},"
-                        . "    ""footer"": {""text"": ""fishSol v1.9.8"", ""icon_url"": ""https://purestellenium.github.io/fishSol%20icon.png""},"
+                        . "    ""footer"": {""text"": ""aery's fishSol v1.9"", ""icon_url"": ""https://github.com/knowaery/Aery-s-fishSol/raw/main/files/img/aery.png""},"
                         . "    ""timestamp"": """ startTimestamp """"
                         . "  }"
                         . "],"

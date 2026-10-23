@@ -1,5 +1,3 @@
-;#Requires AutoHotkey v1.1
-
 #NoEnv
 #SingleInstance Force
 SetWorkingDir %A_ScriptDir%
